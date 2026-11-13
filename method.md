@@ -15,15 +15,35 @@ document is yours.
 - DECIDE: the number of turns that counts as "being followed". default: the paper says 3 or more; the
   group tables in the code use 5 (`SHARE_K` in `analyze.py`).
 
-## 2. The map
+## 2. The map and its decision points (preprocessing)
 
-- Area: Kennedy Town to Sai Ying Pun, Pok Fu Lam Road to the waterfront (`BBOX` in `config.py`).
-- Source: OpenStreetMap walking network. 3,500 junctions, 4,835 segments, 1,538 places (`build_map.py`).
-- Walking time: 1.35 m/s, stairs 2.2 times slower, 40 s per lift, 60 s felt penalty for an unlit segment
-  at night (`config.py`).
-- A turn is left, right, straight or back by the change of bearing: under 35° is straight, over 145° is
-  back (`World.turn`). A junction counts as a decision only if it has 3 or more ways.
-- DECIDE: are these walking constants sourced, or assumptions? default: assumptions, uncited.
+- Area: Kennedy Town to Sai Ying Pun, Pok Fu Lam Road to the waterfront, 22.276–22.292 N, 114.124–114.147 E
+  (`BBOX` in `config.py`).
+- Walking network (`build_map.py`): every OpenStreetMap way a pedestrian can use (footways, paths, steps,
+  pedestrian streets, corridors, cycleways, tracks and public roads), minus ways tagged foot=no,
+  foot=private or access=no, plus lifts. Largest connected part only; runs of two-way nodes contracted.
+  Result: 3,543 nodes, 4,835 segments, 155.8 km of path, 383 segments with stairs, 48 lifts. Lighting is
+  tagged on only 87 segments (2%), so it is not used in the analysis.
+- Walking time: 1.35 m/s, stairs 2.2 times slower, 40 s per lift (`config.py`).
+- Places: 1,538 named buildings and amenities in 17 categories, each snapped to the nearest network node
+  within 150 m; unnamed amenities are named after the nearest landmark (`build_map.py`, `captions.py`).
+- Decision points (`decisions.py`). The raw network has 2,372 junctions, one every 13 m on a typical trip,
+  because sidewalks and crossings are separate ways. Three steps turn it into real intersections:
+  1. a dead-end branch shorter than 15 m is not a road (188 stubs);
+  2. junctions joined by a path of at most 20 m are one intersection, shortest links first, while the
+     intersection stays within 40 m from end to end;
+  3. paths out of an intersection toward the same next intersection within 60°, or leaving within 35° of
+     each other and still within 20 m of each other 40 m from the centre (a street and its sidewalks),
+     are one road ("arm").
+  An intersection with 3 or more roads is a decision point: 573 of them (405 with 3 roads, 107 with 4, 51
+  with 5, 10 with 6). 133 intersections with 2 roads are passed through. Figure: `graphs/intersections.pdf`.
+- A decision is (intersection, road in, road out, time), the record the project plan's thermal sensors
+  would produce. The 57,223 day1 trips give 475,883 decisions: median 6 per trip, 61 m apart (quartiles
+  42–91 m). For tables a decision is also labelled front (within 40° of straight on), left, right or back;
+  93.5% of "back" decisions are crossing to the other side of the same street and walking back.
+- DECIDE: the thresholds 15 m, 20 m, 40 m, 35°, 60°. default: as above, chosen by looking at the result
+  (`graphs/intersections.pdf`, panel b). Check a few intersections you know on the ground.
+- DECIDE: are the walking constants sourced, or assumptions? default: assumptions, uncited.
 
 ## 3. The population (paper section 3.1)
 
