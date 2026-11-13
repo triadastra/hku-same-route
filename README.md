@@ -14,13 +14,27 @@ in a row, within 90 seconds, purely by coincidence.
 |---|---|
 | `hku-agents/` | The simulator: map building, people, agent tools, the day runner and the analysis. Its README explains how to run everything. |
 | `hku-agents/out/day1/analysis/` | Result tables from the 10,000-person run (one weekday, US$20.49, 57,530 trips). |
+| `hku-agents/out/day1/trips.jsonl.gz` | Every trip of the run (57,530), with each road segment, time and turn. |
+| `hku-agents/out/day1/people.jsonl.gz` | The 10,000 people: group, home, schedule and traits. |
+| `hku-agents/out/day1/agents.tar.gz` | One file per person: their whole day, including every tool call the agent made. |
 | `results.xlsx` | All the results in one workbook: a summary sheet with the key findings, then every table from the analysis. |
 | `same-route-simulator.html` | The results website. It reads `web.json` from the same folder. |
 | `amenity-heat-map.html` | Heat map of what each block is for: the 1,538 places on the map, counted per one-hectare block in eight functions. Rebuilt by `python hku-agents/export_amenity_map.py`. |
 | `web.json` | Website data exported from the run (2,000 of the 10,000 people, for the map replay). |
 
-The full per-person output (about 440 MB) and the downloaded OpenStreetMap caches are not in the
-repository; running `python pipeline.py` inside `hku-agents/` rebuilds them. Put your own Anthropic API key in
-`hku-agents/.env` (never commit it).
+The raw output of the run is compressed because the plain files are over GitHub's size limit. To
+re-run the analysis on it, unpack it in place:
+
+```bash
+cd hku-agents/out/day1
+gunzip -k trips.jsonl.gz people.jsonl.gz
+tar -xzf agents.tar.gz
+cd ../.. && python analyze.py --run day1
+```
+
+Running `python pipeline.py` inside `hku-agents/` runs a new simulation from scratch. That calls the API
+(about US$20 for 10,000 people) and gives a different day, since the agents are not deterministic. Put your
+own Anthropic API key in `hku-agents/.env` (never commit it). Downloaded OpenStreetMap caches are not in the
+repository and are fetched again when needed.
 
 Map data © OpenStreetMap contributors, ODbL.

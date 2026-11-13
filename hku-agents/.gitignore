@@ -1,11 +1,15 @@
 # API key: never commit
 .env
 # Generated outputs (hundreds of MB) and downloaded map caches.
-# Keep only the final analysis tables and run summary of the 10,000-person run.
+# Keep the 10,000-person run: analysis tables, run summary, and the raw output compressed
+# (the uncompressed files are over GitHub's size limit).
 out/*
 !out/day1/
 out/day1/*
 !out/day1/analysis/
 !out/day1/run_summary.json
+!out/day1/trips.jsonl.gz
+!out/day1/people.jsonl.gz
+!out/day1/agents.tar.gz
 data/osm_*.json
 __pycache__/
