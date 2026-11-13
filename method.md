@@ -68,21 +68,31 @@ document is yours.
 - DECIDE: is k = 3 the headline, as in the abstract? default: k = 1 to 5 in the table, 3 in the text.
 - DECIDE: fit the chain on the random-walk trips, the agent trips, or report both? default: both.
 
-## 7. Arm C: omni agents (implemented in `omni.py`, not run)
+## 7. Arm C: the live world (implemented in `hku-agents/live.py`, not run)
 
-- Design: the day1 run is the crowd. An omni agent lives its day among those recorded people, with its
-  own recorded self removed. Two extra tools: `look_around` (walkers within 50 m: a label, rough age,
-  distance, heading) and `follow` (walk 5 s behind one of them for 1 to 60 minutes).
-- The system prompt gains one neutral line saying the tools exist.
-- Limits: the crowd does not react; omni agents do not see each other; agents decide only at places, so
-  they can start following only from a place, not in the middle of a walk.
-- DECIDE: run it at all? With how many agents? default: 2,000 (about US$5).
-- DECIDE: sight distance (default 50 m), how far behind (default 5 s), how late you can still catch up
-  (default 20 s), longest follow (default 60 min).
-- DECIDE: what the agent is told about the people it sees. default: label, age decade, distance, heading.
-  Nothing about who they are or where they are going.
-- DECIDE: the wording of the system prompt line. default: "Other people are out walking too. look_around
-  shows who is near you; follow walks behind one of them."
+- No navigation app: no `go_to`, `stroll` or `route_info`. At every junction the person sees the roads
+  leading off (name, compass heading, length, stairs, lifts, unlit at night, places passed, dead ends) and
+  picks one with `walk`. `search_places` and `nearby` give only direction and straight-line distance.
+- One shared clock. Everyone whose next decision falls in the next 10 s is asked at once, then the clock
+  moves on. Each person sees the others where they really are at that moment (within 50 m: a label, age
+  decade, distance, and "walking away from you along road 2", "coming toward you", or "standing at X").
+  People inside buildings are not seen; people at parks, sights, bus stops and MTR exits are.
+- Nothing in the prompt mentions following. Whether anyone follows anyone is up to the agents.
+- The people are the first N of the day1 people (same personas, homes and timetables), so the arms are
+  compared on the same people.
+- The simulator steps in only when a trip passes 90 minutes (it walks the person to where they were going,
+  marked `auto`), and at midnight.
+- Memory: the persona card stays; the conversation keeps the last 8 to 24 exchanges.
+- Tested with a free rule-based walker (1,000 people) and with a fake API server (2,610 valid requests).
+- Estimated cost, assuming about 185 calls per person and about US$0.0002 per call (day1 measured
+  US$0.000175): 1,000 people about US$30 to 60, 2,000 about US$60 to 120, 10,000 about US$300 to 600.
+  Time at 24 calls in parallel: about 4 hours per 1,000 people.
+- DECIDE: how many people. With N people, everyone meets fewer strangers than with 10,000, so the live
+  world is only compared with the other arms on the same N people. default: none run.
+- DECIDE: what a person sees at a junction (list above), sight distance (default 50 m), clock step
+  (default 10 s), when the simulator takes over a lost walker (default 90 min).
+- DECIDE: whether the persona card's mental map, which gives walking minutes to known places, is
+  acceptable without a navigation app. default: kept.
 
 ## 8. Measures (paper section 2.1)
 

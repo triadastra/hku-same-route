@@ -6,8 +6,9 @@ and the finished run in `hku-agents/out/day1/`.
 ## Update
 
 Steps 1 to 4 are now implemented and run; results are in `hku-agents/out/day1/analysis/compare.md` and
-`graphs/`. The omni tools of step 5 are implemented in `hku-agents/omni.py` and tested with the free mock
-planner, but the paid run has not been made. Step 6 (census) and step 7 (paper text) are not started.
+`graphs/`. Step 5 was redesigned as the live world (`hku-agents/live.py`): no navigation app, one shared clock,
+every turn chosen by the agent. It is tested free but the paid run has not been made; see `method.md`,
+section 7. Step 6 (census) and step 7 (paper text) are not started.
 `method.md` exists as a skeleton with the open design choices marked `DECIDE:`. The table below describes
 the state before this work.
 

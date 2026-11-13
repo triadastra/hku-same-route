@@ -3,8 +3,6 @@
     python run_day.py --run pilot --planner mock                 # free, rule-based, for testing
     python run_day.py --run pilot-claude --planner claude --limit 20
     python run_day.py --run day1 --planner claude --budget 30    # stops starting calls at US$30
-    python run_day.py --run omni --planner claude --agents out/day1/people.jsonl --omni-crowd day1 --limit 2000
-                                                                 # the omni arm: agents who see the day1 crowd (omni.py)
 
 Each agent's day is saved to out/<run>/agents/<id>.json as soon as it finishes, so a stopped run can be
 restarted with the same command and only the unfinished agents run again.
@@ -17,7 +15,6 @@ import time
 
 import config as C
 from agent_tools import TOOLS, AgentDay, persona_card, system_prompt, tool_result_text
-from omni import OMNI_TOOLS, Crowd, OmniDay, omni_system_prompt
 from world import World, hhmm, parse_hhmm
 
 
@@ -43,9 +40,8 @@ class Spend:
 
 
 # ---------------- Claude planner ----------------
-async def claude_day(client, system, agent, world, spend, crowd=None):
-    day = OmniDay(agent, world, crowd) if crowd else AgentDay(agent, world)
-    tools = OMNI_TOOLS if crowd else TOOLS
+async def claude_day(client, system, agent, world, spend):
+    day = AgentDay(agent, world)
     messages = [{"role": "user", "content": persona_card(agent, world)}]
     cost, nudges, stop = 0.0, 0, ""
     while not day.done:
@@ -56,7 +52,7 @@ async def claude_day(client, system, agent, world, spend, crowd=None):
         if day.t >= 24 * 3600 - 60:
             stop = "midnight"; break
         resp = await client.messages.create(
-            model=C.MODEL, max_tokens=C.MAX_TOKENS, tools=tools,
+            model=C.MODEL, max_tokens=C.MAX_TOKENS, tools=TOOLS,
             system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
             messages=messages, output_config={"effort": C.EFFORT},
             cache_control={"type": "ephemeral"},
@@ -86,11 +82,9 @@ async def claude_day(client, system, agent, world, spend, crowd=None):
 
 
 # ---------------- free rule-based planner ----------------
-def mock_day(agent, world, rng, crowd=None):
-    """A simple timetable-follower that uses the same tools, for testing the pipeline at no cost.
-    With a crowd (the omni arm) it also looks around after each class and sometimes follows someone,
-    only so that those two tools get tested; it says nothing about what real agents would do."""
-    day = OmniDay(agent, world, crowd) if crowd else AgentDay(agent, world)
+def mock_day(agent, world, rng):
+    """A simple timetable-follower that uses the same tools, for testing the pipeline at no cost."""
+    day = AgentDay(agent, world)
     habits = " ".join(agent["habits"])
     ate_lunch = False
 
@@ -131,10 +125,6 @@ def mock_day(agent, world, rng, crowd=None):
         end = parse_hhmm(c["end"]) if c.get("end") else day.t + rng.randint(30, 90) * 60
         if end > day.t:
             call("stay", until=hhmm(end), activity=c["what"])
-        if crowd:
-            seen = call("look_around")["people_walking_nearby"]
-            if seen and rng.random() < 0.3:
-                call("follow", person=rng.choice(seen)["person"], minutes=rng.randint(2, 10), reason="test")
     if "gym" in habits and day.t < 20 * 3600:
         gym = call("search_places", query="sports gym", category="any")["results"]
         if gym and gym[0]["code"] != day.at:
@@ -168,7 +158,6 @@ def mock_day(agent, world, rng, crowd=None):
 # ---------------- runner ----------------
 async def run_all(args, agents, world, out_dir):
     spend = Spend(args.budget)
-    crowd = Crowd(world, args.omni_crowd) if args.omni_crowd else None
     # The budget covers the whole run, including agents finished by earlier, interrupted attempts.
     spend.usd = sum(json.loads(p.read_text(encoding="utf-8"))["cost_usd"] for p in out_dir.glob("A*.json"))
     todo = [a for a in agents if not (out_dir / f"{a['id']}.json").exists()]
@@ -177,7 +166,7 @@ async def run_all(args, agents, world, out_dir):
     if args.planner == "mock":
         rng = random.Random(args.seed)
         for a in todo:
-            rec = mock_day(a, world, rng, crowd)
+            rec = mock_day(a, world, rng)
             (out_dir / f"{a['id']}.json").write_text(json.dumps(rec, ensure_ascii=False), encoding="utf-8")
         return spend, time.time() - t0
 
@@ -186,7 +175,7 @@ async def run_all(args, agents, world, out_dir):
     except ImportError:
         raise SystemExit("Install the Anthropic SDK first:  pip install anthropic")
     client = anthropic.AsyncAnthropic(max_retries=8)
-    system = omni_system_prompt(world) if crowd else system_prompt(world)
+    system = system_prompt(world)
     sem = asyncio.Semaphore(args.concurrency)
     done, fatal = 0, []
 
@@ -196,7 +185,7 @@ async def run_all(args, agents, world, out_dir):
             if spend.exhausted or fatal:
                 return
             try:
-                rec = await claude_day(client, system, a, world, spend, crowd)
+                rec = await claude_day(client, system, a, world, spend)
             except TypeError as e:  # raised by the SDK when no API key is set at all
                 if not fatal:
                     print(f"  stopping: no API key found ({e}). Set ANTHROPIC_API_KEY first.")
@@ -237,7 +226,6 @@ def main():
     ap.add_argument("--budget", type=float, default=C.BUDGET_USD)
     ap.add_argument("--concurrency", type=int, default=C.CONCURRENCY)
     ap.add_argument("--seed", type=int, default=1)
-    ap.add_argument("--omni-crowd", default="", help="omni arm: name of a finished run whose people the agents can see and follow")
     args = ap.parse_args()
 
     world = World()
@@ -260,7 +248,7 @@ def main():
     stops = {}
     for r in recs:
         stops[r["stop"]] = stops.get(r["stop"], 0) + 1
-    summary = {"planner": args.planner, "arm": f"omni, crowd {args.omni_crowd}" if args.omni_crowd else "agents", "agents": n, "calls": calls, "trips": trips, "usd": round(usd, 4),
+    summary = {"planner": args.planner, "agents": n, "calls": calls, "trips": trips, "usd": round(usd, 4),
                "usd_per_agent": round(usd / n, 5) if n else 0, "projected_usd_10k_agents": round(usd / n * 10000, 2) if n else 0,
                "tokens_this_session": spend.tok, "seconds_this_session": round(secs, 1), "how_days_ended": stops}
     (C.OUT / args.run / "run_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

@@ -114,15 +114,23 @@ python make_compare_figures.py --run day1
 - **Random walk** (`random_walk.py`): one trip per real trip, from a random place to a random place by the
   quickest path, with the real trip's departure time and pace. Five repeats. Costs nothing.
 - **Same trips, noisy turns**: the older baseline from `analyze.py`, kept for reference.
-- **Omni agents** (`omni.py`): agents who also get `look_around` and `follow`, and live among the recorded
-  people of a finished run. This needs a paid run:
+- **Live world** (`live.py`): no navigation app. Everyone lives the day on one shared clock; at every junction
+  each person sees the roads leading off and the people around them, and picks a road. The people are the
+  first N of the day1 people. Try it free with the rule-based walker first:
 
 ```bash
-python run_day.py --run omni --planner claude --agents out/day1/people.jsonl --omni-crowd day1 --limit 2000 --budget 8
+python live.py --run live_test --planner mock --limit 1000
+```
+
+Then the real run, which costs money (see `method.md`, section 7, for the estimate). A stopped run resumes
+from its checkpoint when the same command is run again:
+
+```bash
+python live.py --run live --planner claude --limit 1000 --budget 60 --concurrency 24
 ```
 
 ```bash
-python arms.py --run day1 --omni omni
+python arms.py --run day1 --live live
 ```
 
 `arms.py` writes `out/<run>/analysis/compare.md` and its tables: shared turns per arm, the Markov chain of

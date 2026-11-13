@@ -4,7 +4,8 @@ Arms
   agents   the Agent World run (out/<run>/trips.jsonl)
   random   random place to random place by the quickest path (random_walk.py), several seeds
   noisy    the agents' own trips re-walked with softmax-noisy turns (the older baseline in analyze.py)
-  omni     agents that can see and follow the recorded crowd (out/<omni run>/trips.jsonl), if it exists
+  live     the live world (live.py): everyone on one clock, choosing every turn themselves, seeing each other.
+           It has fewer people, so it is compared with the other arms restricted to the same people.
 
 What it computes
   1. P_k and S_k for every arm (the paper's shared-turn metrics).
@@ -15,10 +16,11 @@ What it computes
   4. Road use in both arms, and how the difference relates to nearby places.
 
     python arms.py --run day1                 # about 10 minutes
-    python arms.py --run day1 --omni omni     # also include the omni run in out/omni/
+    python arms.py --run day1 --live live     # also compare the live run in out/live/
 
 Writes out/<run>/analysis/: compare.md, arms_shared_turns.csv, arms_markov.csv, junction_tests.csv,
-junction_tests_directed.csv, road_usage_compare.csv, road_amenity_regression.csv
+junction_tests_directed.csv, road_usage_compare.csv, road_amenity_regression.csv, and with --live
+live_shared_turns.csv
 """
 import argparse
 import bisect
@@ -314,11 +316,56 @@ def amenity_regression(world, ua, ur):
             for n, b, s in zip(names, beta, se)], float(r2), int(keep.sum())
 
 
+# ---------------------------------------------------------------- live arm
+def live_section(world, args, trips, rw, decision, out):
+    """The live run against the agent run and random walking, all on the same people."""
+    live_dir = C.OUT / args.live
+    live = [t for t in (json.loads(l) for l in open(live_dir / "trips.jsonl", encoding="utf-8")) if t["segments"]]
+    ids = {json.loads(p.read_text(encoding="utf-8"))["agent"]["id"] for p in (live_dir / "agents").glob("A*.json")}
+    arms = {"live": live, "agents": [t for t in trips if t["agent"] in ids], "random": [t for t in rw if t["agent"] in ids]}
+    rows, streaks = {}, {}
+    for name, ts in arms.items():
+        rows[name], streaks[name] = shared_pass(sample_of(ts, args.sample, args.seed), ts, decision)
+    with open(out / "live_shared_turns.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["k_turns_in_a_row"] + [f"p_{a}" for a in arms] + [f"s_{a}" for a in arms])
+        for k in range(1, KMAX + 1):
+            w.writerow([k] + [round(p_k(rows[a], k), 4) for a in arms] + [round(s_k(rows[a], k), 3) for a in arms])
+    label = {"live": "Live world", "agents": "Agent World, same people", "random": "Random walk, same people"}
+    L = ["", f"## Live world ({args.live}): {len(ids)} people on one clock, choosing every turn", "",
+         f"Compared on the same {len(ids)} people: their trips in the agent run, and the random walk of those trips. "
+         "With fewer people on the map, everyone meets fewer strangers, so compare these columns with each other, "
+         "not with the 10,000-person tables above.", "",
+         "| k | " + " | ".join(label.values()) + " |", "|---|---|---|---|"]
+    for k in range(1, KMAX + 1):
+        L.append(f"| {k} | " + " | ".join(f"{p_k(rows[a], k):.1%}" for a in arms) + " |")
+    L += ["", "| | " + " | ".join(label.values()) + " |", "|---|---|---|---|",
+          "| Trips | " + " | ".join(f"{len(arms[a]):,}" for a in arms) + " |",
+          "| Average trip length | " + " | ".join(f"{sum(t['metres'] for t in arms[a]) / max(1, len(arms[a])):.0f} m" for a in arms) + " |",
+          "| Trips finished by the simulator | " + " | ".join(f"{sum(t['auto'] for t in arms[a]) / max(1, len(arms[a])):.1%}" for a in arms) + " |"]
+    counts = {a: Counter(x["turn"] for t in arms[a] for x in t["turns"]) for a in arms}
+    L.append("| Turns: left / right / straight / back | " + " | ".join(
+        " / ".join(f"{counts[a][t] / max(1, sum(counts[a].values())):.0%}" for t in TURNS) for a in arms) + " |")
+    for other in ("agents", "random"):
+        tab = [[counts["live"][t] for t in TURNS], [counts[other][t] for t in TURNS]]
+        keep = [i for i in range(4) if tab[0][i] + tab[1][i]]
+        res = stats.chi2_contingency([[r[i] for i in keep] for r in tab])
+        L.append("")
+        L.append(f"Turn shares, live world against {label[other].lower()}: chi-square = {res.statistic:,.0f}, "
+                 f"{res.dof} degrees of freedom, p {('= %.3g' % res.pvalue) if res.pvalue > 0 else '< 1e-300'}, "
+                 f"Cramér's V = {math.sqrt(res.statistic / sum(map(sum, tab))):.3f}.")
+    q = markov_q(transitions(live), decision)
+    n, obs, pred = markov_vs_observed(streaks["live"], q)
+    L += ["", f"Markov chain, live world: of {n:,} pairs that met, {obs[2]:.1%} made the same next 3 turns; "
+          f"a chain fitted on the live trips predicts {pred[2]:.1%}."]
+    return L
+
+
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="day1")
-    ap.add_argument("--omni", default="", help="name of an omni run in out/ to include")
+    ap.add_argument("--live", default="", help="name of a live run in out/ to compare on the same people")
     ap.add_argument("--seeds", type=int, default=5, help="random-walk repeats")
     ap.add_argument("--sample", type=int, default=5000, help="max trips used as 'you'")
     ap.add_argument("--seed", type=int, default=1)
@@ -360,15 +407,6 @@ def main():
     metres["noisy"] = sum(sum(world.edges[s["edge"]]["len"] for s in t["segments"]) for t in noisy) / len(noisy)
     print("noisy re-walk done")
 
-    omni = None
-    if args.omni:
-        omni = [json.loads(l) for l in open(C.OUT / args.omni / "trips.jsonl", encoding="utf-8")]
-        omni = [t for t in omni if t["segments"]]
-        # an omni agent walks through the recorded crowd; its own recorded self is skipped as "the same person"
-        rows, streaks["omni"] = shared_pass(sample_of(omni, args.sample, args.seed), trips, decision)
-        arms["omni"] = [rows]
-        metres["omni"] = sum(t["metres"] for t in omni) / len(omni)
-
     def stat(arm, f, k):
         v = [f(r, k) for r in arms[arm]]
         return float(np.mean(v)), (float(np.std(v, ddof=1)) if len(v) > 1 else 0.0)
@@ -387,16 +425,13 @@ def main():
     q_ag = markov_q(transitions(trips), decision)
     mk = {"random": markov_vs_observed(streaks["random"], q_rw), "agents": markov_vs_observed(streaks["agents"], q_ag),
           "agents_rw_chain": markov_vs_observed(streaks["agents"], q_rw)}
-    if omni:
-        mk["omni"] = markov_vs_observed(streaks["omni"], q_ag)
     with open(out / "arms_markov.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["k_more_turns", "random_observed", "random_markov", "agents_observed", "agents_markov",
-                    "agents_markov_random_walk_chain"] + (["omni_observed"] if omni else []))
+                    "agents_markov_random_walk_chain"])
         for k in range(1, KMAX + 1):
             w.writerow([k] + [round(x, 5) for x in (mk["random"][1][k - 1], mk["random"][2][k - 1], mk["agents"][1][k - 1],
-                                                    mk["agents"][2][k - 1], mk["agents_rw_chain"][2][k - 1])]
-                       + ([round(mk["omni"][1][k - 1], 5)] if omni else []))
+                                                    mk["agents"][2][k - 1], mk["agents_rw_chain"][2][k - 1])])
     print("Markov chain done")
 
     # ---- junction tests
@@ -447,7 +482,7 @@ def main():
             w.writerow([r["term"], round(r["coef"], 4), round(r["se"], 4), f"{r['p']:.3g}"])
 
     # ---- summary
-    label = {"agents": "Agent World", "random": "Random walk", "noisy": "Same trips, noisy turns", "omni": "Omni agents"}
+    label = {"agents": "Agent World", "random": "Random walk", "noisy": "Same trips, noisy turns"}
     L = [f"# Comparison of the arms: {args.run}", "",
          f"{len(trips)} trips in each arm ({len(arms['agents'][0])} used as 'you'); a turn is shared within {C.SHARED_WINDOW} s. "
          f"Random walk: {args.seeds} repeats, mean ± standard deviation.", "",
@@ -472,8 +507,6 @@ def main():
         L.append(f"| {k} | {mk['random'][1][k - 1]:.1%} | {mk['random'][2][k - 1]:.1%} | {mk['agents'][1][k - 1]:.1%} | "
                  f"{mk['agents'][2][k - 1]:.1%} | {mk['agents_rw_chain'][2][k - 1]:.1%} |")
     L += ["", f"Pairs that met: random walk {mk['random'][0]:,}, agents {mk['agents'][0]:,}."]
-    if omni:
-        L.append(f"Omni agents, observed, 3 more turns: {mk['omni'][1][2]:.1%} ({mk['omni'][0]:,} pairs).")
 
     L += ["", "## Do agents turn differently from random walkers?", "",
           f"Pearson chi-square test of the left/right/straight/back counts, agents against random walk, where both arms "
@@ -527,6 +560,9 @@ def main():
     (out / "compare.md").write_text("\n".join(L), encoding="utf-8")
     (out / "dm_by_hour.csv").write_text("hour,loss_equal_chance_minus_loss_random_walk\n"
                                         + "\n".join(f"{h},{d:.5f}" for h, d in zip(dm["hours"], dm["d_by_hour"])) + "\n")
+    if args.live:
+        L += live_section(world, args, trips, rw, decision, out)
+        (out / "compare.md").write_text("\n".join(L), encoding="utf-8")
     print("\n".join(L))
 
 

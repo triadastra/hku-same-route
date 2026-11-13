@@ -23,7 +23,8 @@ from world import World, xy
 
 BLUE, ORANGE, GREEN, YELLOW, INK, MUTED = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#1f2423", "#6b7370"
 ARMS = [("agents", "Agent World", BLUE, "o"), ("random", "Random walk", ORANGE, "s"),
-        ("omni", "Omni agents", GREEN, "^"), ("noisy", "Same trips, noisy turns", YELLOW, "D")]
+        ("noisy", "Same trips, noisy turns", YELLOW, "D")]
+LIVE_ARMS = [("live", "Live world", GREEN, "^"), ("agents", "Agent World", BLUE, "o"), ("random", "Random walk", ORANGE, "s")]
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 8, "pdf.fonttype": 42, "axes.linewidth": 0.6,
                      "axes.spines.top": False, "axes.spines.right": False, "axes.edgecolor": MUTED,
                      "xtick.color": MUTED, "ytick.color": MUTED, "text.color": INK, "axes.labelcolor": INK})
@@ -53,14 +54,19 @@ def lines(ax, k, series):
 
 
 def shared_turns(an):
-    rows = table(an / "arms_shared_turns.csv")
+    """With a live run: the three arms on the same people (live_shared_turns.csv). Without: the 10,000-person
+    arms (arms_shared_turns.csv), with the spread of the random-walk repeats."""
+    live = an / "live_shared_turns.csv"
+    rows = table(live if live.exists() else an / "arms_shared_turns.csv")
     k = [int(r["k_turns_in_a_row"]) for r in rows]
     fig, ax = plt.subplots(figsize=(3.5, 2.6))
+    arms = LIVE_ARMS if live.exists() else ARMS
     series = [(label, colour, marker, [100 * float(r[f"p_{arm}"]) for r in rows])
-              for arm, label, colour, marker in ARMS if f"p_{arm}" in rows[0]]
-    m = np.array([100 * float(r["p_random"]) for r in rows])
-    sd = np.array([100 * float(r["p_random_sd"]) for r in rows])
-    ax.fill_between(k, m - sd, m + sd, color=ORANGE, alpha=0.2, lw=0)
+              for arm, label, colour, marker in arms if f"p_{arm}" in rows[0]]
+    if "p_random_sd" in rows[0]:
+        m = np.array([100 * float(r["p_random"]) for r in rows])
+        sd = np.array([100 * float(r["p_random_sd"]) for r in rows])
+        ax.fill_between(k, m - sd, m + sd, color=ORANGE, alpha=0.2, lw=0)
     lines(ax, k, series)
     ax.set_xlabel("Same turns in a row, $k$")
     ax.set_ylabel("Trips where a stranger shares $k$ turns (%)")
