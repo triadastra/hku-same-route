@@ -17,6 +17,10 @@ in a row, within 90 seconds, purely by coincidence.
 | `hku-agents/out/day1/trips.jsonl.gz` | Every trip of the run (57,530), with each road segment, time and turn. |
 | `hku-agents/out/day1/people.jsonl.gz` | The 10,000 people: group, home, schedule and traits. |
 | `hku-agents/out/day1/agents.tar.gz` | One file per person: their whole day, including every tool call the agent made. |
+| `hku-agents/out/day1/analysis/compare.md` | The agent run against random walking: shared turns, the Markov chain of turns, junction tests and road use. Rebuilt by `python arms.py --run day1` inside `hku-agents/`. |
+| `graphs/` | Paper figures: the amenity maps, shared turns per arm, the Markov chain, and the road-use map. |
+| `method.md` | Design document for the experiment. A skeleton: the lines marked `DECIDE:` are still to be filled in. |
+| `plan.md` | What of the method is done and what is not. |
 | `results.xlsx` | All the results in one workbook: a summary sheet with the key findings, then every table from the analysis. |
 | `same-route-simulator.html` | The results website. It reads `web.json` from the same folder. |
 | `amenity-heat-map.html` | Heat map of what each block is for: the 1,538 places on the map, counted per one-hectare block in eight functions. Rebuilt by `python hku-agents/export_amenity_map.py`. |
