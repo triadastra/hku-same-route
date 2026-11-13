@@ -1,0 +1,10 @@
+term,coef,se,p
+(intercept),0.2015,0.0709,0.00447
+Food and drink,-0.0308,0.0115,0.00725
+Shops,0.0735,0.0133,3.23e-08
+University,0.5862,0.0302,9.92e-84
+Named buildings,-0.041,0.0085,1.42e-06
+Transport stops,0.057,0.02,0.00437
+Parks and sights,0.1085,0.0203,8.57e-08
+Schools,0.1648,0.0425,0.000104
+Everyday services,-0.1706,0.0217,3.9e-15
