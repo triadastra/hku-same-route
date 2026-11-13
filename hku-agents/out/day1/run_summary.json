@@ -1,0 +1,21 @@
+{
+  "planner": "claude",
+  "agents": 10000,
+  "calls": 117318,
+  "trips": 57530,
+  "usd": 20.4894,
+  "usd_per_agent": 0.00205,
+  "projected_usd_10k_agents": 20.49,
+  "tokens_this_session": {
+    "input": 254662,
+    "cache_write": 41463900,
+    "cache_read": 795503017,
+    "output": 14651567
+  },
+  "seconds_this_session": 7203.3,
+  "how_days_ended": {
+    "ended": 9989,
+    "midnight": 10,
+    "no tool call": 1
+  }
+}

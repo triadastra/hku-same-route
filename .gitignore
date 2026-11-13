@@ -1,0 +1,5 @@
+# API keys: never commit
+.env
+# Local editor and assistant settings
+.claude/
+__pycache__/

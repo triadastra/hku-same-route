@@ -1,0 +1,11 @@
+# API key: never commit
+.env
+# Generated outputs (hundreds of MB) and downloaded map caches.
+# Keep only the final analysis tables and run summary of the 10,000-person run.
+out/*
+!out/day1/
+out/day1/*
+!out/day1/analysis/
+!out/day1/run_summary.json
+data/osm_*.json
+__pycache__/

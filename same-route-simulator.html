@@ -1,0 +1,1618 @@
+<meta charset="utf-8">
+<title>Same Route Simulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: four views under one header. The day view is a large real-map canvas with a person panel beside it. */
+:root {
+  --bg: #f4f6f4;
+  --surface: #ffffff;
+  --ink: #18201c;
+  --ink-2: #4c5650;
+  --ink-3: #7d8781;
+  --line: #d9dfdb;
+  --path: #9aa59f;
+  --path-faint: #d3d9d5;
+  --heat: #4f6b5c;
+  --you: #2a78d6;
+  --follow: #eb6834;
+  --stranger: #8c9690;
+  --base-series: #a7b0aa;
+  --chip: #e8ece9;
+  --warn-bg: #fff4e5;
+  --warn-ink: #7a4a00;
+  /* heatmap: one blue hue, near-zero recedes toward the surface */
+  --ramp-0: #cde2fb; --ramp-1: #86b6ef; --ramp-2: #3987e5; --ramp-3: #1c5cab; --ramp-4: #0d366b;
+  /* broad groups in the replay (validated set; shapes carry the same information) */
+  --grp-student: #1baf7a; --grp-staff: #eda100; --grp-resident: #e87ba4;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614; --surface: #1a1f1c; --ink: #eef1ef; --ink-2: #b9c1bc; --ink-3: #87918b;
+    --line: #2c3430; --path: #5d6862; --path-faint: #2f3733; --heat: #9cc2ad; --you: #3987e5; --follow: #e8703f;
+    --stranger: #78837d; --base-series: #5f6a64; --chip: #252c28; --warn-bg: #2e2412; --warn-ink: #f2c879; color-scheme: dark;
+    --ramp-0: #0d366b; --ramp-1: #1c5cab; --ramp-2: #3987e5; --ramp-3: #86b6ef; --ramp-4: #cde2fb;
+    --grp-student: #199e70; --grp-staff: #c98500; --grp-resident: #d55181;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121614; --surface: #1a1f1c; --ink: #eef1ef; --ink-2: #b9c1bc; --ink-3: #87918b;
+  --line: #2c3430; --path: #5d6862; --path-faint: #2f3733; --heat: #9cc2ad; --you: #3987e5; --follow: #e8703f;
+  --stranger: #78837d; --base-series: #5f6a64; --chip: #252c28; --warn-bg: #2e2412; --warn-ink: #f2c879; color-scheme: dark;
+  --ramp-0: #0d366b; --ramp-1: #1c5cab; --ramp-2: #3987e5; --ramp-3: #86b6ef; --ramp-4: #cde2fb;
+  --grp-student: #199e70; --grp-staff: #c98500; --grp-resident: #d55181;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+header h1 { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.1; margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.tag { font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-3); }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+nav.tabs a { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink-2); text-decoration: none; padding: 8px 12px; border-bottom: 3px solid transparent; white-space: nowrap; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--you); }
+.banner { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.banner.ok { background: var(--chip); color: var(--ink-2); }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--you); outline-offset: 2px; }
+
+/* ---------- day view ---------- */
+.daygrid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+@media (max-width: 980px) { .daygrid { grid-template-columns: minmax(0, 1fr); } }
+.mapcard { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; position: relative; }
+.mapwrap { position: relative; height: min(640px, 70vh); min-height: 360px; }
+canvas.map { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+canvas.map.dragging { cursor: grabbing; }
+.overlay { position: absolute; display: flex; gap: 6px; }
+.ov-tl { top: 10px; left: 10px; flex-direction: column; gap: 0; pointer-events: none; }
+.ov-tr { top: 10px; right: 10px; flex-direction: column; }
+.bigclock { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 6px var(--surface), 0 0 2px var(--surface); }
+.subclock { font-size: 13px; color: var(--ink-2); text-shadow: 0 0 4px var(--surface); }
+.iconbtn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 14px; border-top: 1px solid var(--line); }
+.controls input[type=range] { flex: 1 1 220px; accent-color: var(--you); min-width: 0; }
+.play { font: inherit; font-weight: 700; border: 0; background: var(--you); color: #fff; border-radius: 8px; padding: 7px 14px; cursor: pointer; min-width: 84px; }
+.seg { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--chip); border-radius: 8px; padding: 3px; gap: 3px; }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2); padding: 5px 9px; border-radius: 6px; cursor: pointer; white-space: nowrap; line-height: 1.2; }
+.seg button small { display: block; font-size: 11px; color: var(--ink-3); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); padding: 0 14px 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.bar { width: 18px; height: 4px; border-radius: 2px; display: inline-block; background: var(--heat); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+.who { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--you); }
+.facts { font-size: 14px; color: var(--ink-2); margin: 2px 0 0; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { font: inherit; font-weight: 600; font-size: 14px; padding: 7px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.btn.primary { background: var(--you); border-color: var(--you); color: #fff; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.list li { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 6px; }
+.list .t { font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.daylog { max-height: 240px; overflow-y: auto; border-top: 1px solid var(--line); padding-top: 8px; }
+.daylog li.now { color: var(--ink); font-weight: 600; }
+.daylog li.now .t { color: var(--you); }
+.daylog li.past { color: var(--ink-2); }
+.daylog li.future { color: var(--ink-3); }
+.daylog li.err { text-decoration: line-through; }
+.sharers li { cursor: pointer; border-radius: 6px; padding: 2px 4px; }
+.sharers li:hover { background: var(--chip); }
+.sharers b { color: var(--follow); }
+.callout { font-size: 15px; margin: 0; }
+.callout b.n { font-family: var(--font-display); font-size: 22px; color: var(--follow); }
+.muted { color: var(--ink-3); font-size: 13px; margin: 0; }
+.loading { display: grid; place-items: center; height: 100%; color: var(--ink-2); font-size: 15px; text-align: center; padding: 20px; }
+
+/* ---------- roads & groups ---------- */
+.filters { display: grid; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.filters .frow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.filters .flab { font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-3); min-width: 42px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+.chips button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); font-weight: 600; }
+.ramp { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); }
+.ramp i { display: inline-block; width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--ramp-0), var(--ramp-1), var(--ramp-2), var(--ramp-3), var(--ramp-4)); }
+.hbars { display: grid; gap: 5px; font-size: 13px; }
+.hbar { display: grid; grid-template-columns: 130px minmax(0, 1fr) 64px; gap: 8px; align-items: center; }
+.hbar .track { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; }
+.hbar .fill { height: 100%; background: var(--you); border-radius: 4px; }
+.hbar .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.turnbar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; margin: 4px 0; }
+.turnbar span { display: block; height: 100%; }
+.end { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+.end h4 { margin: 0; font-size: 14px; font-weight: 600; }
+.matrix td { text-align: center; }
+.matrix td.cell { color: var(--ink); }
+.toplist li { cursor: pointer; border-radius: 6px; padding: 2px 4px; grid-template-columns: 28px minmax(0, 1fr) 60px; }
+.toplist li:hover { background: var(--chip); }
+.toplist .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.togglebtn { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+.togglebtn[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.shape { display: inline-block; width: 10px; height: 10px; }
+
+/* ---------- results ---------- */
+.resgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .resgrid { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.card h3 { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin: 0; }
+.big { font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pair div { display: grid; gap: 4px; }
+.lab { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+svg.chart text { fill: var(--ink-2); font-family: var(--font-body); font-size: 11px; }
+svg.chart .axis { stroke: var(--line); }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12px; padding: 5px 8px; border-radius: 5px; white-space: nowrap; z-index: 20; }
+details summary { cursor: pointer; font-size: 13px; color: var(--ink-2); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 13px; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; white-space: normal; }
+th { color: var(--ink-2); font-weight: 600; }
+
+/* ---------- simple model (kept from the first demo) ---------- */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+@media (max-width: 920px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.mapbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.clock { font-family: var(--font-display); font-weight: 600; font-size: 22px; font-variant-numeric: tabular-nums; }
+.clock small { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--ink-2); margin-left: 8px; }
+.dash { width: 18px; height: 0; border-top: 2px dashed var(--path); display: inline-block; }
+canvas.smmap { display: block; width: 100%; height: auto; aspect-ratio: 62 / 40; max-width: 100%; touch-action: manipulation; }
+.status { padding: 12px 14px; border-top: 1px solid var(--line); font-size: 15px; min-height: 48px; }
+.smpanel { display: grid; gap: 18px; min-width: 0; }
+.step { display: grid; gap: 8px; }
+.step h4 { font-family: var(--font-display); font-weight: 600; font-size: 17px; margin: 0; display: flex; gap: 8px; align-items: baseline; }
+.step h4 .n { color: var(--ink-3); }
+.hint { font-size: 13px; color: var(--ink-2); margin: 0; }
+.seg.full { display: grid; }
+.seg.full button { padding: 7px 4px; font-size: 14px; }
+.walk { font-size: 15px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.walk .place { font-weight: 700; }
+.slider { display: grid; gap: 2px; }
+.slider label { font-size: 14px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.slider label output { font-weight: 400; color: var(--ink-2); }
+.slider input[type=range] { width: 100%; accent-color: var(--you); margin: 4px 0 0; }
+.ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-3); }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.result { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
+.progress { height: 3px; background: var(--chip); border-radius: 2px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--you); transition: width .15s; }
+.theory { font-size: 13px; color: var(--ink-2); margin: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* ---------- method ---------- */
+.method { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 900px) { .method { grid-template-columns: minmax(0, 1fr); } }
+.method h3 { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin: 0 0 6px; }
+.method p, .method li { font-size: 14px; color: var(--ink-2); max-width: 65ch; }
+.method p { margin: 0 0 8px; }
+.method ul { margin: 0 0 8px; padding-left: 18px; }
+.method code { font-size: 13px; background: var(--chip); padding: 1px 4px; border-radius: 4px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.stats div { display: grid; }
+.stats b { font-family: var(--font-display); font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stats span { font-size: 13px; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+
+/* ---------- the results paper (top of the page) ---------- */
+.hero { display: grid; gap: 14px; padding-block: 18px 6px; }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 5vw, 56px); line-height: 1.02; letter-spacing: -.5px; margin: 0; max-width: 20ch; text-wrap: balance; }
+.lede { font-size: clamp(17px, 1.7vw, 20px); line-height: 1.5; color: var(--ink); margin: 0; max-width: 62ch; }
+.lede b { color: var(--you); }
+.byline { margin: 0; font-size: 14px; color: var(--ink-2); }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; }
+.toc a { font-size: 14px; font-weight: 600; color: var(--ink-2); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; background: var(--surface); }
+.toc a:hover { color: var(--ink); border-color: var(--ink-3); }
+.block { display: grid; gap: 16px; padding-top: 28px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+h2.sec { font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 3vw, 32px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.secintro { margin: 0; color: var(--ink-2); max-width: 68ch; font-size: 16px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .kpis { grid-template-columns: minmax(0, 1fr); } }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.kpi b { font-family: var(--font-display); font-weight: 700; font-size: 46px; line-height: 1; color: var(--ink); }
+.kpi span { font-size: 15px; color: var(--ink-2); line-height: 1.45; }
+.kpi span strong { color: var(--ink); }
+.figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .figs { grid-template-columns: minmax(0, 1fr); } }
+figure.fig { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+figure.fig.wide { grid-column: 1 / -1; }
+.fig h3 { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.fnum { display: block; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.fig figcaption { font-size: 15px; color: var(--ink-2); line-height: 1.5; max-width: 72ch; }
+.fig figcaption b { color: var(--ink); }
+.fig .legend { padding: 0; }
+.ln { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+svg.chart .hov { fill: transparent; }
+svg.chart .hov:hover { fill: var(--chip); }
+svg.chart .nohit { pointer-events: none; }
+.fig svg.chart text { font-size: 14px; }
+.fig svg.chart text.dl { font-size: 14px; font-weight: 600; fill: var(--ink); }
+svg.chart text.ax { fill: var(--ink-3); }
+.figmap { position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; min-height: 260px; border-radius: 8px; overflow: hidden; background: var(--surface); }
+.figmap canvas { display: block; width: 100%; height: 100%; }
+.figmap .loading { position: absolute; inset: 0; }
+.hbar.big { grid-template-columns: 170px minmax(0, 1fr) 48px; font-size: 14px; }
+.hbar.big .track { height: 12px; border-radius: 6px; }
+.hbar.big .fill { border-radius: 6px; }
+@media (max-width: 480px) { .hbar.big { grid-template-columns: 112px minmax(0, 1fr) 42px; font-size: 13px; } }
+.matrix th, .matrix td { padding: 6px 6px; }
+.cols4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 980px) { .cols4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cols4 { grid-template-columns: minmax(0, 1fr); } }
+.cols4 h3 { font-family: var(--font-display); font-weight: 600; font-size: 19px; margin: 0 0 6px; }
+.cols4 p { margin: 0 0 8px; font-size: 15px; color: var(--ink-2); }
+.cols4 code, .limits code { font-size: 13px; background: var(--chip); padding: 1px 4px; border-radius: 4px; }
+.runstrip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.runstrip div { display: grid; gap: 2px; }
+.runstrip b { font-family: var(--font-display); font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.runstrip span { font-size: 13px; color: var(--ink-2); }
+.days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .days { grid-template-columns: minmax(0, 1fr); } }
+.days blockquote { margin: 0; display: grid; gap: 8px; align-content: start; border-left: 3px solid var(--line); padding: 2px 0 2px 14px; }
+.days blockquote p { margin: 0; font-size: 16px; line-height: 1.5; }
+.days cite { font-style: normal; font-size: 13px; color: var(--ink-3); }
+.limits { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 76ch; }
+.limits li { font-size: 15px; color: var(--ink-2); }
+.limits b { color: var(--ink); }
+.subh { font-family: var(--font-display); font-weight: 600; font-size: 19px; margin: 0 0 10px; }
+.foot { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: var(--ink-3); display: grid; gap: 4px; }
+.foot p { margin: 0; max-width: 90ch; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="tag">COMP1110 group project · Modeling coincidences: accidentally having the same route · HKU, November 2026</span>
+    <h1>Is that stranger following you, or just taking the quickest way?</h1>
+    <p class="lede">We simulated one weekday for 10,000 people on the real footpaths from Kennedy Town to Sai Ying Pun and recorded every turn they made. Nobody in the simulation follows anyone. Even so, on <b>74%</b> of trips a stranger made the same five turns in a row as the walker, each within 90 seconds of them. Long matching streaks like this come mostly from everyone choosing the same quickest routes.</p>
+    <p class="byline">Celsia, Jerry, Angie, Bryan and Michelle</p>
+    <nav class="toc" aria-label="On this page">
+      <a href="#findings">Key findings</a><a href="#figures">Results</a><a href="#method">Method</a><a href="#limits">Limits</a><a href="#explore">Explore the data</a>
+    </nav>
+  </header>
+
+  <!-- ===================== KEY FINDINGS ===================== -->
+  <section class="block" id="findings" aria-labelledby="h-findings">
+    <h2 class="sec" id="h-findings">Key findings</h2>
+    <div class="kpis">
+      <div class="kpi"><b>74%</b><span>of trips had a stranger make the same <strong>5 turns in a row</strong> as the walker, each within 90 seconds.</span></div>
+      <div class="kpi"><b>48%</b><span>of trips still had one for <strong>10 turns in a row</strong>.</span></div>
+      <div class="kpi"><b>13×</b><span>more strangers share 10 turns with you when everyone takes the quickest path than when turns are random: <strong>11.1 against 0.9</strong> per trip.</span></div>
+      <div class="kpi"><b>49%</b><span>of local residents' trips had a 5-turn match, against <strong>73–81%</strong> for students and staff, who share the class-change crowds.</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTS (FIGURES) ===================== -->
+  <section class="block" id="figures" aria-labelledby="h-figures">
+    <h2 class="sec" id="h-figures">Results</h2>
+    <p class="secintro">A stranger <b>shares a turn</b> with you when you both pass the same junction, coming in the same way and leaving the same way, each within 90 seconds of the other. For each trip we find the stranger with the longest unbroken run of shared turns. The baseline re-walks the very same 57,000 trips (same start, end and departure time) with near-random turns.</p>
+    <div class="figs">
+      <figure class="fig">
+        <div><span class="fnum">Figure 1</span><h3>Chance that a stranger makes your same k turns in a row</h3></div>
+        <div class="legend"><span><i class="ln" style="background:var(--you)"></i>Quickest path (how people walk)</span><span><i class="ln" style="background:var(--base-series)"></i>Same trips, random turns</span></div>
+        <svg class="chart" id="f1" viewBox="0 0 520 270" role="img" aria-label="Share of trips where at least one stranger made the same k turns in a row, for k from 1 to 10, quickest path against random turns"></svg>
+        <figcaption>Random walkers wander longer and pass more people, so they collect short matches more often. Their matches break off quickly. Quickest-path matches last: once a stranger has matched 9 of your turns, there is a <b>91%</b> chance they match the 10th too, against 76% with random turns.</figcaption>
+        <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f1t"></table></div></details>
+      </figure>
+      <figure class="fig">
+        <div><span class="fnum">Figure 2</span><h3>How many strangers make your same k turns, on average</h3></div>
+        <div class="legend"><span><i class="ln" style="background:var(--you)"></i>Quickest path</span><span><i class="ln" style="background:var(--base-series)"></i>Random turns</span></div>
+        <svg class="chart" id="f2" viewBox="0 0 520 270" role="img" aria-label="Average number of strangers per trip who made the same k turns in a row, on a log scale, quickest path against random turns"></svg>
+        <figcaption>Log scale. Up to 3 turns, random walking produces as many matches. From 4 turns on, quickest paths produce more, and the gap keeps growing: <b>11.1 strangers against 0.9</b> at 10 turns. Long "following" streaks are a product of shared efficient routes.</figcaption>
+        <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f2t"></table></div></details>
+      </figure>
+      <figure class="fig wide">
+        <div><span class="fnum">Figure 3</span><h3>Where people walked: walkers on each path segment over the whole day</h3></div>
+        <div class="figmap"><canvas id="f3" aria-label="Map from Kennedy Town to Sai Ying Pun, each path coloured by how many simulated people walked it"></canvas><div class="loading" id="f3load">Loading the map…</div></div>
+        <div class="legend"><span class="ramp"><span>Fewer walkers</span><i></i><span>More (busiest: 10,761)</span></span><span><i class="dot" style="background:var(--follow)"></i>Busiest link</span></div>
+        <figcaption>Walking concentrates on a few links between the MTR exits and the main campus, which is where shared routes begin. The busiest link, 7 m from the HKU station Exit A lifts onto University Street, was walked <b>10,761 times</b>. You can filter this map by group and time of day under <a href="#roads">Explore the data</a>.</figcaption>
+      </figure>
+      <figure class="fig">
+        <div><span class="fnum">Figure 4</span><h3>Chance of a 5-turn match, by the hour the trip started</h3></div>
+        <svg class="chart" id="f4" viewBox="0 0 520 250" role="img" aria-label="Share of trips with a stranger matching 5 turns in a row, by departure hour from 07:00 to 20:00"></svg>
+        <figcaption>Highest after classes end (17:00 to 19:00, <b>84–85%</b>), when many people head for the same MTR exits at once. Lowest in the late morning and at lunch (11:00 to 12:00, <b>66–67%</b>), when people spread out to many places. Hours with fewer than 50 trips are left out.</figcaption>
+        <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f4t"></table></div></details>
+      </figure>
+      <figure class="fig">
+        <div><span class="fnum">Figure 5</span><h3>Chance of a 5-turn match, by group</h3></div>
+        <div class="hbars" id="f5"></div>
+        <figcaption>Staff and commuting students mostly walk between the MTR exits and campus at fixed times, the busiest corridor of the day. Residents walk to shops, errands and homes spread across the area, so their matches are rarer.</figcaption>
+        <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f5t"></table></div></details>
+      </figure>
+      <figure class="fig wide">
+        <div><span class="fnum">Figure 6</span><h3>Who the matching stranger is</h3></div>
+        <div class="tablewrap"><table class="matrix" id="f6"></table></div>
+        <figcaption>For trips where a stranger matched 5 or more turns in a row: which group that stranger came from. Read across a row; each row adds to 100%. Undergraduates, staff and residents are matched mostly by <b>their own group</b>, people with the same timetable leaving from the same side of campus. Postgrads are matched mostly by undergrads, simply because there are many more undergrads.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===================== METHOD ===================== -->
+  <section class="block" id="method" aria-labelledby="h-method">
+    <h2 class="sec" id="h-method">Method</h2>
+    <div class="cols4">
+      <div>
+        <h3>The map</h3>
+        <p>Every footpath, staircase, lift and road from Kennedy Town to Sai Ying Pun, from OpenStreetMap: 3,543 junctions and 4,835 path segments, 156 km in all. Stairs walk 2.2 times slower, and a lift costs 40 seconds.</p>
+        <p>All 1,538 named buildings and amenities are places with a short caption, so a person can search "noodles", "toilet" or "study".</p>
+      </div>
+      <div>
+        <h3>The people</h3>
+        <p>10,000 synthetic people: 62% undergrads, 12% postgrads, 10% staff and 16% local residents. Each has a home (a hall, a flat, or the MTR exit or bus stop they commute through), fixed commitments such as classes in HKU's :30 to :20 slots, and drawn traits: personality, habits, interests, mood, how spontaneous they are and walking pace.</p>
+      </div>
+      <div>
+        <h3>Their decisions</h3>
+        <p>Each day was lived by Claude Haiku 5.5, acting through map tools like someone with a phone map: <code>where_am_i</code>, <code>search_places</code>, <code>nearby</code>, <code>route_info</code>, <code>go_to</code>, <code>stroll</code>, <code>stay</code> and <code>end_day</code>. Nobody was told what to do with free time. Variety comes from each person's traits; 22% chose to wander somewhere without a set route.</p>
+      </div>
+      <div>
+        <h3>The measure</h3>
+        <p>Walks follow the quickest path and record every segment entered, with the time, and every turn at a junction: left, right, straight or back. For each trip we find the longest run of turns a single stranger shared, each within 90 seconds. The random-turn baseline re-walks the same trips.</p>
+      </div>
+    </div>
+    <div class="runstrip" aria-label="The run in numbers">
+      <div><b>10,000</b><span>people simulated</span></div>
+      <div><b>57,530</b><span>trips recorded</span></div>
+      <div><b>117,318</b><span>model calls</span></div>
+      <div><b>9,989</b><span>days ended normally</span></div>
+      <div><b>2 h</b><span>to run the whole day</span></div>
+      <div><b>US$20.49</b><span>total model cost</span></div>
+    </div>
+    <div>
+      <h3 class="subh">Three days, as each person summed them up</h3>
+      <div class="days">
+        <blockquote><p>"Hayden wandered the Kennedy Town and Sai Ying Pun harbourside on a cheap, slow day, tried a Korean lunch, rested and studied, attended the 16:30 lecture, and spent the evening in May Hall working on the assignment."</p><cite>Hayden, 21, Law undergraduate living in hall</cite></blockquote>
+        <blockquote><p>"Worked at the office, taught class, had bubble tea at E.Tea, walked the harbour promenade in Kennedy Town, and headed home to HKU MTR by 17:20."</p><cite>Sharon, 55, Science staff, commutes by MTR</cite></blockquote>
+        <blockquote><p>"Karen slept in, walked the harbour front, had coffee and lunch, did her 14:00 errand at the 7-Eleven, and got home at 14:49 after a detour to HKU by mistake."</p><cite>Karen, 51, local resident at home that day</cite></blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LIMITS ===================== -->
+  <section class="block" id="limits" aria-labelledby="h-limits">
+    <h2 class="sec" id="h-limits">Limits</h2>
+    <ul class="limits">
+      <li><b>Synthetic people.</b> The mix of roles, homes, timetables and traits is our estimate, not HKU data. The headline numbers depend on how many people share each class change.</li>
+      <li><b>The baseline is not a clean control.</b> Random walkers take longer routes and pass more people, so they collect more short matches. Compare long runs (Figure 2), not short ones.</li>
+      <li><b>Nobody reacts to anyone.</b> Deliberate following, crowds slowing people down and choosing a route to avoid someone are not modelled.</li>
+      <li><b>Map gaps.</b> Indoor routes through buildings are mostly missing from OpenStreetMap, lighting is known for only 87 segments, and opening hours were not enforced.</li>
+      <li><b>One weekday.</b> One run, with fine weather and normal classes. Weekends, exams and rain would change who walks where.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== EXPLORE ===================== -->
+  <section class="block" id="explore" aria-labelledby="h-explore">
+    <h2 class="sec" id="h-explore">Explore the data</h2>
+    <p class="secintro">Replay the day on the real map and follow anyone to see who made the same turns, filter the walking heatmap by group and hour, or try the simple model we used to explain the idea.</p>
+  <nav class="tabs" aria-label="Views">
+    <a href="#day" data-tab="day">A day at HKU</a>
+    <a href="#roads" data-tab="roads">Roads &amp; groups</a>
+    <a href="#model" data-tab="model">Simple model</a>
+  </nav>
+  <div class="banner" id="banner">Loading the run…</div>
+
+  <!-- ===================== DAY ===================== -->
+  <section id="tab-day" data-view="day">
+    <div class="daygrid">
+      <div class="mapcard">
+        <div class="mapwrap">
+          <canvas class="map" id="dmap" aria-label="Map of the walking network with people moving through the day"></canvas>
+          <div class="loading" id="dloading" style="position:absolute;inset:0">Loading the map and the people…</div>
+          <div class="overlay ov-tl"><span class="bigclock" id="dclock">06:00</span><span class="subclock" id="dcount"></span></div>
+          <div class="overlay ov-tr">
+            <button class="iconbtn" id="zin" aria-label="Zoom in">+</button>
+            <button class="iconbtn" id="zout" aria-label="Zoom out">−</button>
+            <button class="iconbtn" id="zhome" aria-label="Show all of campus" style="font-size:14px">⌂</button>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="play" id="dplay">Pause</button>
+          <input type="range" id="dtime" min="21600" max="86340" step="60" value="28800" aria-label="Time of day">
+          <div class="seg" id="dspeed" role="group" aria-label="Playback speed">
+            <button data-v="60" aria-pressed="true">1 min/s</button><button data-v="300">5 min/s</button><button data-v="1200">20 min/s</button>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--you)"></i>Person you follow</span>
+          <span><i class="dot" style="background:var(--follow)"></i>Stranger making the same turns</span>
+          <span id="lg-plain"><i class="dot" style="background:var(--stranger)"></i>Everyone else</span>
+          <span id="lg-groups" hidden style="gap:10px">
+            <span><svg class="shape" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.5" fill="var(--grp-student)"/></svg>Students</span>
+            <span><svg class="shape" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="var(--grp-staff)"/></svg>Staff</span>
+            <span><svg class="shape" viewBox="0 0 10 10"><path d="M5 0.5 L9.5 9.5 L0.5 9.5 Z" fill="var(--grp-resident)"/></svg>Local residents</span>
+          </span>
+          <span><i class="bar"></i>Busier path</span>
+          <button class="togglebtn" id="dgroups" aria-pressed="false">Colour by group</button>
+        </div>
+      </div>
+
+      <aside class="panel" aria-live="polite">
+        <div>
+          <h2>Following</h2>
+          <div class="who" id="pname">–</div>
+          <p class="facts" id="pfacts"></p>
+          <p class="facts" id="phabits"></p>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="pnext">Jump to their next walk</button>
+          <button class="btn" id="prand">Someone else</button>
+        </div>
+        <p class="muted">Or click any dot on the map to follow that person.</p>
+        <div>
+          <h2>Feels like following after</h2>
+          <div class="seg" id="dk" role="group" aria-label="Turns in a row" style="margin-top:6px"></div>
+        </div>
+        <p class="callout" id="pshare"></p>
+        <ul class="list sharers" id="psharers"></ul>
+        <div>
+          <h2>Their day</h2>
+          <ul class="list daylog" id="plog"></ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== ROADS & GROUPS ===================== -->
+  <section id="tab-roads" data-view="roads" hidden>
+    <div class="daygrid">
+      <div class="mapcard">
+        <div class="filters">
+          <div class="frow"><span class="flab">Who</span><div class="chips" id="rwho" role="group" aria-label="Which people"></div></div>
+          <div class="frow"><span class="flab">When</span><div class="chips" id="rwhen" role="group" aria-label="Time of day"></div></div>
+        </div>
+        <div class="mapwrap">
+          <canvas class="map" id="rmap" aria-label="Heatmap of how many people walked each road"></canvas>
+          <div class="overlay ov-tr">
+            <button class="iconbtn" id="rzin" aria-label="Zoom in">+</button>
+            <button class="iconbtn" id="rzout" aria-label="Zoom out">−</button>
+            <button class="iconbtn" id="rzhome" aria-label="Show all of campus" style="font-size:14px">⌂</button>
+          </div>
+        </div>
+        <div class="legend" style="padding-top:10px">
+          <span class="ramp"><span>Fewer walkers</span><i></i><span id="rmax">More</span></span>
+          <span>Click any road to see who uses it and how they turn at its end.</span>
+        </div>
+      </div>
+      <aside class="panel" aria-live="polite">
+        <div>
+          <h2>Selected road</h2>
+          <div class="who" id="rname" style="color:var(--ink);font-size:21px">–</div>
+          <p class="facts" id="rmeta"></p>
+        </div>
+        <p class="callout" id="rcount"></p>
+        <div><h2>Who walks it</h2><div class="hbars" id="rgroups" style="margin-top:6px"></div></div>
+        <div><h2>When</h2><svg class="chart" id="rhours" viewBox="0 0 320 90" role="img" aria-label="Walkers on this road by hour"></svg></div>
+        <div id="rends"></div>
+      </aside>
+    </div>
+    <div class="resgrid" style="margin-top:16px">
+      <div class="card" style="grid-column:1/-1">
+        <h3>Groups compared</h3>
+        <div class="tablewrap"><table id="gtable"></table></div>
+        <p class="muted">Each person is in one group. "Stranger shares 5+ turns" is the share of that group's trips where someone else made the same 5 or more turns in a row.</p>
+      </div>
+      <div class="card">
+        <h3>Who makes your turns</h3>
+        <div class="tablewrap"><table class="matrix" id="gmatrix"></table></div>
+        <p class="muted">For trips where a stranger matched 5 or more turns in a row: which group that stranger came from. Read across a row.</p>
+      </div>
+      <div class="card">
+        <h3 id="toptitle">Busiest roads</h3>
+        <ul class="list toplist" id="toplist"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SIMPLE MODEL ===================== -->
+  <section id="tab-model" data-view="model" hidden>
+    <p class="muted" style="margin:0 0 12px;font-size:14px;color:var(--ink-2)">A small hand-drawn version of campus with adjustable rules. Use it to explain the idea: how the way people pick turns changes the odds that a stranger matches yours.</p>
+    <div class="main">
+      <section class="mapcard" aria-label="Simple model">
+        <div class="mapbar">
+          <div class="clock" id="sm-clock">01:30<small id="sm-crowd"></small></div>
+          <div class="legend" aria-hidden="true" style="padding:0">
+            <span><i class="dot" style="background:var(--you)"></i>You</span>
+            <span><i class="dot" style="background:var(--stranger)"></i>Stranger</span>
+            <span><i class="dot" style="background:var(--follow)"></i>Same choices as you</span>
+            <span><i class="dash"></i>Unlit path</span>
+          </div>
+          <div class="seg" id="sm-speed" role="group" aria-label="Playback speed" style="width:150px">
+            <button data-v="1">1×</button><button data-v="5" aria-pressed="true">5×</button><button data-v="20">20×</button>
+          </div>
+        </div>
+        <canvas class="smmap" id="sm-map" width="1240" height="800" aria-label="Schematic map with walkers"></canvas>
+        <div class="status" id="sm-status" aria-live="polite"></div>
+      </section>
+      <aside class="smpanel">
+        <div class="step"><h4><span class="n">1</span>Time of day</h4><div class="seg full" id="sm-scen" role="group" aria-label="Time of day"></div><p class="hint" id="sm-scenHint"></p></div>
+        <div class="step"><h4><span class="n">2</span>Your walk</h4><div class="walk"><span class="place" id="sm-fromName"></span><span>→</span><span class="place" id="sm-toName"></span></div><p class="hint">Click a place on the map to start there, then click where you're going.</p></div>
+        <div class="step"><h4><span class="n">3</span>How strangers pick their turns</h4>
+          <div class="slider"><label for="sm-beta">Prefer the quickest way <output id="sm-betaOut"></output></label><input type="range" id="sm-beta" min="0" max="100" step="1" value="60"><div class="ends"><span>Random turns</span><span>Always quickest</span></div></div>
+          <div class="slider"><label for="sm-copy">Copy the person just ahead <output id="sm-copyOut"></output></label><input type="range" id="sm-copy" min="0" max="60" step="5" value="15"><div class="ends"><span>Never</span><span>Often</span></div></div>
+        </div>
+        <div class="step"><h4><span class="n">4</span>When does it feel like following?</h4><div class="seg full" id="sm-kseg" role="group" aria-label="Choices in a row"></div><p class="hint">Same choices in a row, same direction, each within 90 seconds of you.</p></div>
+        <div class="actions"><button class="btn primary" id="sm-watch">Watch my walk</button><button class="btn" id="sm-estimate">Estimate the odds</button></div>
+        <div class="result" aria-live="polite">
+          <p class="callout" id="sm-headline" style="font-size:15px">Running 250 simulated walks…</p>
+          <div class="progress"><i id="sm-prog"></i></div>
+          <div class="pair">
+            <div><span class="lab"><i class="sw" style="background:var(--you)"></i>Your settings</span><span class="big" style="font-size:34px" id="sm-pNow">–</span></div>
+            <div><span class="lab"><i class="sw" style="background:var(--base-series)"></i>Random turns</span><span class="big" style="font-size:34px" id="sm-pBase">–</span></div>
+          </div>
+          <svg class="chart" id="sm-chart" viewBox="0 0 330 170" role="img" aria-label="Chance at least one stranger shares k choices in a row"></svg>
+          <details><summary>Show the numbers</summary><table id="sm-tbl"></table></details>
+          <p class="theory" id="sm-theory"></p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  </section>
+
+  <footer class="foot">
+    <p>Each person's day was decided by Claude Haiku 5.5 (Anthropic) through map tools; the summaries quoted above are its own words. People, names and timetables are synthetic.</p>
+    <p>Map data © OpenStreetMap contributors, available under the Open Database Licence. COMP1110, The University of Hong Kong.</p>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+// ===================================================================
+// Shared helpers
+// ===================================================================
+const $ = id => document.getElementById(id);
+const tip = $("tip");
+function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function hhmm(t) { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 3600) % 24).padStart(2, "0") + ":" + String(Math.floor(t / 60) % 60).padStart(2, "0"); }
+function pct(p) { return p >= 0.995 ? "100%" : p > 0 && p < 0.01 ? "<1%" : Math.round(p * 100) + "%"; }
+function pressed(group, v) { for (const b of group.querySelectorAll("button")) b.setAttribute("aria-pressed", b.dataset.v === String(v)); }
+// "claude-haiku-5-5" -> "Claude Haiku 5.5"
+function modelName(id) {
+  return String(id || "").replace(/^claude-/, "Claude ").replace(/-(\d+)-(\d+)$/, " $1.$2")
+    .replace(/\b(haiku|sonnet|opus|fable)\b/i, w => w[0].toUpperCase() + w.slice(1));
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function hoverTips(svg) {
+  svg.addEventListener("mousemove", e => {
+    const t = e.target.getAttribute && e.target.getAttribute("data-tip");
+    if (!t) { tip.hidden = true; return; }
+    tip.textContent = t; tip.hidden = false;
+    tip.style.left = Math.min(innerWidth - 200, e.clientX + 12) + "px"; tip.style.top = (e.clientY - 30) + "px";
+  });
+  svg.addEventListener("mouseleave", () => tip.hidden = true);
+}
+let themeVersion = 0;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => themeVersion++);
+new MutationObserver(() => themeVersion++).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+// ===================================================================
+// Tabs
+// ===================================================================
+const views = ["day", "roads", "model"];
+let current = null;
+const onShow = {};
+function show(v) {
+  if (!views.includes(v)) v = "day";
+  current = v;
+  for (const x of views) $("tab-" + x).hidden = x !== v;
+  for (const a of document.querySelectorAll("nav.tabs a")) a.setAttribute("aria-current", a.dataset.tab === v ? "page" : "false");
+  if (onShow[v]) onShow[v]();
+}
+addEventListener("hashchange", () => {
+  const h = location.hash.slice(1);
+  if (views.includes(h)) { show(h); $("explore").scrollIntoView({ block: "start" }); }
+});
+// the explorer only animates while it is on screen
+let exploreOn = false;
+new IntersectionObserver(es => { for (const e of es) exploreOn = e.isIntersecting; }).observe($("explore"));
+
+// ===================================================================
+// Day view: the real map replay
+// ===================================================================
+let D = null, E = [], PEOPLE = [], IDX = new Map(), PLACE = {};
+const HOME = { x: 40, y: 60 };
+const W_SHARE = 90;
+const DV = { t: 8 * 3600, speed: 60, playing: !matchMedia("(prefers-reduced-motion: reduce)").matches, follow: -1, k: 3,
+             cx: 0, cy: 0, scale: 1, shared: null };
+const dcv = $("dmap"), dctx = dcv.getContext("2d");
+let baseCanvas = document.createElement("canvas"), baseKey = "";
+
+function prepData(d) {
+  D = d;
+  E = d.edges.map(e => {
+    const p = e.p, cum = [0];
+    for (let i = 2; i < p.length; i += 2) cum.push(cum[cum.length - 1] + Math.hypot(p[i] - p[i - 2], p[i + 1] - p[i - 1]));
+    return { u: e.u, v: e.v, p, cum, len: cum[cum.length - 1] || 1, t: e.t, s: e.s, l: e.l, n: e.n, m: e.m };
+  });
+  for (const pl of d.places) PLACE[pl.code] = pl;
+  // both maps open centred on HKU's buildings
+  const hku = d.places.filter(p => p.cat === "hku");
+  if (hku.length) { HOME.x = hku.reduce((a, p) => a + p.x, 0) / hku.length; HOME.y = hku.reduce((a, p) => a + p.y, 0) / hku.length; }
+  RV.cx = HOME.x; RV.cy = HOME.y;
+  PEOPLE = d.people.map((pp, pi) => {
+    const trips = pp.trips.map(tr => {
+      const n = tr.seg.length, times = new Float64Array(n + 1);
+      let t = tr.d;
+      const pace = tr.k || 1;  // this person's walking speed relative to average
+      for (let k = 0; k < n; k++) { times[k] = t; t += E[tr.seg[k] >> 1].t / pace; }
+      times[n] = t;
+      return { ...tr, times };
+    });
+    return { ...pp, trips, cur: 0 };
+  });
+  // index every segment entry so shared runs can be found quickly
+  PEOPLE.forEach((pp, pi) => pp.trips.forEach((tr, ti) => tr.seg.forEach((code, si) => {
+    let L = IDX.get(code); if (!L) IDX.set(code, L = []);
+    L.push([tr.times[si], pi, ti, si]);
+  })));
+  for (const L of IDX.values()) L.sort((a, b) => a[0] - b[0]);
+}
+
+function lowerBound(L, t) { let lo = 0, hi = L.length; while (lo < hi) { const m = (lo + hi) >> 1; if (L[m][0] < t) lo = m + 1; else hi = m; } return lo; }
+
+// For one person: every stranger's longest run of shared turns, and when it happened.
+function sharedFor(pi) {
+  const res = new Map(), me = PEOPLE[pi];
+  me.trips.forEach((tr, ti) => {
+    let prev = new Map();
+    tr.seg.forEach((code, si) => {
+      const t = tr.times[si], e = E[code >> 1], start = (code & 1) ? e.v : e.u;
+      const dec = D.degree[start] >= 3, L = IDX.get(code) || [];
+      const cur = new Map();
+      for (let i = lowerBound(L, t - W_SHARE); i < L.length && L[i][0] <= t + W_SHARE; i++) {
+        const [ot, opi, oti, osi] = L[i];
+        if (opi === pi) continue;
+        const p = prev.get(opi * 1e6 + oti * 1e3 + osi - 1);
+        const run = p ? { turns: p.turns + (dec ? 1 : 0), t0: p.t0, myT0: p.myT0 } : { turns: 0, t0: ot, myT0: t };
+        run.t1 = ot + e.t / (PEOPLE[opi].trips[oti].k || 1); run.myTrip = ti; run.oti = oti;
+        cur.set(opi * 1e6 + oti * 1e3 + osi, run);
+        const best = res.get(opi);
+        if (!best || run.turns > best.turns) res.set(opi, run);
+      }
+      prev = cur;
+    });
+  });
+  return res;
+}
+
+function pointOn(code, f) {
+  const e = E[code >> 1], d = ((code & 1) ? 1 - f : f) * e.len, p = e.p, cum = e.cum;
+  let i = 1; while (i < cum.length - 1 && cum[i] < d) i++;
+  const a = cum[i - 1], b = cum[i], g = b > a ? (d - a) / (b - a) : 0;
+  return [p[(i - 1) * 2] + (p[i * 2] - p[(i - 1) * 2]) * g, p[(i - 1) * 2 + 1] + (p[i * 2 + 1] - p[(i - 1) * 2 + 1]) * g];
+}
+function where(pp, t) {
+  const trips = pp.trips; if (!trips.length) return null;
+  let i = Math.min(pp.cur, trips.length - 1);
+  while (i > 0 && trips[i].times[0] > t) i--;
+  while (i < trips.length - 1 && trips[i].times[trips[i].seg.length] <= t) i++;
+  pp.cur = i;
+  const tr = trips[i], n = tr.seg.length;
+  if (t < tr.times[0] || t >= tr.times[n]) return null;
+  let lo = 0, hi = n - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (tr.times[m] <= t) lo = m; else hi = m - 1; }
+  return pointOn(tr.seg[lo], (t - tr.times[lo]) / (tr.times[lo + 1] - tr.times[lo]));
+}
+
+// ---- view transform ----
+function sx(x) { return (x - DV.cx) * DV.scale + dcv.width / 2; }
+function sy(y) { return dcv.height / 2 - (y - DV.cy) * DV.scale; }
+function wx(px) { return (px - dcv.width / 2) / DV.scale + DV.cx; }
+function wy(py) { return DV.cy - (py - dcv.height / 2) / DV.scale; }
+function dpr() { return window.devicePixelRatio || 1; }
+let fitted = false;
+function fitDay() {
+  const r = dcv.getBoundingClientRect(); if (!r.width) return;
+  const k = dpr(), oldW = dcv.width, w = Math.round(r.width * k), h = Math.round(r.height * k);
+  if (w === oldW && h === dcv.height) return;
+  dcv.width = w; dcv.height = h;
+  if (!fitted) { fitted = true; homeView(); } else DV.scale *= w / oldW;  // keep the same area in view
+  baseKey = "";
+}
+function homeView() { DV.cx = HOME.x; DV.cy = HOME.y; DV.scale = dcv.width / 1300; baseKey = ""; }
+
+function drawBase() {
+  const key = [dcv.width, dcv.height, DV.cx, DV.cy, DV.scale, themeVersion].join(",");
+  if (key === baseKey) return;
+  baseKey = key;
+  baseCanvas.width = dcv.width; baseCanvas.height = dcv.height;
+  const c = baseCanvas.getContext("2d"), k = dpr();
+  c.fillStyle = css("--surface"); c.fillRect(0, 0, baseCanvas.width, baseCanvas.height);
+  const umax = Math.max(1, ...D.usage);
+  c.lineCap = "round"; c.lineJoin = "round";
+  // faint network first, then busier paths on top
+  const order = E.map((e, i) => i).sort((a, b) => D.usage[a] - D.usage[b]);
+  const heat = css("--heat"), faint = css("--path-faint");
+  for (const i of order) {
+    const e = E[i], u = D.usage[i] / umax;
+    c.strokeStyle = u > 0 ? heat : faint;
+    c.globalAlpha = u > 0 ? 0.25 + 0.6 * Math.sqrt(u) : 1;
+    c.lineWidth = (u > 0 ? 1 + 3.5 * Math.sqrt(u) : 1) * k * Math.min(1.2, Math.max(0.6, DV.scale / k));
+    c.setLineDash(e.s ? [2 * k, 2 * k] : []);
+    c.beginPath(); c.moveTo(sx(e.p[0]), sy(e.p[1]));
+    for (let j = 2; j < e.p.length; j += 2) c.lineTo(sx(e.p[j]), sy(e.p[j + 1]));
+    c.stroke();
+  }
+  c.globalAlpha = 1; c.setLineDash([]);
+  // places and labels (more labels as you zoom in)
+  const pxPerM = DV.scale / k, fs = 12 * k;
+  c.font = `600 ${fs}px "Source Sans 3", sans-serif`; c.textBaseline = "middle";
+  const ink = css("--ink"), ink2 = css("--ink-2"), surf = css("--surface");
+  const taken = [];
+  // label priority and the zoom (pixels per metre) at which each kind of place starts showing
+  const pri = { mtr: 0, hall: 1, hku: 2, library: 3, sight: 3, park: 4, bus: 6, food: 5, shop: 6 };
+  const show = { mtr: 0.35, hall: 0.6, hku: 0.75, library: 0.9, sight: 0.9, park: 1.2, bus: 2.4, food: 1.8, shop: 2.2 };
+  const pl = [...D.places].sort((a, b) => (pri[a.cat] ?? 9) - (pri[b.cat] ?? 9));
+  for (const p of pl) {
+    const x = sx(p.x), y = sy(p.y);
+    if (x < -50 || y < -50 || x > dcv.width + 50 || y > dcv.height + 50) continue;
+    if (!(p.cat in pri) && pxPerM < 2.6) continue;  // homes, ATMs, toilets... only when zoomed right in
+    c.beginPath(); c.arc(x, y, (p.cat === "mtr" ? 4 : 3) * k, 0, 7);
+    c.fillStyle = surf; c.fill(); c.lineWidth = 1.5 * k; c.strokeStyle = p.cat === "mtr" ? ink : ink2; c.stroke();
+    if (pxPerM < (show[p.cat] ?? 2.6)) continue;
+    let label = p.cat === "mtr" ? p.name.replace(/^MTR /, "").replace(/ \(.*\)$/, "") : p.name;
+    if (label.length > 28) label = label.slice(0, 26) + "…";
+    const w = c.measureText(label).width, bx = x + 7 * k, by = y - fs / 2;
+    if (taken.some(r => bx < r[2] && bx + w > r[0] && by < r[3] && by + fs > r[1])) continue;
+    taken.push([bx - 2, by - 2, bx + w + 2, by + fs + 2]);
+    c.lineWidth = 3 * k; c.strokeStyle = surf; c.strokeText(label, bx, y);
+    c.fillStyle = p.cat === "mtr" ? ink : ink2; c.fillText(label, bx, y);
+  }
+  // scale bar
+  const m = DV.scale > 0 ? [50, 100, 200, 500].find(v => v * DV.scale > 60 * k) || 500 : 100;
+  c.fillStyle = ink2; c.strokeStyle = ink2; c.lineWidth = 2 * k;
+  const x0 = 12 * k, y0 = dcv.height - 14 * k;
+  c.beginPath(); c.moveTo(x0, y0); c.lineTo(x0 + m * DV.scale, y0); c.stroke();
+  c.font = `${11 * k}px "Source Sans 3", sans-serif`; c.textBaseline = "bottom"; c.fillText(m + " m", x0, y0 - 3 * k);
+}
+
+function drawDay() {
+  if (!D || current !== "day") return;
+  drawBase();
+  const k = dpr();
+  dctx.setTransform(1, 0, 0, 1, 0, 0);
+  dctx.drawImage(baseCanvas, 0, 0);
+  const t = DV.t, sh = DV.shared, K = DV.k;
+  const stranger = css("--stranger"), follow = css("--follow"), you = css("--you"), surf = css("--surface");
+  const gStudent = css("--grp-student"), gStaff = css("--grp-staff"), gResident = css("--grp-resident");
+  // the followed person's route today: faint for other walks, strong for the current or next one
+  const me = PEOPLE[DV.follow];
+  if (me) {
+    let ni = me.trips.findIndex(tr => tr.times[tr.seg.length] > t);
+    me.trips.forEach((tr, ti) => {
+      dctx.strokeStyle = you; dctx.globalAlpha = ti === ni ? 0.55 : 0.15; dctx.lineWidth = (ti === ni ? 5 : 3) * k; dctx.lineCap = "round";
+      dctx.beginPath();
+      tr.seg.forEach((code, si) => {
+        const e = E[code >> 1], p = e.p, n = p.length / 2;
+        for (let j = 0; j < n; j++) {
+          const q = (code & 1) ? n - 1 - j : j, X = sx(p[q * 2]), Y = sy(p[q * 2 + 1]);
+          if (si === 0 && j === 0) dctx.moveTo(X, Y); else dctx.lineTo(X, Y);
+        }
+      });
+      dctx.stroke();
+    });
+    dctx.globalAlpha = 1;
+  }
+  let walking = 0;
+  const hot = [];
+  for (let i = 0; i < PEOPLE.length; i++) {
+    if (i === DV.follow) continue;
+    const pos = where(PEOPLE[i], t); if (!pos) continue;
+    walking++;
+    const run = sh && sh.get(i);
+    if (run && run.turns >= K && t >= run.t0 - 5 && t <= run.t1 + 30) { hot.push(pos); continue; }
+    const X = sx(pos[0]), Y = sy(pos[1]);
+    if (DV.byGroup) {
+      const g = PEOPLE[i].g, r = 3.2 * k;
+      dctx.globalAlpha = 0.9; dctx.fillStyle = g <= 3 ? gStudent : g === 4 ? gStaff : gResident;
+      dctx.beginPath();
+      if (g <= 3) dctx.arc(X, Y, r, 0, 7);
+      else if (g === 4) dctx.rect(X - r, Y - r, 2 * r, 2 * r);
+      else { dctx.moveTo(X, Y - r * 1.2); dctx.lineTo(X + r * 1.1, Y + r * 0.9); dctx.lineTo(X - r * 1.1, Y + r * 0.9); dctx.closePath(); }
+      dctx.fill();
+      continue;
+    }
+    dctx.fillStyle = stranger; dctx.globalAlpha = 0.75;
+    dctx.beginPath(); dctx.arc(X, Y, 2.6 * k, 0, 7); dctx.fill();
+  }
+  dctx.globalAlpha = 1;
+  for (const pos of hot) {
+    dctx.beginPath(); dctx.arc(sx(pos[0]), sy(pos[1]), 5 * k, 0, 7);
+    dctx.fillStyle = follow; dctx.fill(); dctx.lineWidth = 1.5 * k; dctx.strokeStyle = surf; dctx.stroke();
+  }
+  if (me) {
+    const pos = where(me, t);
+    if (pos) {
+      walking++;
+      const X = sx(pos[0]), Y = sy(pos[1]);
+      dctx.beginPath(); dctx.arc(X, Y, 13 * k, 0, 7); dctx.fillStyle = you; dctx.globalAlpha = 0.18; dctx.fill(); dctx.globalAlpha = 1;
+      dctx.beginPath(); dctx.arc(X, Y, 6.5 * k, 0, 7); dctx.fillStyle = you; dctx.fill(); dctx.lineWidth = 2 * k; dctx.strokeStyle = surf; dctx.stroke();
+    }
+  }
+  $("dclock").textContent = hhmm(t);
+  $("dcount").textContent = `${walking} walking now` + (hot.length ? ` · ${hot.length} making ${me.name.split(" ")[0]}'s turns` : "");
+}
+
+// ---- the person panel ----
+function roleText(p) {
+  const r = { undergrad: "undergraduate", postgrad: "postgraduate", staff: "staff", resident: "local resident" }[p.role] || p.role;
+  let s = `${p.age} · ${r}`;
+  if (p.faculty) s += `, ${p.faculty}` + (p.year ? `, year ${p.year}` : "");
+  if (p.occupation) s += `, ${p.occupation}`;
+  return s + ` · ${p.personality}`;
+}
+function follow(pi, jump) {
+  DV.follow = pi;
+  const p = PEOPLE[pi];
+  DV.shared = sharedFor(pi);
+  $("pname").textContent = p.name;
+  $("pfacts").textContent = roleText(p);
+  const home = PLACE[p.home] ? PLACE[p.home].name : p.home;
+  const today = p.today && p.today.feeling ? ` Today: ${p.today.feeling}${(p.today.notes || []).map(n => "; " + n.toLowerCase()).join("")}.` : "";
+  const likes = p.interests && p.interests.length ? ` Likes ${p.interests.join(", ")}. ${p.plans_style || ""}` : "";
+  $("phabits").textContent = `Home: ${home} (${p.home_kind}). Habits: ${p.habits.join("; ")}.${likes}${today}`;
+  renderSharers(); renderLog();
+  if (jump) jumpToNextWalk(true);
+}
+function renderSharers() {
+  const p = PEOPLE[DV.follow]; if (!p) return;
+  const K = DV.k, first = p.name.split(" ")[0];
+  const rows = [...DV.shared.entries()].filter(([, r]) => r.turns >= K).sort((a, b) => b[1].turns - a[1].turns || a[1].t0 - b[1].t0);
+  $("pshare").innerHTML = rows.length
+    ? `<b class="n">${rows.length}</b> stranger${rows.length > 1 ? "s" : ""} made ${esc(first)}'s same ${K} or more turns in a row today, without following anyone.`
+    : `Nobody made ${esc(first)}'s same ${K} turns in a row today.`;
+  $("psharers").innerHTML = rows.slice(0, 8).map(([opi, r]) => {
+    const o = PEOPLE[opi], tr = o.trips[r.oti];
+    const to = PLACE[tr.to] ? PLACE[tr.to].name : tr.to;
+    return `<li data-pi="${opi}" data-t="${r.t0}"><span class="t">${hhmm(r.myT0)}</span><span><b>${r.turns} turns</b> with ${esc(o.name)}, who was heading to ${esc(to)}</span></li>`;
+  }).join("");
+}
+function renderLog() {
+  const p = PEOPLE[DV.follow]; if (!p) return;
+  const now = hhmm(DV.t);
+  let lastPast = -1;
+  p.log.forEach((l, i) => { if (l[0] <= now) lastPast = i; });
+  const html = p.log.map((l, i) => `<li class="${i === lastPast ? "now" : i < lastPast ? "past" : "future"}${l[3] ? " err" : ""}"><span class="t">${l[0]}</span><span>${esc(l[2])}</span></li>`).join("");
+  if ($("plog").dataset.key !== DV.follow + ":" + lastPast) {
+    const box = $("plog");
+    box.innerHTML = html; box.dataset.key = DV.follow + ":" + lastPast;
+    const el = box.querySelector("li.now");  // scroll the log box only, never the page
+    if (el) box.scrollTop = Math.max(0, el.offsetTop - box.offsetTop - box.clientHeight / 3);
+  }
+}
+function jumpToNextWalk(center) {
+  const p = PEOPLE[DV.follow]; if (!p || !p.trips.length) return;
+  let tr = p.trips.find(tr => tr.times[0] > DV.t + 30) || p.trips[0];
+  DV.t = Math.max(21600, tr.times[0] - 20);
+  for (const q of PEOPLE) q.cur = 0;
+  if (center) {
+    const a = PLACE[tr.from], b = PLACE[tr.to];
+    if (a && b) {
+      DV.cx = (a.x + b.x) / 2; DV.cy = (a.y + b.y) / 2;
+      const span = Math.max(450, Math.abs(a.x - b.x) * 1.6, Math.abs(a.y - b.y) * 1.6 * dcv.width / dcv.height);
+      DV.scale = Math.min(dcv.width / span, 4 * dpr()); baseKey = "";
+    }
+  }
+  DV.playing = true; $("dplay").textContent = "Pause";
+}
+function pickFeatured() {
+  // start with someone whose day shows the effect: a long shared run
+  const rng = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  let best = -1, bestTurns = -1;
+  for (let n = 0; n < 40; n++) {
+    const pi = Math.floor(rng() * PEOPLE.length);
+    if (!PEOPLE[pi].trips.length || PEOPLE[pi].role === "resident") continue;
+    let mx = 0; for (const r of sharedFor(pi).values()) mx = Math.max(mx, r.turns);
+    if (mx > bestTurns && mx <= 12) { bestTurns = mx; best = pi; }
+  }
+  return best < 0 ? 0 : best;
+}
+
+// ---- interaction ----
+let drag = null, pointers = new Map(), pinch = null;
+dcv.addEventListener("pointerdown", e => {
+  try { dcv.setPointerCapture(e.pointerId); } catch (_) { /* pointer already gone */ }
+  pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: DV.scale }; drag = null; }
+  else drag = { x: e.clientX, y: e.clientY, cx: DV.cx, cy: DV.cy, moved: false };
+});
+dcv.addEventListener("pointermove", e => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, [e.clientX, e.clientY]);
+  const k = dpr();
+  if (pinch && pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    DV.scale = Math.max(0.15 * k, Math.min(8 * k, pinch.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d)); baseKey = ""; return;
+  }
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; dcv.classList.add("dragging"); }
+  DV.cx = drag.cx - dx * k / DV.scale; DV.cy = drag.cy + dy * k / DV.scale; baseKey = "";
+});
+function endPointer(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  dcv.classList.remove("dragging");
+  if (drag && !drag.moved && e.type === "pointerup") clickMap(e);
+  if (!pointers.size) drag = null;
+}
+dcv.addEventListener("pointerup", endPointer); dcv.addEventListener("pointercancel", endPointer);
+dcv.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = dcv.getBoundingClientRect(), k = dpr(), px = (e.clientX - r.left) * k, py = (e.clientY - r.top) * k;
+  const bx = wx(px), by = wy(py), f = Math.exp(-e.deltaY * 0.0015);
+  DV.scale = Math.max(0.15 * k, Math.min(8 * k, DV.scale * f));
+  DV.cx = bx - (px - dcv.width / 2) / DV.scale; DV.cy = by + (py - dcv.height / 2) / DV.scale; baseKey = "";
+}, { passive: false });
+function clickMap(e) {
+  const r = dcv.getBoundingClientRect(), k = dpr(), px = (e.clientX - r.left) * k, py = (e.clientY - r.top) * k;
+  let best = -1, bd = 14 * k;
+  PEOPLE.forEach((p, i) => { const pos = where(p, DV.t); if (!pos) return; const d = Math.hypot(sx(pos[0]) - px, sy(pos[1]) - py); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0) follow(best, false);
+}
+function zoomBy(f) { const k = dpr(); DV.scale = Math.max(0.15 * k, Math.min(8 * k, DV.scale * f)); baseKey = ""; }
+$("zin").onclick = () => zoomBy(1.5); $("zout").onclick = () => zoomBy(1 / 1.5); $("zhome").onclick = () => homeView();
+$("dplay").onclick = () => { DV.playing = !DV.playing; $("dplay").textContent = DV.playing ? "Pause" : "Play"; };
+$("dtime").addEventListener("input", () => { DV.t = +$("dtime").value; for (const q of PEOPLE) q.cur = 0; });
+$("dspeed").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; DV.speed = +b.dataset.v; pressed($("dspeed"), DV.speed); });
+$("dk").innerHTML = [2, 3, 4, 5, 6].map(k => `<button data-v="${k}">${k} turns</button>`).join("");
+pressed($("dk"), DV.k);
+$("dk").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; DV.k = +b.dataset.v; pressed($("dk"), DV.k); renderSharers(); });
+$("dgroups").onclick = () => {
+  DV.byGroup = !DV.byGroup;
+  $("dgroups").setAttribute("aria-pressed", DV.byGroup);
+  $("lg-plain").hidden = DV.byGroup; $("lg-groups").hidden = !DV.byGroup;
+  $("lg-groups").style.display = DV.byGroup ? "inline-flex" : "";
+};
+$("pnext").onclick = () => jumpToNextWalk(true);
+$("prand").onclick = () => { let i; do { i = Math.floor(Math.random() * PEOPLE.length); } while (!PEOPLE[i].trips.length); follow(i, true); };
+$("psharers").addEventListener("click", e => {
+  const li = e.target.closest("li"); if (!li) return;
+  const t = +li.dataset.t; follow(+li.dataset.pi, false);
+  DV.t = Math.max(21600, t - 20); for (const q of PEOPLE) q.cur = 0;
+});
+addEventListener("resize", () => { if (current === "day") fitDay(); });
+
+let lastTs = 0;
+function dayTick(ts) {
+  const dt = Math.min(0.1, (ts - lastTs) / 1000 || 0); lastTs = ts;
+  if (D) drawFigMap();
+  if (D && current === "day" && exploreOn) {
+    if (DV.playing) { DV.t += dt * DV.speed; if (DV.t >= 86340) { DV.t = 86340; DV.playing = false; $("dplay").textContent = "Play"; } }
+    if (document.activeElement !== $("dtime")) $("dtime").value = Math.round(DV.t);
+    fitDay(); drawDay(); renderLog();
+  }
+  if (D && current === "roads" && exploreOn) { fitRoads(); drawRoads(); }
+  requestAnimationFrame(dayTick);
+}
+onShow.day = () => { requestAnimationFrame(() => { fitDay(); baseKey = ""; }); };
+
+// ===================================================================
+// Roads & groups view: heatmap by group and hour, and decisions per road
+// ===================================================================
+const WHO = [["Everyone", [0, 1, 2, 3, 4, 5]], ["All students", [0, 1, 2, 3]], ["Undergrads in halls", [0]], ["Commuting undergrads", [1]],
+             ["Postgrads", [2, 3]], ["Staff", [4]], ["Local residents", [5]]];
+const WHEN = [["All day", 0, 24], ["Morning 7–10", 7, 10], ["Midday 10–14", 10, 14], ["Afternoon 14–18", 14, 18], ["Evening 18–24", 18, 24]];
+const RV = { who: 0, when: 0, sel: -1, cx: 40, cy: 60, scale: 1, counts: null, max: 1, fitted: false };
+const rcv = $("rmap"), rctx = rcv.getContext("2d");
+let RH = null, RDEC = null, rBase = document.createElement("canvas"), rKey = "";
+const GSHORT = ["UG, halls", "UG, commute", "PG, halls", "PG, commute", "Staff", "Residents"];
+
+function prepRoads() {
+  RH = D.heat.map(byHour => byHour.map(arr => { const m = new Map(); for (let i = 0; i < arr.length; i += 2) m.set(arr[i], arr[i + 1]); return m; }));
+  RDEC = new Map();
+  for (let i = 0; i < D.dec.length; i += 6) {
+    const code = D.dec[i]; let a = RDEC.get(code);
+    if (!a) RDEC.set(code, a = new Array(6).fill(null));
+    a[D.dec[i + 1]] = D.dec.slice(i + 2, i + 6);
+  }
+  $("rwho").innerHTML = WHO.map((w, i) => `<button data-v="${i}">${w[0]}</button>`).join("");
+  $("rwhen").innerHTML = WHEN.map((w, i) => `<button data-v="${i}">${w[0]}</button>`).join("");
+  pressed($("rwho"), RV.who); pressed($("rwhen"), RV.when);
+  recount();
+  RV.sel = RV.top[0] ?? -1;
+  renderRoadPanel(); renderGroupTables();
+}
+function recount() {
+  const gs = WHO[RV.who][1], [, h0, h1] = WHEN[RV.when], c = new Float64Array(E.length);
+  for (const g of gs) for (let h = h0; h < h1; h++) for (const [e, n] of RH[g][h]) c[e] += n;
+  RV.counts = c; RV.max = Math.max(1, ...c);
+  RV.top = [...c.keys()].filter(e => c[e] > 0).sort((a, b) => c[b] - c[a]).slice(0, 10);
+  $("rmax").textContent = `More (busiest: ${Math.round(RV.max).toLocaleString()} walkers)`;
+  rKey = "";
+}
+function rampColor(f, stops) {
+  const x =Math.max(0, Math.min(1, f)) * 4, i = Math.min(3, Math.floor(x)), u = x - i, a = stops[i], b = stops[i + 1];
+  return `rgb(${a.map((v, j) => Math.round(v + (b[j] - v) * u)).join(",")})`;
+}
+function hexRgb(h) { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); }
+
+const rsx = x => (x - RV.cx) * RV.scale + rcv.width / 2, rsy = y => rcv.height / 2 - (y - RV.cy) * RV.scale;
+function fitRoads() {
+  const r = rcv.getBoundingClientRect(); if (!r.width) return;
+  const k = dpr(), w = Math.round(r.width * k), h = Math.round(r.height * k), oldW = rcv.width;
+  if (w === oldW && h === rcv.height) return;
+  rcv.width = w; rcv.height = h;
+  if (!RV.fitted) { RV.fitted = true; RV.scale = w / 1300; } else RV.scale *= w / oldW;
+  rKey = "";
+}
+function drawRoads() {
+  if (!D || current !== "roads" || !RV.counts) return;
+  const key = [rcv.width, rcv.height, RV.cx, RV.cy, RV.scale, RV.who, RV.when, RV.sel, themeVersion].join(",");
+  if (key === rKey) return;
+  rKey = key;
+  const c = rctx, k = dpr(), counts = RV.counts, max = RV.max;
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.fillStyle = css("--surface"); c.fillRect(0, 0, rcv.width, rcv.height);
+  const zoomW = Math.min(1.3, Math.max(0.6, RV.scale / k));
+  const line = (e, w, col) => {
+    c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(rsx(e.p[0]), rsy(e.p[1]));
+    for (let j = 2; j < e.p.length; j += 2) c.lineTo(rsx(e.p[j]), rsy(e.p[j + 1]));
+    c.stroke();
+  };
+  c.lineCap = "round"; c.lineJoin = "round";
+  const faint = css("--path-faint");
+  E.forEach((e, i) => { if (!counts[i]) line(e, 1 * k * zoomW, faint); });
+  const used = [...counts.keys()].filter(i => counts[i] > 0).sort((a, b) => counts[a] - counts[b]);
+  const stops = [0, 1, 2, 3, 4].map(j => hexRgb(css("--ramp-" + j)));
+  for (const i of used) { const f = Math.sqrt(counts[i] / max); line(E[i], (1.2 + 5 * f) * k * zoomW, rampColor(0.15 + 0.85 * f, stops)); }
+  if (RV.sel >= 0) { line(E[RV.sel], 10 * k * zoomW, css("--ink")); line(E[RV.sel], 5 * k * zoomW, css("--follow")); }
+  // labels for orientation
+  const fs = 12 * k, ink = css("--ink"), ink2 = css("--ink-2"), surf = css("--surface"), taken = [];
+  c.font = `600 ${fs}px "Source Sans 3", sans-serif`; c.textBaseline = "middle";
+  const show = { mtr: 0.35, hall: 0.6, hku: 0.75, library: 0.9 }, pxPerM = RV.scale / k;
+  for (const p of D.places) {
+    if (!(p.cat in show) || pxPerM < show[p.cat]) continue;
+    const x = rsx(p.x), y = rsy(p.y); if (x < 0 || y < 0 || x > rcv.width || y > rcv.height) continue;
+    let label = p.cat === "mtr" ? p.name.replace(/^MTR /, "").replace(/ \(.*\)$/, "") : p.name;
+    if (label.length > 26) label = label.slice(0, 24) + "…";
+    const w = c.measureText(label).width, bx = x + 6 * k, by = y - fs / 2;
+    if (taken.some(r => bx < r[2] && bx + w > r[0] && by < r[3] && by + fs > r[1])) continue;
+    taken.push([bx - 2, by - 2, bx + w + 2, by + fs + 2]);
+    c.beginPath(); c.arc(x, y, 2.5 * k, 0, 7); c.fillStyle = ink2; c.fill();
+    c.lineWidth = 3 * k; c.strokeStyle = surf; c.strokeText(label, bx, y); c.fillStyle = p.cat === "mtr" ? ink : ink2; c.fillText(label, bx, y);
+  }
+}
+function nearPlace(x, y) {
+  let b = null, bd = 1e9;
+  for (const p of D.places) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; b = p; } }
+  return b && bd < 120 ? b.name : "the next junction";
+}
+function roadName(i) {
+  const e = E[i]; if (e.n) return e.n;
+  const n = e.p.length / 2, mx = e.p[Math.floor(n / 2) * 2], my = e.p[Math.floor(n / 2) * 2 + 1];
+  const pl = nearPlace(mx, my); return pl === "the next junction" ? "Unnamed path" : "Path near " + pl;
+}
+function selectRoad(i, center) {
+  RV.sel = i; rKey = "";
+  if (center && i >= 0) { const e = E[i]; RV.cx = e.p[0]; RV.cy = e.p[1]; RV.scale = Math.max(RV.scale, 2 * dpr()); }
+  renderRoadPanel();
+}
+function renderRoadPanel() {
+  const i = RV.sel; if (i < 0 || !RH) return;
+  const e = E[i], gs = WHO[RV.who][1], [whenLabel, h0, h1] = WHEN[RV.when];
+  $("rname").textContent = roadName(i);
+  $("rmeta").textContent = `${e.m} m` + (e.s ? " · has stairs" : "") + (e.l ? " · has a lift" : "");
+  const n = Math.round(RV.counts[i]);
+  $("rcount").innerHTML = `<b class="n" style="color:var(--ink)">${n.toLocaleString()}</b> walkers (${esc(WHO[RV.who][0].toLowerCase())}, ${esc(whenLabel.toLowerCase())})`;
+  // by group, for the chosen hours
+  const per = D.groups.map((g, gi) => { let s = 0; for (let h = h0; h < h1; h++) s += RH[gi][h].get(i) || 0; return s; });
+  const pmax = Math.max(1, ...per), ptot = per.reduce((a, b) => a + b, 0) || 1;
+  $("rgroups").innerHTML = D.groups.map((g, gi) => `<div class="hbar"><span>${esc(g.label)}</span><span class="track"><span class="fill" style="width:${100 * per[gi] / pmax}%;display:block;${gs.includes(gi) ? "" : "opacity:.35"}"></span></span><span class="v">${per[gi]} · ${Math.round(100 * per[gi] / ptot)}%</span></div>`).join("");
+  // by hour, for the chosen groups
+  const hrs = []; for (let h = 6; h < 24; h++) { let s = 0; for (const g of gs) s += RH[g][h].get(i) || 0; hrs.push(s); }
+  const hm = Math.max(1, ...hrs), Wd = 320, H = 90, L = 4, B = 16, bw = (Wd - L * 2) / hrs.length;
+  let s = "";
+  hrs.forEach((v, j) => {
+    const h = (H - B - 6) * v / hm, x = L + j * bw + 1, inRange = (j + 6) >= h0 && (j + 6) < h1;
+    s += `<rect x="${x}" y="${H - B - h}" width="${bw - 2}" height="${Math.max(0, h)}" rx="2" fill="var(--you)" opacity="${inRange ? 1 : 0.35}"/>`;
+    s += `<rect x="${x}" y="0" width="${bw - 2}" height="${H - B}" fill="transparent" data-tip="${String(j + 6).padStart(2, "0")}:00 · ${v} walkers"/>`;
+    if (j % 3 === 0) s += `<text x="${x + bw / 2}" y="${H - 3}" text-anchor="middle">${String(j + 6).padStart(2, "0")}</text>`;
+  });
+  $("rhours").innerHTML = s;
+  // decisions at each end
+  const ends = [0, 1].map(dir => {
+    const code = i * 2 + dir, byG = RDEC.get(code); if (!byG) return "";
+    const last = dir === 0 ? [e.p[e.p.length - 2], e.p[e.p.length - 1]] : [e.p[0], e.p[1]];
+    const first = dir === 0 ? [e.p[0], e.p[1]] : [e.p[e.p.length - 2], e.p[e.p.length - 1]];
+    const ang = Math.atan2(last[1] - first[1], last[0] - first[0]) * 180 / Math.PI;  // 0 = east, 90 = north
+    const compass = ["east", "north-east", "north", "north-west", "west", "south-west", "south", "south-east"][((Math.round(ang / 45) % 8) + 8) % 8];
+    const sum = [0, 0, 0, 0]; for (const g of gs) if (byG[g]) byG[g].forEach((v, j) => sum[j] += v);
+    const tot = sum.reduce((a, b) => a + b, 0); if (!tot) return "";
+    const pc = v => Math.round(100 * v / tot);
+    const cols = ["var(--you)", "var(--follow)", "var(--base-series)", "var(--ink-3)"], names = ["Left", "Right", "Straight", "Back"];
+    const bar = sum.map((v, j) => v ? `<span style="width:${100 * v / tot}%;background:${cols[j]}" title="${names[j]} ${pc(v)}%"></span>` : "").join("");
+    const rows = D.groups.map((g, gi) => { const c = byG[gi]; if (!c) return ""; const t = c.reduce((a, b) => a + b, 0); if (t < 5) return "";
+      return `<tr><td>${esc(GSHORT[gi])}</td><td>${t}</td><td>${Math.round(100 * c[0] / t)}%</td><td>${Math.round(100 * c[1] / t)}%</td><td>${Math.round(100 * c[2] / t)}%</td></tr>`; }).join("");
+    return `<div class="end"><h4>Walking ${compass}, toward ${esc(nearPlace(last[0], last[1]))}</h4>
+      <p class="muted" style="color:var(--ink-2)">Over the whole day, ${tot} ${esc(WHO[RV.who][0] === "Everyone" ? "people" : WHO[RV.who][0].toLowerCase())} reached the end and turned: <b style="color:var(--you)">left ${pc(sum[0])}%</b>, <b style="color:var(--follow)">right ${pc(sum[1])}%</b>, straight ${pc(sum[2])}%${sum[3] ? `, back ${pc(sum[3])}%` : ""}.</p>
+      <div class="turnbar">${bar}</div>
+      ${rows ? `<div class="tablewrap"><table><tr><th>Group</th><th>People</th><th>Left</th><th>Right</th><th>Straight</th></tr>${rows}</table></div>` : ""}</div>`;
+  }).join("");
+  $("rends").innerHTML = ends ? `<h2>At the end of this road</h2>${ends}` : `<p class="muted">Nobody made a turn at the end of this road in this selection.</p>`;
+  // busiest roads list
+  $("toptitle").textContent = `Busiest roads: ${WHO[RV.who][0].toLowerCase()}, ${whenLabel.toLowerCase()}`;
+  $("toplist").innerHTML = RV.top.map((r, j) => `<li data-e="${r}" style="display:grid"><span class="t">${j + 1}</span><span>${esc(roadName(r))}</span><span class="n">${Math.round(RV.counts[r]).toLocaleString()}</span></li>`).join("");
+}
+function renderGroupTables() {
+  const G = D.results.groups || [];
+  $("gtable").innerHTML = "<tr><th>Group</th><th>People</th><th>Trips each</th><th>Walking min each</th><th>Turns per trip</th><th>Left</th><th>Right</th><th>Straight</th><th>Stranger shares 5+ turns</th><th>Busiest road</th></tr>" +
+    G.map(g => `<tr><td>${esc(g.label)}</td><td>${(+g.people).toLocaleString()}</td><td>${(+g.trips_per_person).toFixed(1)}</td><td>${Math.round(+g.walk_min_per_person)}</td><td>${(+g.turns_per_trip).toFixed(1)}</td><td>${Math.round(+g["left_%"])}%</td><td>${Math.round(+g["right_%"])}%</td><td>${Math.round(+g["straight_%"])}%</td><td>${pct(+g.p_shares_5)}</td><td>${esc(g.busiest_road.replace(/^[^A-Za-z]*(?=[A-Za-z])/, ""))}</td></tr>`).join("");
+  const M = D.results.share_matrix || [], keys = D.groups.map(g => g.key);
+  $("gmatrix").innerHTML = `<tr><th>You are</th>${GSHORT.map(s => `<th>${s}</th>`).join("")}</tr>` +
+    M.map(r => `<tr><td>${esc(GSHORT[keys.indexOf(r.you)])}</td>${keys.map(k => { const v = +r[k]; return `<td class="cell" style="background:color-mix(in srgb, var(--you) ${Math.round(v * 70)}%, transparent)">${pct(v)}</td>`; }).join("")}</tr>`).join("");
+}
+
+$("rwho").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; RV.who = +b.dataset.v; pressed($("rwho"), RV.who); recount(); renderRoadPanel(); });
+$("rwhen").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; RV.when = +b.dataset.v; pressed($("rwhen"), RV.when); recount(); renderRoadPanel(); });
+$("toplist").addEventListener("click", e => { const li = e.target.closest("li"); if (li) selectRoad(+li.dataset.e, true); });
+$("rzin").onclick = () => { RV.scale = Math.min(8 * dpr(), RV.scale * 1.5); };
+$("rzout").onclick = () => { RV.scale = Math.max(0.15 * dpr(), RV.scale / 1.5); };
+$("rzhome").onclick = () => { RV.cx = HOME.x; RV.cy = HOME.y; RV.scale = rcv.width / 1300; };
+hoverTips($("rhours"));
+{
+  let drag = null;
+  rcv.addEventListener("pointerdown", e => { try { rcv.setPointerCapture(e.pointerId); } catch (_) {} drag = { x: e.clientX, y: e.clientY, cx: RV.cx, cy: RV.cy, moved: false }; });
+  rcv.addEventListener("pointermove", e => {
+    if (!drag) return; const k = dpr(), dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; rcv.classList.add("dragging"); }
+    RV.cx = drag.cx - dx * k / RV.scale; RV.cy = drag.cy + dy * k / RV.scale;
+  });
+  const up = e => {
+    rcv.classList.remove("dragging");
+    if (drag && !drag.moved && e.type === "pointerup") {
+      const r = rcv.getBoundingClientRect(), k = dpr(), px = (e.clientX - r.left) * k, py = (e.clientY - r.top) * k;
+      let best = -1, bd = 10 * k;
+      E.forEach((ed, i) => {
+        for (let j = 2; j < ed.p.length; j += 2) {
+          const ax = rsx(ed.p[j - 2]), ay = rsy(ed.p[j - 1]), bx = rsx(ed.p[j]), by = rsy(ed.p[j + 1]);
+          const L2 = (bx - ax) ** 2 + (by - ay) ** 2, t = L2 ? Math.max(0, Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / L2)) : 0;
+          const d = Math.hypot(px - ax - t * (bx - ax), py - ay - t * (by - ay));
+          if (d < bd || (d < bd + 2 * k && RV.counts[i] > (RV.counts[best] || 0))) { bd = Math.min(bd, d); best = i; }
+        }
+      });
+      if (best >= 0) selectRoad(best, false);
+    }
+    drag = null;
+  };
+  rcv.addEventListener("pointerup", up); rcv.addEventListener("pointercancel", up);
+  rcv.addEventListener("wheel", e => {
+    e.preventDefault();
+    const r = rcv.getBoundingClientRect(), k = dpr(), px = (e.clientX - r.left) * k, py = (e.clientY - r.top) * k;
+    const bx = (px - rcv.width / 2) / RV.scale + RV.cx, by = RV.cy - (py - rcv.height / 2) / RV.scale;
+    RV.scale = Math.max(0.15 * k, Math.min(8 * k, RV.scale * Math.exp(-e.deltaY * 0.0015)));
+    RV.cx = bx - (px - rcv.width / 2) / RV.scale; RV.cy = by + (py - rcv.height / 2) / RV.scale;
+  }, { passive: false });
+}
+addEventListener("resize", () => { if (current === "roads") fitRoads(); });
+onShow.roads = () => { requestAnimationFrame(() => { fitRoads(); rKey = ""; if (D) { renderRoadPanel(); renderGroupTables(); } }); };
+
+// ===================================================================
+// Results paper: figures drawn from the day1 analysis (out/day1/analysis/*.csv)
+// ===================================================================
+const RES = {
+  // k, P(stranger shares k) quickest, random; mean strangers sharing k, quickest, random
+  shared: [[1, .9558, .9882, 70.268, 180.839], [2, .911, .9774, 50.857, 95.552], [3, .8544, .9588, 40.476, 48.462],
+           [4, .797, .9312, 33.516, 24.4], [5, .7394, .8892, 26.191, 12.382], [6, .685, .8258, 21.223, 6.598],
+           [7, .623, .7358, 18.136, 3.586], [8, .5758, .612, 15.672, 2.074], [9, .524, .472, 13.267, 1.302], [10, .4766, .3594, 11.063, .867]],
+  // departure hour, trips, P(share 3), P(share 5)
+  hours: [[6, 17, .4706, .2941], [7, 361, .8726, .7313], [8, 518, .8764, .7568], [9, 397, .8514, .7254], [10, 363, .8623, .7548],
+          [11, 413, .8039, .6586], [12, 536, .7649, .6679], [13, 474, .8312, .7278], [14, 329, .8328, .6809], [15, 317, .877, .7539],
+          [16, 319, .8997, .768], [17, 376, .9149, .8404], [18, 259, .9382, .8533], [19, 185, .9189, .8486], [20, 103, .8447, .7573],
+          [21, 17, .8824, .8235], [22, 14, .7143, .3571], [23, 2, 0, 0]],
+  // label, people, trips each, P(share 5)
+  groups: [["Undergrads in halls", 2201, 7.28, .7633], ["Commuting undergrads", 3983, 6.01, .7719], ["Postgrads in halls", 177, 7.6, .7308],
+           ["Commuting postgrads", 1013, 5.94, .7709], ["Staff", 1008, 4.03, .8098], ["Local residents", 1618, 3.61, .4856]],
+  // rows: you; columns: the matching stranger's group; last value: trips
+  matrix: [[.5388, .2817, .0388, .0737, .0321, .035, 1058], [.1772, .5949, .0171, .1551, .0342, .0215, 1580],
+           [.4316, .3053, .0737, .0842, .0632, .0421, 95], [.1965, .6071, .0101, .1511, .0151, .0202, 397],
+           [.1174, .2181, .0101, .0369, .5872, .0302, 298], [.1822, .2305, .0112, .0446, .0446, .487, 269]],
+};
+const GLONG = RES.groups.map(g => g[0]);
+
+// phones get a narrower drawing so chart text stays readable
+function narrow(svg) { const w = svg.clientWidth < 440 ? 380 : 520; svg.setAttribute("viewBox", `0 0 ${w} ${svg.viewBox.baseVal.height}`); return w; }
+function gridY(ticks, y, L, R, fmt) {
+  return ticks.map(g => `<line class="axis nohit" x1="${L}" x2="${R}" y1="${y(g)}" y2="${y(g)}" stroke-width="${g === ticks[0] ? 1 : .6}" ${g === ticks[0] ? "" : 'stroke-dasharray="2 3"'}/>` +
+    `<text class="ax" x="${L - 6}" y="${y(g) + 3.5}" text-anchor="end">${fmt(g)}</text>`).join("");
+}
+// two-series line chart over k = 1..10, with per-column hover and direct end labels
+function kChart(svg, rows, qi, bi, scale, fmt, ticks) {
+  const Wd = narrow(svg), H = 270, L = 48, R = 126, T = 14, B = 40, pw = Wd - L - R, ph = H - T - B;
+  const x = i => L + pw * i / (rows.length - 1);
+  const y = scale === "log"
+    ? (v => { const a = Math.log(ticks[0]), b = Math.log(ticks[ticks.length - 1]); return T + ph * (1 - (Math.log(v) - a) / (b - a)); })
+    : (v => T + ph * (1 - v));
+  const cw = pw / (rows.length - 1);
+  let s = rows.map((r, i) => `<rect class="hov" x="${x(i) - cw / 2}" y="${T}" width="${cw}" height="${ph}" data-tip="${r[0]} turn${r[0] > 1 ? "s" : ""} in a row · quickest ${fmt(r[qi])} · random ${fmt(r[bi])}"/>`).join("");
+  s += gridY(ticks, y, L, x(rows.length - 1) + 6, fmt);
+  rows.forEach((r, i) => { s += `<text class="ax" x="${x(i)}" y="${H - B + 16}" text-anchor="middle">${r[0]}</text>`; });
+  s += `<text class="ax" x="${L + pw / 2}" y="${H - 4}" text-anchor="middle">Same turns in a row (k)</text>`;
+  const series = [{ i: bi, c: "var(--base-series)" }, { i: qi, c: "var(--you)" }];
+  for (const se of series) {
+    s += `<polyline class="nohit" fill="none" stroke="${se.c}" stroke-width="2.5" stroke-linejoin="round" points="${rows.map((r, i) => x(i) + "," + y(r[se.i])).join(" ")}"/>`;
+    rows.forEach((r, i) => { s += `<circle class="nohit" cx="${x(i)}" cy="${y(r[se.i])}" r="4" fill="${se.c}" stroke="var(--surface)" stroke-width="2"/>`; });
+  }
+  // end labels, pushed apart if they collide
+  const last = rows[rows.length - 1], lx = x(rows.length - 1) + 12;
+  let yq = y(last[qi]), yb = y(last[bi]);
+  if (Math.abs(yq - yb) < 32) { const m = (yq + yb) / 2, d = yq < yb ? -16 : 16; yq = m + d; yb = m - d; }
+  const lab = (yy, name, v) => `<text class="dl nohit" x="${lx}" y="${yy - 2}">${name}</text><text class="dl nohit" x="${lx}" y="${yy + 12}" style="font-weight:400;fill:var(--ink-2)">${v}</text>`;
+  s += lab(yq, "Quickest path", fmt(last[qi])) + lab(yb, "Random turns", fmt(last[bi]));
+  svg.innerHTML = s;
+  hoverTips(svg);
+}
+function hourChart(svg, rows) {
+  const Wd = narrow(svg), H = 250, L = 48, R = 8, T = 22, B = 40, pw = Wd - L - R, ph = H - T - B;
+  const gw = pw / rows.length, bw = Math.min(24, gw - 6), y = v => T + ph * (1 - v);
+  let s = "";
+  const hi = rows.reduce((a, r) => r[3] > a[3] ? r : a), lo = rows.reduce((a, r) => r[3] < a[3] ? r : a);
+  rows.forEach((r, i) => { s += `<rect class="hov" x="${L + gw * i}" y="${T}" width="${gw}" height="${ph}" data-tip="${String(r[0]).padStart(2, "0")}:00 · ${pct(r[3])} of ${r[1]} trips had a 5-turn match"/>`; });
+  s += gridY([0, .25, .5, .75, 1], y, L, Wd - R, v => v * 100 + "%");
+  rows.forEach((r, i) => {
+    const cx = L + gw * (i + .5), x0 = cx - bw / 2, top = y(r[3]), h = y(0) - top, rad = Math.min(4, h / 2);
+    s += `<path class="nohit" d="M${x0},${y(0)} V${top + rad} Q${x0},${top} ${x0 + rad},${top} H${x0 + bw - rad} Q${x0 + bw},${top} ${x0 + bw},${top + rad} V${y(0)} Z" fill="var(--you)"/>`;
+    if (i % (Wd < 500 ? 3 : 2) === 0) s += `<text class="ax" x="${cx}" y="${H - B + 16}" text-anchor="middle">${String(r[0]).padStart(2, "0")}:00</text>`;
+    if (r === hi || r === lo) s += `<text class="dl nohit" x="${cx}" y="${top - 6}" text-anchor="middle">${pct(r[3])}</text>`;
+  });
+  s += `<text class="ax" x="${L + pw / 2}" y="${H - 4}" text-anchor="middle">Hour the trip started</text>`;
+  svg.innerHTML = s;
+  hoverTips(svg);
+}
+function renderPaper() {
+  const sh = RES.shared, p1 = v => pct(v);
+  kChart($("f1"), sh, 1, 2, "lin", v => Math.round(v * 100) + "%", [0, .25, .5, .75, 1]);
+  kChart($("f2"), sh, 3, 4, "log", v => v >= 10 ? String(Math.round(v)) : v.toFixed(1).replace(/\.0$/, ""), [0.5, 1, 10, 100, 200]);
+  $("f1t").innerHTML = "<tr><th>Turns in a row</th><th>Quickest path</th><th>Random turns</th></tr>" + sh.map(r => `<tr><td>${r[0]}</td><td>${p1(r[1])}</td><td>${p1(r[2])}</td></tr>`).join("");
+  $("f2t").innerHTML = "<tr><th>Turns in a row</th><th>Quickest path</th><th>Random turns</th><th>Ratio</th></tr>" + sh.map(r => `<tr><td>${r[0]}</td><td>${r[3].toFixed(1)}</td><td>${r[4].toFixed(1)}</td><td>${(r[3] / r[4]).toFixed(1)}×</td></tr>`).join("");
+  hourChart($("f4"), RES.hours.filter(r => r[1] >= 50));
+  $("f4t").innerHTML = "<tr><th>Hour</th><th>Trips</th><th>3-turn match</th><th>5-turn match</th></tr>" + RES.hours.map(r => `<tr><td>${String(r[0]).padStart(2, "0")}:00</td><td>${r[1]}</td><td>${p1(r[2])}</td><td>${p1(r[3])}</td></tr>`).join("");
+  const gs = [...RES.groups].sort((a, b) => b[3] - a[3]);
+  $("f5").innerHTML = gs.map(g => `<div class="hbar big"><span>${esc(g[0])}</span><span class="track"><span class="fill" style="display:block;width:${g[3] * 100}%"></span></span><span class="v">${pct(g[3])}</span></div>`).join("") +
+    `<div class="hbar big" aria-hidden="true" style="font-size:12px;color:var(--ink-3)"><span></span><span style="display:flex;justify-content:space-between"><span>0%</span><span>50%</span><span>100%</span></span><span></span></div>`;
+  $("f5t").innerHTML = "<tr><th>Group</th><th>People</th><th>Trips each</th><th>5-turn match</th></tr>" + RES.groups.map(g => `<tr><td>${esc(g[0])}</td><td>${g[1].toLocaleString()}</td><td>${g[2].toFixed(1)}</td><td>${pct(g[3])}</td></tr>`).join("");
+  $("f6").innerHTML = `<tr><th>You are</th>${GLONG.map(s => `<th style="white-space:normal;min-width:84px">${esc(s)}</th>`).join("")}<th>Trips</th></tr>` +
+    RES.matrix.map((r, i) => `<tr><td>${esc(GLONG[i])}</td>${r.slice(0, 6).map((v, j) => `<td class="cell" style="background:color-mix(in srgb, var(--you) ${Math.round(v * 85)}%, transparent);${v > .45 ? "color:#fff;" : ""}${i === j ? "font-weight:700;" : ""}">${pct(v)}</td>`).join("")}<td style="color:var(--ink-3)">${r[6].toLocaleString()}</td></tr>`).join("");
+}
+
+// Figure 3: the whole-day heatmap, a fixed view from Kennedy Town to Sai Ying Pun
+const fcv = $("f3"), fctx = fcv.getContext("2d");
+let figKey = "";
+function drawFigMap() {
+  const r = fcv.getBoundingClientRect(); if (!r.width) return;
+  const k = dpr(), w = Math.round(r.width * k), h = Math.round(r.height * k);
+  const key = [w, h, themeVersion].join(",");
+  if (key === figKey) return;
+  figKey = key; fcv.width = w; fcv.height = h;
+  const use = D.usage, max = Math.max(...use);
+  // frame Kennedy Town (west) to Sai Ying Pun (east) with HKU in the middle
+  const X0 = -1000, X1 = 860, Y0 = -420, Y1 = 640, sc = Math.min(w / (X1 - X0), h / (Y1 - Y0));
+  const cx = (X0 + X1) / 2, cy = (Y0 + Y1) / 2;
+  const px = x => (x - cx) * sc + w / 2, py = y => h / 2 - (y - cy) * sc;
+  const c = fctx; c.setTransform(1, 0, 0, 1, 0, 0);
+  c.fillStyle = css("--surface"); c.fillRect(0, 0, w, h);
+  c.lineCap = "round"; c.lineJoin = "round";
+  const line = (e, lw, col) => { c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(px(e.p[0]), py(e.p[1])); for (let j = 2; j < e.p.length; j += 2) c.lineTo(px(e.p[j]), py(e.p[j + 1])); c.stroke(); };
+  const lw = Math.max(.6, Math.min(1.6, sc / k * 2.2));
+  const faint = css("--path-faint");
+  E.forEach((e, i) => { if (!use[i]) line(e, k * lw * .7, faint); });
+  const stops = [0, 1, 2, 3, 4].map(j => hexRgb(css("--ramp-" + j)));
+  [...use.keys()].filter(i => use[i] > 0).sort((a, b) => use[a] - use[b]).forEach(i => {
+    const f = Math.sqrt(use[i] / max); line(E[i], k * lw * (0.8 + 3.2 * f), rampColor(0.12 + 0.88 * f, stops));
+  });
+  // the busiest link
+  const te = E[use.indexOf(max)], tx = px(te.p[0]), ty = py(te.p[1]);
+  c.beginPath(); c.arc(tx, ty, 9 * k, 0, 7); c.lineWidth = 2.5 * k; c.strokeStyle = css("--follow"); c.stroke();
+  // labels
+  const ink = css("--ink"), ink2 = css("--ink-2"), surf = css("--surface"), fs = Math.max(11, Math.min(15, r.width / 60)) * k;
+  const find = re => D.places.find(p => re.test(p.name));
+  const labs = [
+    [find(/^MTR Kennedy Town Exit/), "Kennedy Town", -24, 20, "left"],
+    [find(/^MTR Sai Ying Pun Exit B2/), "Sai Ying Pun", 0, -20, "center"],
+    [{ x: HOME.x, y: HOME.y - 170 }, "HKU main campus", 0, 0, "center"],
+    [{ x: te.p[0], y: te.p[1] }, "HKU station, Exit A", 14, -16, "left"],
+  ];
+  c.textBaseline = "middle";
+  for (const [p, text, dx, dy, al] of labs) {
+    if (!p) continue;
+    const x = px(p.x) + dx * k, y = py(p.y) + dy * k;
+    c.font = `700 ${fs}px "Source Sans 3", sans-serif`; c.textAlign = al;
+    c.lineWidth = 4 * k; c.strokeStyle = surf; c.strokeText(text, x, y); c.fillStyle = ink; c.fillText(text, x, y);
+  }
+  // scale bar (500 m) and north arrow
+  const sb = 500 * sc, sx0 = 14 * k, sy0 = h - 16 * k;
+  c.strokeStyle = ink2; c.lineWidth = 2 * k; c.beginPath(); c.moveTo(sx0, sy0); c.lineTo(sx0 + sb, sy0); c.stroke();
+  c.font = `${12 * k}px "Source Sans 3", sans-serif`; c.fillStyle = ink2; c.textAlign = "left"; c.fillText("500 m", sx0, sy0 - 10 * k);
+  c.textAlign = "right"; c.fillText("N ↑", w - 12 * k, 16 * k); c.textAlign = "left";
+}
+let paperW = innerWidth;
+addEventListener("resize", () => { figKey = ""; if ((innerWidth < 600) !== (paperW < 600)) renderPaper(); paperW = innerWidth; });
+
+// ===================================================================
+// Simple model (the first demo, unchanged in behaviour)
+// ===================================================================
+function initSimpleModel() {
+  const $s = id => document.getElementById("sm-" + id);
+  const NODES = [
+    ["A1", "MTR Exit A1", 50, 330, "transport", "r"], ["J1", "", 110, 270, "junction", ""], ["C1", "MTR Exit C1", 280, 340, "transport", "r"],
+    ["LIFT", "C1 lifts", 280, 280, "junction", "r"], ["CPD", "CPD LG", 190, 230, "classroom", "l"], ["LUS", "Lower U St", 330, 225, "junction", "r"],
+    ["UUS", "Upper U St", 330, 150, "junction", "b"], ["LEC", "Lecture block", 110, 165, "classroom", "l"], ["CAN", "Canteen", 210, 120, "food", "t"],
+    ["LIB", "Library", 450, 150, "library", "tl"], ["MB", "Main Building", 560, 190, "classroom", "b"], ["J2", "", 450, 245, "junction", ""],
+    ["BUS", "Bus stop", 560, 330, "transport", "b"], ["J3", "", 450, 70, "junction", ""], ["HALL", "Halls (east)", 560, 50, "halls", "b"],
+    ["J4", "", 210, 50, "junction", ""], ["HALLW", "Halls (west)", 60, 50, "halls", "b"]];
+  const EDGES = [["A1","J1","road",1],["J1","CPD","path",1],["J1","LEC","stairs",0],["C1","LIFT","lift",1],["LIFT","CPD","path",1],["LIFT","LUS","path",1],
+    ["CPD","LUS","path",1],["CPD","LEC","path",1],["LUS","UUS","stairs",1],["LUS","J2","path",0],["UUS","CAN","path",1],["UUS","LIB","path",1],
+    ["CAN","LEC","path",1],["CAN","J4","stairs",0],["LIB","J2","path",1],["LIB","MB","path",1],["LIB","J3","stairs",0],["MB","J2","path",1],
+    ["J2","BUS","road",1],["BUS","C1","road",1],["J3","HALL","path",1],["J3","J4","path",0],["J4","HALLW","path",0],["LEC","HALLW","stairs",0],
+    ["MB","HALL","road",1],["A1","C1","road",1]];
+  const N = NODES.length, idx = Object.fromEntries(NODES.map((n, i) => [n[0], i]));
+  const X = NODES.map(n => n[2]), Y = NODES.map(n => n[3]), ELEV = Y.map(y => (370 - y) * 0.25);
+  const adj = Array.from({ length: N }, () => []);
+  for (const [a, b, kind, lit] of EDGES) { const i = idx[a], j = idx[b], len = Math.hypot(X[i] - X[j], Y[i] - Y[j]); adj[i].push({ to: j, len, kind, lit: !!lit }); adj[j].push({ to: i, len, kind, lit: !!lit }); }
+  const ROLE = {}; NODES.forEach((n, i) => { if (n[4] !== "junction") (ROLE[n[4]] ||= []).push(i); });
+  const PLACES = NODES.map((n, i) => i).filter(i => NODES[i][4] !== "junction");
+  const edgeTime = (i, e) => e.kind === "lift" ? 45 : e.len / 1.35 + Math.max(0, ELEV[e.to] - ELEV[i]) * 6;
+  const SCEN = {
+    morning: { clock: "08:30", name: "Morning", rate: 40, night: false, from: { transport: .7, halls: .3 }, to: { classroom: .75, library: .25 }, you: ["C1", "MB"], hint: "40 people a minute, mostly from the MTR and halls to classrooms." },
+    lunch: { clock: "12:30", name: "Lunch", rate: 30, night: false, from: { classroom: .7, library: .3 }, to: { food: .7, library: .2, transport: .1 }, you: ["MB", "CAN"], hint: "30 people a minute, mostly from classrooms to the canteen." },
+    evening: { clock: "18:00", name: "Evening", rate: 35, night: false, from: { classroom: .6, library: .3, food: .1 }, to: { transport: .7, halls: .3 }, you: ["LIB", "C1"], hint: "35 people a minute heading to the MTR, bus and halls." },
+    night: { clock: "01:30", name: "Late night", rate: 3, night: true, from: { library: .5, classroom: .5 }, to: { halls: .6, transport: .4 }, you: ["CPD", "HALL"], hint: "3 people a minute. Unlit paths count as 150 s slower, so people bunch onto lit ones." }};
+  const W = 90, MAX_STEPS = 10, KMAX = 6;
+  const S = { scen: "night", beta: 60, copy: 15, k: 3, from: idx.CPD, to: idx.HALL, speed: 5 };
+  let COST = null, DIST = null;
+  const betaOf = v => v <= 0 ? 0 : 0.002 * Math.pow(10, (v / 100) * 2.2);
+  const params = () => ({ sc: SCEN[S.scen], beta: betaOf(S.beta), m: S.copy / 100 });
+  function rebuildCosts() {
+    const night = SCEN[S.scen].night;
+    COST = adj.map((list, i) => list.map(e => edgeTime(i, e) + (night && !e.lit ? 150 : 0)));
+    DIST = [];
+    for (let d = 0; d < N; d++) {
+      const dist = new Array(N).fill(Infinity), done = new Array(N).fill(false); dist[d] = 0;
+      for (let it = 0; it < N; it++) {
+        let u = -1; for (let v = 0; v < N; v++) if (!done[v] && (u < 0 || dist[v] < dist[u])) u = v;
+        if (u < 0 || dist[u] === Infinity) break; done[u] = true;
+        for (let i = 0; i < N; i++) adj[i].forEach((e, k) => { if (e.to === u && dist[u] + COST[i][k] < dist[i]) dist[i] = dist[u] + COST[i][k]; });
+      }
+      DIST.push(dist);
+    }
+  }
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function poisson(l, r) { const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= r(); } while (p > L); return k - 1; }
+  function pickWeighted(obj, r) { let x = r(), acc = 0; const ks = Object.keys(obj); for (const k of ks) { acc += obj[k]; if (x < acc) return k; } return ks[ks.length - 1]; }
+  function candidates(i, prev) { const c = []; adj[i].forEach((e, k) => { if (e.to !== prev) c.push(k); }); return c.length ? c : adj[i].map((e, k) => k); }
+  function policy(i, prev, d, beta) {
+    const c = candidates(i, prev);
+    if (beta === 0) return c.map(k => [k, 1 / c.length]);
+    const q = c.map(k => COST[i][k] + DIST[d][adj[i][k].to]), m = Math.min(...q), w = q.map(v => Math.exp(-beta * (v - m))), s = w.reduce((a, b) => a + b, 0);
+    return c.map((k, n) => [k, w[n] / s]);
+  }
+  function quickestRoute(o, d) {
+    const path = [o]; let i = o, prev = -1;
+    while (i !== d && path.length < 30) { let best = -1, bv = Infinity; adj[i].forEach((e, k) => { if (e.to === prev) return; const v = COST[i][k] + DIST[d][e.to]; if (v < bv) { bv = v; best = k; } }); prev = i; i = adj[i][best].to; path.push(i); }
+    return path;
+  }
+  class Sim {
+    constructor(P, rng) { this.P = P; this.r = rng; this.t = 0; this.walkers = []; this.nextId = 1; this.edgeLog = new Map(); this.nodeLog = Array.from({ length: N }, () => []); this.you = null; }
+    spawn() {
+      const sc = this.P.sc, r = this.r, pick = role => { const l = ROLE[role]; return l[Math.floor(r() * l.length)]; };
+      const o = pick(pickWeighted(sc.from, r)); let d = o, tries = 0;
+      while (d === o && tries++ < 10) d = pick(pickWeighted(sc.to, r));
+      if (d !== o) this.add(o, d, false);
+    }
+    add(o, d, isYou) {
+      const w = { id: this.nextId++, o, d, isYou, prev: -1, at: o, k: -1, s: 0, dur: 1, steps: 0, log: [], speed: isYou ? 1 : 0.8 + 0.4 * this.r(), done: false, t0: this.t };
+      if (isYou) { this.you = w; w.route = quickestRoute(o, d); }
+      this.walkers.push(w); this.depart(w, o); return w;
+    }
+    choose(w, i) {
+      if (w.isYou) { const nxt = w.route[w.steps + 1]; return adj[i].findIndex(e => e.to === nxt); }
+      const c = candidates(i, w.prev);
+      if (this.P.m > 0 && this.r() < this.P.m) { const log = this.nodeLog[i]; for (let n = log.length - 1; n >= 0; n--) { const L = log[n]; if (this.t - L.t > 20) break; if (L.id !== w.id && c.includes(L.k)) return L.k; } }
+      const pol = policy(i, w.prev, w.d, this.P.beta); let x = this.r();
+      for (const [k, p] of pol) { x -= p; if (x <= 0) return k; }
+      return pol[pol.length - 1][0];
+    }
+    depart(w, i) {
+      const k = this.choose(w, i), e = adj[i][k];
+      w.at = i; w.k = k; w.s = 0; w.dur = edgeTime(i, e) / w.speed;
+      const key = i * 64 + e.to; w.log.push({ key, t: this.t });
+      let L = this.edgeLog.get(key); if (!L) this.edgeLog.set(key, L = []);
+      L.push({ id: w.id, idx: w.log.length - 1, t: this.t });
+      const nl = this.nodeLog[i]; nl.push({ t: this.t, k, id: w.id }); if (nl.length > 40) nl.shift();
+      w.steps++;
+    }
+    step(dt) {
+      const n = poisson(this.P.sc.rate / 60 * dt, this.r); for (let a = 0; a < n; a++) this.spawn();
+      this.t += dt; let alive = 0;
+      for (const w of this.walkers) {
+        w.s += dt / w.dur;
+        if (w.s >= 1) { const j = adj[w.at][w.k].to; w.prev = w.at; if (j === w.d || (!w.isYou && w.steps >= MAX_STEPS)) { w.done = true; w.at = j; w.doneT = this.t; } else this.depart(w, j); }
+        if (!w.done) this.walkers[alive++] = w;
+      }
+      this.walkers.length = alive;
+    }
+    prune(before) { for (const [, L] of this.edgeLog) { let c = 0; while (c < L.length && L[c].t < before) c++; if (c) L.splice(0, c); } }
+  }
+  function sharedRuns(sim, you) {
+    const best = new Map(); let prev = new Map();
+    for (const { key, t } of you.log) {
+      const cur = new Map();
+      for (const m of sim.edgeLog.get(key) || []) { if (m.id === you.id || Math.abs(m.t - t) > W) continue; const len = (prev.get(m.id * 1000 + m.idx - 1) || 0) + 1; cur.set(m.id * 1000 + m.idx, len); if (len > (best.get(m.id) || 0)) best.set(m.id, len); }
+      prev = cur;
+    }
+    return best;
+  }
+  function oneWalk(P, o, d, rng) {
+    const sim = new Sim(P, rng); for (let t = 0; t < 240; t++) sim.step(1);
+    const you = sim.add(o, d, true); let end = Infinity;
+    while (sim.t < 4000) { sim.step(1); if (you.done && end === Infinity) end = sim.t + W; if (sim.t >= end) break; }
+    let mx = 0; for (const v of sharedRuns(sim, you).values()) mx = Math.max(mx, v); return mx;
+  }
+  const RUNS = 250; let estToken = 0, lastEst = null;
+  function estimate() {
+    const token = ++estToken, P = params(), B = { sc: P.sc, beta: 0, m: 0 }, o = S.from, d = S.to, rng = mulberry32(12345 + o * 97 + d);
+    const now = new Array(KMAX + 1).fill(0), base = new Array(KMAX + 1).fill(0); let n = 0;
+    $s("estimate").disabled = true; $s("headline").textContent = `Running ${RUNS} simulated walks for each model…`;
+    const chunk = () => {
+      if (token !== estToken) return;
+      const t0 = performance.now();
+      while (n < RUNS && performance.now() - t0 < 30) { const a = oneWalk(P, o, d, rng), b = oneWalk(B, o, d, rng); for (let k = 1; k <= KMAX; k++) { if (a >= k) now[k]++; if (b >= k) base[k]++; } n++; }
+      $s("prog").style.width = (100 * n / RUNS) + "%";
+      if (n < RUNS) { setTimeout(chunk, 0); return; }
+      lastEst = { now: now.map(v => v / RUNS), base: base.map(v => v / RUNS), routeLen: quickestRoute(o, d).length - 1 };
+      $s("estimate").disabled = false; renderResult();
+    };
+    setTimeout(chunk, 20);
+  }
+  function renderResult() {
+    if (!lastEst) return;
+    const k = S.k, { now, base, routeLen } = lastEst;
+    $s("pNow").textContent = pct(now[k]); $s("pBase").textContent = pct(base[k]);
+    const sc = SCEN[S.scen];
+    $s("headline").innerHTML = routeLen < k ? `Your walk is only <b>${routeLen}</b> segment${routeLen > 1 ? "s" : ""} long, so nobody can share ${k} in a row. Pick a longer walk or a smaller number.`
+      : `At ${sc.clock}, in <b>${pct(now[k])}</b> of walks at least one stranger made the same <b>${k}</b> choices in a row as you, by coincidence. With random turns it would be <b>${pct(base[k])}</b>.`;
+    barsChart($s("chart"), [1, 2, 3, 4, 5, 6], [{ name: "Your settings", color: "var(--you)", values: now.slice(1) }, { name: "Random turns", color: "var(--base-series)", values: base.slice(1) }],
+      { xlabel: "Same choices in a row (k)", highlight: k, tip: (c, se, v) => `${c} in a row · ${se.name}: ${pct(v)}` });
+    let rows = "<tr><th>Choices in a row</th><th>Your settings</th><th>Random turns</th></tr>";
+    for (let i = 1; i <= KMAX; i++) rows += `<tr><td>${i}</td><td>${pct(now[i])}</td><td>${pct(base[i])}</td></tr>`;
+    $s("tbl").innerHTML = rows; renderTheory();
+  }
+  function renderTheory() {
+    const route = quickestRoute(S.from, S.to), k = Math.min(S.k, route.length - 1), beta = params().beta;
+    let pr = 1, pm = 1; const parts = [];
+    for (let s = 0; s < k; s++) { const i = route[s], prev = s ? route[s - 1] : -1, kk = adj[i].findIndex(e => e.to === route[s + 1]); const c = candidates(i, prev).length; pr /= c; parts.push("1/" + c); pm *= policy(i, prev, S.to, beta).find(p => p[0] === kk)[1]; }
+    $s("theory").innerHTML = `Why: a stranger beside you who turns at random copies your first ${k} choices with chance ${parts.join(" × ")} = <b>${pct(pr)}</b>. One going to the same place as you, with your settings, does it <b>${pct(pm)}</b> of the time. Shared destinations, not chasing, drive most matches.`;
+  }
+  const cv = $s("map"), ctx = cv.getContext("2d"); let live = null, youW = null, youDoneShown = false, picking = null; const VW = 620, VH = 400;
+  function newLive() { rebuildCosts(); live = new Sim(params(), mulberry32((Math.random() * 1e9) | 0)); for (let t = 0; t < 240; t++) live.step(1); youW = null; youDoneShown = false; status(`Strangers are walking around campus at ${SCEN[S.scen].clock}. Press <b>Watch my walk</b> to start yours.`); }
+  function startWalk() { if (!live) newLive(); live.P = params(); youW = live.add(S.from, S.to, true); youDoneShown = false; }
+  function status(html) { $s("status").innerHTML = html; }
+  function colors() { return { ink: css("--ink"), ink2: css("--ink-2"), ink3: css("--ink-3"), path: css("--path"), you: css("--you"), follow: css("--follow"), stranger: css("--stranger"), surface: css("--surface") }; }
+  let C = colors(), cv2 = themeVersion, frame = 0;
+  function fit() { const r = cv.getBoundingClientRect(); if (!r.width) return; const k = dpr(); cv.width = Math.round(r.width * k); cv.height = Math.round(r.width * (VH / VW) * k); }
+  addEventListener("resize", () => { if (current === "model") fit(); });
+  function draw(runs) {
+    if (cv2 !== themeVersion) { C = colors(); cv2 = themeVersion; }
+    const s = cv.width / VW, k = dpr(), fs = Math.max(11, 12.5 * s / k) * k;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+    const P = i => [(X[i] + 10) * s, (Y[i] + 10) * s];
+    const use = new Map(); let umax = 1;
+    for (const [key, L] of live.edgeLog) { let c = 0; for (let n = L.length - 1; n >= 0 && L[n].t > live.t - 300; n--) c++; const a = Math.floor(key / 64), b = key % 64, u = Math.min(a, b) * 64 + Math.max(a, b); use.set(u, (use.get(u) || 0) + c); umax = Math.max(umax, use.get(u)); }
+    const route = youW && !youW.done ? youW.route : null, onRoute = new Set();
+    if (route) for (let n = 0; n + 1 < route.length; n++) onRoute.add(Math.min(route[n], route[n + 1]) * 64 + Math.max(route[n], route[n + 1]));
+    for (const [a, b, kind, lit] of EDGES) {
+      const i = idx[a], j = idx[b], u = Math.min(i, j) * 64 + Math.max(i, j), [x1, y1] = P(i), [x2, y2] = P(j);
+      if (onRoute.has(u)) { ctx.strokeStyle = C.you; ctx.globalAlpha = .22; ctx.lineWidth = 14 * s; ctx.setLineDash([]); ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.globalAlpha = 1; }
+      ctx.strokeStyle = C.path; ctx.lineWidth = (1.5 + 6 * Math.sqrt((use.get(u) || 0) / umax)) * s; ctx.lineCap = "round"; ctx.setLineDash(lit ? [] : [5 * s, 5 * s]);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      if (kind === "lift") { ctx.setLineDash([]); ctx.fillStyle = C.ink3; ctx.font = `${fs * .85}px "Source Sans 3", sans-serif`; ctx.textAlign = "left"; ctx.fillText("lift", (x1 + x2) / 2 + 8 * s, (y1 + y2) / 2 + 4 * s); }
+    }
+    ctx.setLineDash([]);
+    for (let i = 0; i < N; i++) {
+      const [x, y] = P(i), n = NODES[i], place = n[4] !== "junction", isEnd = i === S.from || i === S.to;
+      ctx.beginPath(); ctx.arc(x, y, (place ? 6.5 : 3) * s, 0, 7); ctx.fillStyle = isEnd ? C.you : place ? C.surface : C.path; ctx.fill();
+      if (place) { ctx.lineWidth = 2 * s; ctx.strokeStyle = isEnd ? C.you : C.ink2; ctx.stroke(); }
+      if (n[1]) {
+        ctx.font = `${place ? 600 : 400} ${fs}px "Source Sans 3", sans-serif`; ctx.fillStyle = place ? C.ink : C.ink3;
+        const pos = n[5], off = 11 * s; let tx = x, ty = y + 4 * s; ctx.textAlign = "center";
+        if (pos === "r") { ctx.textAlign = "left"; tx = x + off; } if (pos === "l") { ctx.textAlign = "right"; tx = x - off; }
+        if (pos === "t") ty = y - off; if (pos === "tl") { ctx.textAlign = "right"; tx = x - off * .6; ty = y - off; } if (pos === "b") ty = y + off + fs * .9;
+        let label = n[1]; if (i === S.from) label += "  · start"; else if (i === S.to) label += "  · end";
+        ctx.fillText(label, tx, ty);
+      }
+    }
+    for (const w of live.walkers) {
+      if (w.isYou) continue;
+      const a = w.at, b = adj[w.at][w.k].to, f = Math.min(1, w.s), x = (X[a] + (X[b] - X[a]) * f + 10) * s, y = (Y[a] + (Y[b] - Y[a]) * f + 10) * s;
+      const run = runs.get(w.id) || 0, fol = youW && run >= S.k;
+      ctx.beginPath(); ctx.arc(x, y, (fol ? 5 : 3.2) * s, 0, 7); ctx.fillStyle = fol ? C.follow : C.stranger; ctx.globalAlpha = fol ? 1 : .8; ctx.fill(); ctx.globalAlpha = 1;
+      if (fol) { ctx.lineWidth = 2 * s; ctx.strokeStyle = C.surface; ctx.stroke(); }
+    }
+    if (youW && !youW.done) {
+      const a = youW.at, b = adj[a][youW.k].to, f = Math.min(1, youW.s), x = (X[a] + (X[b] - X[a]) * f + 10) * s, y = (Y[a] + (Y[b] - Y[a]) * f + 10) * s;
+      ctx.beginPath(); ctx.arc(x, y, 12 * s, 0, 7); ctx.fillStyle = C.you; ctx.globalAlpha = .18; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(x, y, 6.5 * s, 0, 7); ctx.fillStyle = C.you; ctx.fill(); ctx.lineWidth = 2 * s; ctx.strokeStyle = C.surface; ctx.stroke();
+      ctx.font = `700 ${fs}px "Source Sans 3", sans-serif`; ctx.fillStyle = C.you; ctx.textAlign = "left"; ctx.fillText("You", x + 10 * s, y - 8 * s);
+    }
+  }
+  function fmtClock(t) { const [h, m] = SCEN[S.scen].clock.split(":").map(Number); const sec = Math.floor(h * 3600 + m * 60 + t - 240); return `${String(Math.floor(sec / 3600) % 24).padStart(2, "0")}:${String(Math.floor(sec / 60) % 60).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`; }
+  let last = 0;
+  function tick(ts) {
+    const dtReal = Math.min(0.1, (ts - last) / 1000 || 0); last = ts;
+    if (current === "model") {
+      let simDt = dtReal * S.speed; while (simDt > 0) { const d = Math.min(0.5, simDt); live.step(d); simDt -= d; }
+      if (++frame % 600 === 0) live.prune(youW && !youW.done ? youW.t0 - W - 5 : live.t - 400);
+      const runs = youW ? sharedRuns(live, youW) : new Map(); let foll = 0, longest = 0;
+      for (const v of runs.values()) { if (v >= S.k) foll++; longest = Math.max(longest, v); }
+      draw(runs);
+      $s("clock").firstChild.nodeValue = fmtClock(live.t);
+      $s("crowd").textContent = `${live.walkers.length - (youW && !youW.done ? 1 : 0)} people walking`;
+      if (youW) {
+        const seg = Math.min(youW.log.length, youW.route.length - 1), tot = youW.route.length - 1;
+        const who = foll === 0 ? "No stranger has" : foll === 1 ? "<b>1 stranger</b> has" : `<b>${foll} strangers</b> have`;
+        if (!youW.done) status(`You're on segment ${seg} of ${tot}, ${NODES[S.from][1]} to ${NODES[S.to][1]}. ${who} made your same ${S.k} choices in a row so far.`);
+        else if (!youDoneShown || live.t - youW.doneT < W) { youDoneShown = true; status(`You reached ${NODES[S.to][1]}. ${who} made your same ${S.k} choices in a row. Longest shared run: ${longest} segment${longest === 1 ? "" : "s"}. Press <b>Watch my walk</b> to go again.`); }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  function syncLabels() {
+    $s("fromName").textContent = NODES[S.from][1]; $s("toName").textContent = NODES[S.to][1];
+    $s("betaOut").textContent = S.beta === 0 ? "random" : S.beta < 35 ? "a little" : S.beta < 75 ? "mostly" : "strongly";
+    $s("copyOut").textContent = S.copy + "%"; $s("scenHint").textContent = SCEN[S.scen].hint;
+  }
+  $s("scen").innerHTML = Object.entries(SCEN).map(([k, v]) => `<button data-v="${k}">${v.clock}<small>${v.name}</small></button>`).join("");
+  $s("kseg").innerHTML = [2, 3, 4, 5].map(k => `<button data-v="${k}">${k}</button>`).join("");
+  $s("scen").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.scen = b.dataset.v; S.from = idx[SCEN[S.scen].you[0]]; S.to = idx[SCEN[S.scen].you[1]]; pressed($s("scen"), S.scen); syncLabels(); newLive(); startWalk(); estimate(); });
+  $s("kseg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.k = +b.dataset.v; pressed($s("kseg"), S.k); renderResult(); });
+  $s("speed").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.speed = +b.dataset.v; pressed($s("speed"), S.speed); });
+  let sliderTimer = 0;
+  function onSlider() { S.beta = +$s("beta").value; S.copy = +$s("copy").value; syncLabels(); if (live) live.P = params(); renderTheory(); clearTimeout(sliderTimer); sliderTimer = setTimeout(estimate, 350); }
+  $s("beta").addEventListener("input", onSlider); $s("copy").addEventListener("input", onSlider);
+  $s("watch").addEventListener("click", startWalk); $s("estimate").addEventListener("click", estimate);
+  function hitPlace(ev) { const r = cv.getBoundingClientRect(), s = r.width / VW, mx = (ev.clientX - r.left) / s - 10, my = (ev.clientY - r.top) / s - 10; let best = -1, bd = 22 / s + 6; for (const i of PLACES) { const d = Math.hypot(X[i] - mx, Y[i] - my); if (d < bd) { bd = d; best = i; } } return best; }
+  cv.addEventListener("mousemove", e => { cv.style.cursor = hitPlace(e) >= 0 ? "pointer" : "default"; });
+  cv.addEventListener("click", e => { const i = hitPlace(e); if (i < 0) return; if (picking === null) { picking = i; S.from = i; syncLabels(); status(`Start set to <b>${NODES[i][1]}</b>. Now click where you're going.`); } else { if (i === picking) return; S.to = i; picking = null; syncLabels(); startWalk(); estimate(); } });
+  hoverTips($s("chart"));
+  pressed($s("scen"), S.scen); pressed($s("kseg"), S.k); syncLabels();
+  fit(); newLive(); startWalk(); estimate();
+  requestAnimationFrame(ts => { last = ts; requestAnimationFrame(tick); });
+  return { fit };
+}
+let simple = null;
+onShow.model = () => { requestAnimationFrame(() => { if (!simple) simple = initSimpleModel(); else simple.fit(); }); };
+
+// ===================================================================
+// Boot
+// ===================================================================
+renderPaper();
+{ const h = location.hash.slice(1); show(views.includes(h) ? h : "day"); }
+requestAnimationFrame(ts => { lastTs = ts; requestAnimationFrame(dayTick); });
+fetch("web.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
+  prepData(d);
+  const m = d.meta;
+  const b = $("banner");
+  if (m.planner === "claude") { b.className = "banner ok"; b.textContent = `${m.agents_total.toLocaleString()} people whose days were decided by ${modelName(m.model)} · ${m.trips_total.toLocaleString()} trips · showing ${m.agents_shown.toLocaleString()} on the map. People and timetables are synthetic.`; }
+  else b.textContent = `Test run: ${m.agents_total.toLocaleString()} people following a simple rule-based timetable planner. The Claude run will replace this data; the method and the map are final.`;
+  $("dloading").hidden = true;
+  fitDay();
+  follow(pickFeatured(), true);
+  prepRoads();
+  $("f3load").hidden = true; figKey = "";
+  if (current === "roads") onShow.roads();
+}).catch(err => {
+  $("dloading").textContent = "The run data (web.json) could not be loaded. Export it with export_web.py and publish it next to this page.";
+  $("f3load").textContent = "The map data could not be loaded.";
+  $("banner").textContent = "No run data loaded.";
+});
+</script>

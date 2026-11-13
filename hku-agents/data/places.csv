@@ -1,0 +1,1539 @@
+﻿code,name,category,caption,aliases,lat,lon
+H001,Kadoorie Biological Sciences Building,hku,Faculty of Science: labs and classrooms,science,22.283496,114.137092
+H002,HKU Station Exit A,hku,HKU campus building with classrooms or offices,,22.283387,114.136732
+H003,James Hsioung Lee Science Building,hku,Faculty of Science: labs and classrooms,science,22.282536,114.137449
+H004,Haking Wong Building,hku,"Faculty of Engineering: labs, classrooms and offices",engineering,22.28296,114.136491
+H005,Haking Wong Podium,hku,Engineering podium with classrooms,engineering,22.283163,114.136458
+H006,Hui Oi Chow Science Building,hku,Faculty of Science: labs and classrooms,science,22.282803,114.137747
+H007,Main Library (Old Wing),hku,"Main Library: books, quiet study desks, open into the evening",library; study,22.283109,114.137802
+H008,Library Extension,hku,Main Library extension: study desks and collections,library; study,22.283427,114.137825
+H009,Run Run Shaw Building,hku,HKU campus building with classrooms or offices,,22.282513,114.13806
+H010,Graduate House,hku,Postgraduate residence with a cafe,residence; cafe,22.281962,114.137445
+H011,Main Building,hku,Historic Main Building with Loke Yew Hall: offices and ceremonies,,22.28405,114.137858
+H012,Knowles Building,hku,Classrooms and departmental offices,lecture,22.283202,114.138456
+H013,Rayson Huang Theatre,hku,"Theatre used for big lectures, shows and events",lecture; theatre,22.282497,114.138364
+H014,Chow Yei Ching Building,hku,Engineering and computer science classrooms and labs,engineering; computer science,22.283057,114.135475
+H015,Runme Shaw Building,hku,HKU campus building with classrooms or offices,,22.282486,114.138674
+H016,Pao Siu Loong Building,hku,HKU campus building with classrooms or offices,,22.284519,114.13755
+H017,Hung Hing Ying Building,hku,HKU campus building with classrooms or offices,,22.28455,114.137873
+H018,K.K. Leung Building,hku,Faculty of Business and Economics: classrooms and offices,business; economics,22.283282,114.139037
+H019,Lee Chi Hung Hall,hku,HKU campus building with classrooms or offices,,22.282721,114.13908
+H020,Yam Pak Building,hku,HKU campus building with classrooms or offices,,22.284128,114.135448
+H021,Chong Yuet Ming Amenities Centre,hku,"Canteen, shops and student services",canteen; food; shops,22.282709,114.139135
+H022,Fung Ping Shan Building,hku,University Museum and Art Gallery,museum,22.283687,114.139107
+H023,Meng Wah Complex,hku,"Classrooms, lecture theatres and offices",lecture,22.282341,114.139177
+H024,Lee Shau Kee Lecture Centre,hku,Large lecture theatres on Centennial Campus,Centennial Campus,22.283379,114.134791
+H025,The Jockey Club Tower,hku,Centennial Campus tower: Faculty of Social Sciences offices and classrooms,Centennial Campus,22.283213,114.134656
+H026,T.T. Tsui Building,hku,HKU campus building with classrooms or offices,,22.283915,114.1394
+H027,Chi Wah Learning Commons,hku,Student study space with group rooms and computers,study; learning commons,22.283477,114.134606
+H028,The University of Hong Kong Run Run Shaw Tower,hku,Centennial Campus tower: Faculty of Arts offices and classrooms,Centennial Campus,22.283669,114.13452
+H029,Central Podium,hku,Centennial Campus podium (CPD): classrooms and lecture rooms linking the three towers,CPD; Centennial Campus,22.283406,114.134421
+H030,Run Run Shaw Heritage House,hku,HKU campus building with classrooms or offices,,22.28388,114.13455
+H031,Swire Building,hku,HKU campus building with classrooms or offices,,22.283736,114.139703
+H032,Chong Yuet Ming Physics Building,hku,Faculty of Science: labs and classrooms,science,22.28318,114.139853
+H033,Run Run Shaw Tower,hku,Centennial Campus tower: Faculty of Arts offices and classrooms,Centennial Campus,22.283716,114.134432
+H034,"Hong Kong Institute for the Humanities and Social Sciences, The University of Hong Kong",hku,Faculty of Science: labs and classrooms,science,22.282342,114.139799
+H035,Tang Chi Ngong Building,hku,HKU campus building with classrooms or offices,,22.283572,114.139962
+H036,Chong Yuet Ming Chemistry Building,hku,Faculty of Science: labs and classrooms,science,22.282963,114.140079
+H037,Centennial Gate,hku,Entrance to the campus,gate; entrance,22.284112,114.134346
+H038,Visitor and Information Centre,hku,Information desk for visitors,,22.283937,114.134188
+H039,Large Moot Court,hku,Law school courtroom used for teaching,law,22.283246,114.134013
+H040,Cheng Yu Tung Tower,hku,Centennial Campus tower: Faculty of Law offices and classrooms,Centennial Campus,22.283295,114.133752
+H041,University Lodge,hku,HKU campus building with classrooms or offices,,22.281446,114.140066
+R001,Simon K.Y. Lee Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.283013,114.135897
+R002,Wong Ming Him Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.284132,114.138795
+R003,Robert Black College,hall,Student residence hall: residents sleep here and eat in the hall,,22.281782,114.139011
+R004,Eliot Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.28254,114.139717
+R005,May Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.282319,114.139808
+R006,Lady Ho Tung Hall (Ho Tim Hall),hall,Student residence hall: residents sleep here and eat in the hall,,22.284158,114.133302
+R007,Starr Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.283851,114.13288
+R008,Ho Tim Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.284141,114.132927
+R009,Ricci Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.283928,114.132316
+R010,Wong Chik Ting Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.280188,114.131835
+R011,Lee Shau Kee Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.279964,114.13092
+R012,Morrison Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.28041,114.130609
+R013,Suen Chi Sun Hall,hall,Student residence hall: residents sleep here and eat in the hall,,22.280104,114.130551
+R014,Shun Hing College,hall,Student residence hall: residents sleep here and eat in the hall,,22.278755,114.128969
+R015,New College,hall,Student residence hall: residents sleep here and eat in the hall,,22.279445,114.128589
+R016,Lap-Chee College,hall,Student residence hall: residents sleep here and eat in the hall,,22.279169,114.128576
+R017,Chi Sun College,hall,Student residence hall: residents sleep here and eat in the hall,,22.278923,114.128688
+M001,MTR HKU Exit A2 (The University of Hong Kong),mtr,MTR station exit: where people arrive and leave by train,,22.283269,114.136744
+M002,MTR HKU Exit A1 (Pok Fu Lam Road),mtr,MTR station exit: where people arrive and leave by train,,22.283424,114.136656
+M003,MTR HKU Exit B1 (Whitty Street),mtr,MTR station exit: where people arrive and leave by train,,22.285659,114.13682
+M004,MTR HKU Exit C1 (Pok Fu Lam Road),mtr,MTR station exit: where people arrive and leave by train,,22.284455,114.134639
+M005,MTR HKU Exit B2 (Hill Road),mtr,MTR station exit: where people arrive and leave by train,,22.28564,114.135151
+M006,MTR HKU Exit C2 (Belcher's Street),mtr,MTR station exit: where people arrive and leave by train,,22.285901,114.132644
+M007,MTR Sai Ying Pun Exit B2 (Second Street),mtr,MTR station exit: where people arrive and leave by train,,22.286208,114.141799
+M008,MTR Sai Ying Pun Exit B1 (First Street),mtr,MTR station exit: where people arrive and leave by train,,22.286436,114.141806
+M009,MTR Sai Ying Pun Exit C (Bonham Road),mtr,MTR station exit: where people arrive and leave by train,,22.284536,114.143353
+M010,MTR Sai Ying Pun Exit B3 (Ki Ling Lane),mtr,MTR station exit: where people arrive and leave by train,,22.287606,114.141506
+M011,MTR Kennedy Town Exit B (Rock Hill Street),mtr,MTR station exit: where people arrive and leave by train,,22.281812,114.129353
+M012,MTR Sai Ying Pun Exit A1 (Queen's Road West),mtr,MTR station exit: where people arrive and leave by train,,22.287092,114.14447
+M013,MTR Sai Ying Pun Exit A2 (Des Voeux Road West),mtr,MTR station exit: where people arrive and leave by train,,22.287758,114.144222
+M014,MTR Kennedy Town Exit A (Smithfield),mtr,MTR station exit: where people arrive and leave by train,,22.281178,114.12854
+M015,MTR Kennedy Town Exit C (Forbes Street),mtr,MTR station exit: where people arrive and leave by train,,22.281282,114.128035
+B001,Chiu Sheung School Hong Kong (Rose Villas) #2,bus,Bus stop,,22.283622,114.136052
+B002,Chiu Sheung School Hong Kong (Rose Villas),bus,Bus stop,,22.283632,114.136027
+B003,HKU West Gate (Simon K.Y. Lee Hall) #2,bus,Bus stop,,22.283471,114.135924
+B004,HKU West Gate (Simon K.Y. Lee Hall),bus,Bus stop,,22.283512,114.135803
+B005,HKU West Gate (Chow Yei Ching Building),bus,Bus stop,,22.28354,114.13571
+B006,HKU East Gate (Wong Ming Him Hall),bus,Bus stop,,22.28402,114.138633
+B007,HKU East Gate (University Museum and Art Gallery),bus,Bus stop,,22.283881,114.138912
+B008,HKU Centennial Campus,bus,Bus stop,,22.284314,114.134917
+B009,St. Stephen's Church College (Amber House),bus,Bus stop,,22.285309,114.138442
+B010,King's College (Smiling Court),bus,Bus stop,,22.284299,114.139715
+B011,King's College (Smiling Court) #2,bus,Bus stop,,22.28429,114.139784
+B012,HKU Station,bus,Bus stop,,22.284449,114.134187
+B013,Shek Tong Tsui Complex,bus,Bus stop,,22.285955,114.135599
+B014,Hatton Road,bus,Bus stop,,22.281103,114.139974
+B015,Kotewall Road,bus,Bus stop,,22.281236,114.140225
+B016,Lady Ho Tung Hall (Starr Hall) #2,bus,Bus stop,,22.283801,114.133448
+B017,Lady Ho Tung Hall (Starr Hall) #4,bus,Bus stop,,22.283722,114.133351
+B018,Li Sing Primary School (111 High Street),bus,Bus stop,,22.285459,114.139931
+B019,Hill Road (Des Voeux Road West Building),bus,Bus stop,,22.28662,114.136107
+B020,Second Street,bus,Bus stop,,22.286209,114.13944
+B021,Lady Ho Tung Hall (Starr Hall),bus,Bus stop,,22.283631,114.132967
+B022,Lady Ho Tung Hall (Starr Hall) #3,bus,Bus stop,,22.283609,114.132945
+B023,Ka On Street (Fairchild),bus,Bus stop,,22.287029,114.136964
+B024,Sai Ying Pun Post Office (Second Street),bus,Bus stop,,22.286049,114.139976
+B025,Ka On Street (Oasis Aurum 181),bus,Bus stop,,22.287067,114.137098
+B026,Ning Yeung Terrace,bus,Bus stop,,22.284827,114.14117
+B027,Kwan Yick Building Phase II (Sai On Lane Children's Playground) #2,bus,Bus stop,,22.287234,114.137692
+B028,Water Street (Sai On Lane Children's Playground) #2,bus,Bus stop,,22.287184,114.138126
+B029,Water Street (Sai On Lane Children's Playground),bus,Bus stop,,22.287197,114.138171
+B030,Kwan Yick Building Phase II (Sai On Lane Children's Playground) #3,bus,Bus stop,,22.287278,114.137848
+B031,Kwan Yick Building Phase II (Sai On Lane Children's Playground),bus,Bus stop,,22.287281,114.13786
+B032,Pokfield Road (Academic Terrace) #2,bus,Bus stop,,22.281978,114.132431
+B033,Chiu Kwong Street,bus,Bus stop,,22.286754,114.139752
+B034,Alpine Court (Kotewall Road Rest Garden),bus,Bus stop,,22.281601,114.141819
+B035,Pokfield Road (Academic Terrace) #3,bus,Bus stop,,22.281753,114.132327
+B036,Pokfield Road (Academic Terrace),bus,Bus stop,,22.281862,114.132174
+B037,Yat Fu Lane,bus,Bus stop,,22.286413,114.133563
+B038,Hill Road (Sitting Out Area Under Flyover in Hill Road),bus,Bus stop,,22.287202,114.134447
+B039,Water Street (Courtyard by Marriott Hong Kong),bus,Bus stop,,22.287695,114.138675
+B040,Centre Street (Sun Luen Building) #2,bus,Bus stop,,22.284432,114.142174
+B041,Alpine Court (Conduit Road Rest Garden),bus,Bus stop,,22.282001,114.142331
+B042,Hill Road (Yat Fu Lane),bus,Bus stop,,22.287237,114.13427
+B043,Centre Street (Sun Luen Building),bus,Bus stop,,22.284387,114.142261
+B044,The Westwood (MTR HKU Exit C2 (Belcher's Street)),bus,Bus stop,,22.286183,114.132685
+B045,Sai Cheung Street (Belcher's Street Sitting-out Area),bus,Bus stop,,22.284896,114.131901
+B046,Academic Terrace,bus,Bus stop,,22.281675,114.131649
+B047,Western Police Station (The Westpoint) #2,bus,Bus stop,,22.287802,114.139772
+B048,Kennedy Town Swimming Pool (Island Waldorf School),bus,Bus stop,,22.285498,114.131768
+B049,Western Street (Chun Kwan Building),bus,Bus stop,,22.286903,114.141499
+B050,Western Street (Chun Kwan Building) #2,bus,Bus stop,,22.286899,114.1416
+B051,Western Police Station (The Westpoint) #3,bus,Bus stop,,22.28795,114.140222
+B052,Collinson Street (Island Waldorf School (Kindergarten)) #2,bus,Bus stop,,22.286247,114.131945
+B053,Collinson Street (Island Waldorf School (Kindergarten)),bus,Bus stop,,22.286368,114.13201
+B054,Western Police Station (The Westpoint) #4,bus,Bus stop,,22.28798,114.140328
+B055,Western Police Station (The Westpoint),bus,Bus stop,,22.28799,114.140363
+B056,St. Stephen's Girls' College (Park Height) #2,bus,Bus stop,,22.283941,114.1433
+B057,St. Stephen's Girls' College (Park Height),bus,Bus stop,,22.283922,114.14339
+B058,St. Stephen's Girls' College (Oaklands Avenue Sitting-out Area),bus,Bus stop,,22.283199,114.14349
+B059,Sands Street (Kennedy Town Commercial Centre),bus,Bus stop,,22.28371,114.130748
+B060,Kennedy Town Swimming Pool Sitting-out Area (Harbour One),bus,Bus stop,,22.28728,114.132641
+B061,Kennedy Town Swimming Pool Sitting-out Area (Harbour One) #3,bus,Bus stop,,22.287192,114.132538
+B062,Kennedy Town Swimming Pool Sitting-out Area (Harbour One) #2,bus,Bus stop,,22.287209,114.132555
+B063,Eastern Street (MTR Sai Ying Pun Exit C (Bonham Road)),bus,Bus stop,,22.284327,114.143434
+B064,Holland Street,bus,Bus stop,,22.284456,114.13078
+B065,Sai Cheung Street (Holland Street),bus,Bus stop,,22.284992,114.13094
+B066,Villa Veneto (West End Park Sub-station),bus,Bus stop,,22.282462,114.143632
+B067,Fulham Garden (Lee Shau Kee Hall),bus,Bus stop,,22.280002,114.13131
+B068,Villa Veneto (Oaklands Avenue Sitting-out Area),bus,Bus stop,,22.28265,114.143722
+B069,Fulham Garden (Lee Shau Kee Hall) #2,bus,Bus stop,,22.279824,114.131249
+B070,Sands Street (Kennedy Town Praya),bus,Bus stop,,22.28434,114.130405
+B071,St. Stephen's Girls' College (June Li Building),bus,Bus stop,,22.28322,114.14403
+B072,Centre Street (Tung Che Commercial Centre),bus,Bus stop,,22.28786,114.14172
+B073,Centre Street (Tak Lee Building),bus,Bus stop,,22.28683,114.142767
+B074,Centre Street (Hong Ming Building),bus,Bus stop,,22.288024,114.141745
+B075,Centre Street (Hong Ming Building) #2,bus,Bus stop,,22.288023,114.14176
+B076,Belcher Bay Park (Kennedy Town Praya),bus,Bus stop,,22.284313,114.130101
+B077,Belcher Bay Park (Kennedy Town Praya) #2,bus,Bus stop,,22.284241,114.130012
+B078,Centre Street (Tak On Lau) #2,bus,Bus stop,,22.288018,114.14193
+B079,Centre Street (Tak On Lau),bus,Bus stop,,22.288017,114.14196
+B080,Eastern Street (錦翠園),bus,Bus stop,,22.28422,114.144373
+B081,Connaught Garden (Hong Ming Building),bus,Bus stop,,22.28853,114.14167
+B082,Island Pacific Hotel (Tone Hing Building),bus,Bus stop,,22.288097,114.142294
+B083,Euston Court (Mrs Yu Lee Mo Fan Memorial Building),bus,Bus stop,,22.284397,114.14471
+B084,Pok Fu Lam Road Playground (Mount Davis Road),bus,Bus stop,,22.278217,114.131141
+B085,Mount Davis Road,bus,Bus stop,,22.278252,114.130945
+B086,Euston Court (Hing Ying Mansion),bus,Bus stop,,22.284862,114.14509
+B087,Kennedy Town Station (Smithfield Sitting-out Area),bus,Bus stop,,22.281218,114.129005
+B088,North Street (Imperial Kennedy) #2,bus,Bus stop,,22.282649,114.12874
+B089,Kennedy Town Station (MTR Kennedy Town Exit A (Smithfield)) #2,bus,Bus stop,,22.281214,114.128894
+B090,Rock Hill Street,bus,Bus stop,,22.282029,114.128732
+B091,Kennedy Town Station (Smithfield Municipal Services Building),bus,Bus stop,,22.281495,114.128797
+B092,North Street (Imperial Kennedy),bus,Bus stop,,22.282624,114.128594
+B093,Kennedy Town Station (MTR Kennedy Town Exit A (Smithfield)) #3,bus,Bus stop,,22.281276,114.128737
+B094,Kennedy Town Station (MTR Kennedy Town Exit A (Smithfield)),bus,Bus stop,,22.281087,114.128783
+B095,Smithfield,bus,Bus stop,,22.283388,114.128417
+B096,Belcher Bay (Kennedy Town (Belcher Bay)),bus,Bus stop,,22.28445,114.128547
+B097,Belcher Bay (Kennedy Town (Belcher Bay)) #2,bus,Bus stop,,22.284495,114.128512
+B098,Eastern Street (Hung Cheong House),bus,Bus stop,,22.287941,114.14415
+B099,Belcher Bay (Kennedy Town (Belcher Bay)) #3,bus,Bus stop,,22.284633,114.128449
+B100,Kennedy Town (Belcher Bay),bus,Bus stop,,22.284472,114.128364
+B101,High Street,bus,Bus stop,,22.284896,114.145787
+B102,Eastern Street (Tai Hing Building),bus,Bus stop,,22.287934,114.14436
+B103,Forbes Street,bus,Bus stop,,22.281152,114.128274
+B104,Sutherland Street (Teen Wo Building),bus,Bus stop,,22.286673,114.145285
+B105,Sutherland Street (Teen Wo Building) #2,bus,Bus stop,,22.286637,114.145316
+B106,"New Praya, Kennedy Town (Kennedy Town (Belcher Bay))",bus,Bus stop,,22.284438,114.128113
+B107,Sai Wan (Kwun Lung Lau),bus,Bus stop,,22.279765,114.128638
+B108,Davis Street (May Sun Building) #4,bus,Bus stop,,22.283243,114.127774
+B109,Luen Bong Apartment (Luen Yau Apartments),bus,Bus stop,,22.282459,114.12762
+B110,Kennedy Town Station (Forbes Street Temporary Playground),bus,Bus stop,,22.28134,114.127704
+B111,Davis Street (May Sun Building) #3,bus,Bus stop,,22.283236,114.127508
+B112,Luen Bong Apartment (Luen Hong Apartments),bus,Bus stop,,22.282435,114.127486
+B113,Luen Bong Apartment (Luen Hong Apartments) #2,bus,Bus stop,,22.282424,114.127419
+B114,Davis Street (May Sun Building) #2,bus,Bus stop,,22.283215,114.127384
+B115,Wilmer Street,bus,Bus stop,,22.287908,114.145268
+B116,Ko Shing Street,bus,Bus stop,,22.287733,114.14542
+B117,Sun Yat Sen Memorial Park (Chi Residences 120),bus,Bus stop,,22.289096,114.144327
+B118,Ying Wa Girls' School (London Mission Building),bus,Bus stop,,22.28254,114.14688
+B119,Davis Street (May Sun Building),bus,Bus stop,,22.283193,114.127257
+B120,Davis Street (Catchick Street Garden),bus,Bus stop,,22.283173,114.127142
+B121,Kennedy Town (Forbes Street),bus,Bus stop,,22.281229,114.12713
+B122,Kennedy Town (Davis Street),bus,Bus stop,,22.281871,114.126908
+B123,Sutherland Street (Overseas Trust Bank Building) #3,bus,Bus stop,,22.287813,114.146295
+B124,Sutherland Street (Overseas Trust Bank Building) #2,bus,Bus stop,,22.287805,114.14638
+B125,Davis Street (Catchick Street Garden) #2,bus,Bus stop,,22.283052,114.126474
+B126,Sutherland Street (Overseas Trust Bank Building),bus,Bus stop,,22.287795,114.1465
+B127,Western Fire Services Street (Sea View Mansion) #2,bus,Bus stop,,22.288861,114.145809
+B128,Western Fire Services Street (Sea View Mansion),bus,Bus stop,,22.28886,114.1459
+B129,Queen Street,bus,Bus stop,,22.287616,114.146729
+B130,Cadogan Street,bus,Bus stop,,22.28275,114.1259
+B131,Sai Wan (Ka Wai Man Road),bus,Bus stop,,22.281196,114.125295
+B132,Sai See Street,bus,Bus stop,,22.282222,114.125117
+B133,Ka Wai Man Road,bus,Bus stop,,22.282057,114.124922
+F001,EAT,food,Restaurant serving chinese · open Mo-Su 07:30-21:30,food; eat; restaurant,22.283006,114.13649
+F002,Fast food near Haking Wong Podium,food,Fast food · open Mo-Fr 11:30-14:30;PH off,food; eat; fast food,22.283071,114.136286
+F003,Starbucks (Main Library (Old Wing)),food,Cafe serving coffee shop,food; eat; cafe,22.28307,114.137955
+F004,Joseph's,food,Restaurant serving international,food; eat; restaurant,22.281967,114.137416
+F005,Mein Bowl,food,Fast food serving asian,food; eat; fast food,22.283513,114.138113
+F006,Subway (Rayson Huang Theatre),food,Fast food serving sandwich · open Mo-Sa 08:30-20:30; PH Su 08:00-18:00,food; eat; fast food,22.282641,114.13834
+F007,Starbucks (Simon K.Y. Lee Hall),food,Cafe serving coffee shop,food; eat; cafe,22.283136,114.135769
+F008,Maxim's MX,food,"Fast food serving cantonese, western · open Mo-Fr 12:00-14:00;PH off",food; eat; fast food,22.282712,114.139004
+F009,Dear Neighbor,food,Cafe · open Tu-Su 08:30-18:00,food; eat; cafe,22.284745,114.136321
+F010,Cafe 330,food,Cafe · open Mo-Fr 07:30-20:30; Sa-Su PH 10:00-18:30,food; eat; cafe,22.282721,114.139121
+F011,Maxim's Food²,food,Fast food serving chinese · open Mo-Su 07:30-21:30,food; eat; fast food,22.282674,114.139158
+F012,Délifrance,food,"Cafe serving coffee shop, pastry · open Mo-Fr 07:30-22:00;Sa-Su,PH 08:00-20:00",food; eat; cafe,22.283109,114.134975
+F013,TamJai SamGor,food,"Restaurant serving asian, chinese, noodle, oriental · open Mo-Fr 07:45-21:30; Sa-Su 07:45-20:30",food; eat; restaurant,22.283264,114.134951
+F014,Pacific Coffee (Swire Building),food,Cafe serving coffee shop,food; eat; cafe,22.283867,114.139621
+F015,Shek Tong Tsui Market Cooked Food Centre,food,Food court · open Mo-Su 06:00-20:00,food; eat; food court,22.285374,114.136071
+F016,Fong Shu Chuen Amenities Centre Restaurant,food,Restaurant,food; eat; restaurant,22.283869,114.139696
+F017,Ebeneezer's Kebabs & Pizzeria,food,Restaurant serving kebab,food; eat; restaurant,22.283899,114.139763
+F018,Bijas Vegetarian,food,Restaurant serving regional,food; eat; restaurant,22.283817,114.134177
+F019,香港仔魚蛋王,food,Restaurant,food; eat; restaurant,22.285874,114.136732
+F020,兩餸飯三餸飯,food,Restaurant serving chinese,food; eat; restaurant,22.285866,114.136628
+F021,PHD,food,Fast food serving pizza,food; eat; fast food,22.284254,114.139914
+F022,Cheung Wo Noodles,food,Restaurant serving noodle · open 12:00-21:00; Tu off,food; eat; restaurant,22.285541,114.135582
+F023,Restaurant near Fung Lam Building,food,Restaurant,food; eat; restaurant,22.285279,114.139065
+F024,SoulFree,food,"Cafe serving western, pasta, cake · open Mo-Su 12:00-21:00",food; eat; cafe,22.285579,114.135466
+F025,Pan Asian strEAT Food,food,Restaurant serving asian,food; eat; restaurant,22.283613,114.133872
+F026,傾吓偈粉麵茶餐廳,food,Restaurant,food; eat; restaurant,22.285843,114.135845
+F027,Tong Kee Bao Dim,food,Fast food,food; eat; fast food,22.285881,114.13568
+F028,Tangs Roast,food,Restaurant,food; eat; restaurant,22.286003,114.135947
+F029,佳記美食,food,Restaurant,food; eat; restaurant,22.285895,114.135617
+F030,Mountain Road Cafe,food,Restaurant serving chinese,food; eat; restaurant,22.285854,114.135242
+F031,McDonald's (Sun On Building),food,Fast food serving burger,food; eat; fast food,22.28592,114.135319
+F032,Restaurant near Whitty Street Children's Playground,food,Restaurant serving japanese,food; eat; restaurant,22.286404,114.136452
+F033,火井火鍋海鮮飯店,food,Restaurant,food; eat; restaurant,22.28644,114.13789
+F034,Cobohouse by 2am,food,Cafe,food; eat; cafe,22.285597,114.134542
+F035,Ka Kee Restaurant,food,Restaurant,food; eat; restaurant,22.28638,114.138483
+F036,Fairwood (Fairchild),food,"Fast food serving cantonese, western",food; eat; fast food,22.28667,114.136632
+F037,Mong Shing Noodle Restaurant,food,Restaurant,food; eat; restaurant,22.286617,114.136253
+F038,Ho Lo Kee,food,Restaurant,food; eat; restaurant,22.286677,114.136469
+F039,BBQ,food,Restaurant,food; eat; restaurant,22.285812,114.139729
+F040,fairwood,food,"Restaurant serving chinese, oriental",food; eat; restaurant,22.286721,114.136754
+F041,Cafe Hunan,food,Restaurant,food; eat; restaurant,22.286458,114.13879
+F042,藍山食坊,food,Restaurant,food; eat; restaurant,22.286463,114.13882
+F043,源興隆麵家,food,Restaurant,food; eat; restaurant,22.286257,114.134941
+F044,WPS,food,Restaurant,food; eat; restaurant,22.286586,114.138576
+F045,Hometown Dumpling,food,Restaurant,food; eat; restaurant,22.286486,114.138865
+F046,Hashtag Coffee,food,"Cafe serving coffee shop, pastry",food; eat; cafe,22.285271,114.140452
+F047,Shop 9,food,Restaurant,food; eat; restaurant,22.285679,114.140089
+F048,New One Cafe,food,Restaurant,food; eat; restaurant,22.286494,114.138898
+F049,super super,food,Restaurant serving chinese,food; eat; restaurant,22.286659,114.135704
+F050,Andy's Hot Pot,food,Restaurant,food; eat; restaurant,22.28661,114.138641
+F051,港大宴會廳,food,Restaurant serving chinese,food; eat; restaurant,22.284098,114.133079
+F052,Mouth Full,food,Fast food,food; eat; fast food,22.286513,114.13897
+F053,Super Farm,food,Restaurant,food; eat; restaurant,22.286685,114.135633
+F054,Pascucci,food,Restaurant,food; eat; restaurant,22.286811,114.136022
+F055,Yoshinoya,food,Fast food serving beef bowl,food; eat; fast food,22.286956,114.136684
+F056,Poké Love,food,Restaurant serving hawaiian,food; eat; restaurant,22.284686,114.140975
+F057,Lin Heung Tea House,food,Restaurant,food; eat; restaurant,22.286199,114.134529
+F058,Thai Ná,food,Restaurant · open Mo-Su 12:00-15:00,food; eat; restaurant,22.286173,114.139728
+F059,西環添飯餸,food,Restaurant · open Mo-Su 10:00-21:00,food; eat; restaurant,22.286996,114.137616
+F060,Meeting Point Restaurant & Bar,food,Bar,food; eat; bar,22.286864,114.135852
+F061,North Viet Pho,food,Restaurant serving vietnamese,food; eat; restaurant,22.28669,114.138902
+F062,Smoke & Barrel,food,Restaurant serving steak house,food; eat; restaurant,22.285579,114.140466
+F063,Bar near Second Street,food,Bar,food; eat; bar,22.286282,114.139735
+F064,King Prawn Restaurant (Sai On Lane Children's Playground),food,Restaurant,food; eat; restaurant,22.28706,114.137754
+F065,Fairwood (Pacific Plaza),food,"Fast food serving cantonese, western",food; eat; fast food,22.2869,114.135663
+F066,Jiang's Hunan Chef,food,Restaurant serving chinese,food; eat; restaurant,22.285808,114.133829
+F067,Aziza Egyptian & Mediterranean Cuisine,food,Restaurant serving mediterranean,food; eat; restaurant,22.287149,114.137304
+F068,桃源川粵小廚,food,Restaurant serving chinese,food; eat; restaurant,22.285932,114.133856
+F069,La Terrazza Pizzería,food,Restaurant,food; eat; restaurant,22.285621,114.140689
+F070,Hey Hey Kitchen,food,Restaurant,food; eat; restaurant,22.286243,114.134134
+F071,Chau Kee,food,Restaurant · open Tu-Su 08:00-18:00,food; eat; restaurant,22.28695,114.138829
+F072,Cafe 2,food,Restaurant,food; eat; restaurant,22.286779,114.139311
+F073,Northern Dumpling Yuan,food,Restaurant serving chinese,food; eat; restaurant,22.287009,114.138816
+F074,英記燒臘茶餐小廚,food,Restaurant,food; eat; restaurant,22.286277,114.134073
+F075,McDonald's (Ning Yeung Terrace),food,Fast food serving burger,food; eat; fast food,22.284878,114.141301
+F076,ChorLand Cookfood Stall,food,Restaurant · open Mo-Su 17:30-01:30,food; eat; restaurant,22.286187,114.133916
+F077,Cross Cafe,food,Cafe · open Mo-Su 07:15-18:15,food; eat; cafe,22.285119,114.141197
+F078,Restaurant near Best Western Plus Hotel Hong Kong,food,Restaurant,food; eat; restaurant,22.286965,114.139102
+F079,火鍋撚,food,Restaurant,food; eat; restaurant,22.286299,114.133983
+F080,Pacific Coffee (Yat Fu Lane),food,Cafe serving coffee shop,food; eat; cafe,22.286277,114.133944
+F081,Matsumoto,food,Restaurant serving japanese,food; eat; restaurant,22.28342,114.14182
+F082,Restaurant near Tower 6,food,Restaurant,food; eat; restaurant,22.285334,114.133019
+F083,Starbucks (Best Western Plus Hotel Hong Kong),food,Cafe serving coffee shop,food; eat; cafe,22.28726,114.138589
+F084,Kam Cheung Pork Noodle,food,"Restaurant serving chinese, noodle · open 08:00-23:00; Tu off",food; eat; restaurant,22.287197,114.138844
+F085,Saam Hui Yaat,food,Restaurant · open Mo-Su 06:30-14:30,food; eat; restaurant,22.286554,114.140172
+F086,Pizza Hut,food,Restaurant serving pizza,food; eat; restaurant,22.284388,114.141962
+F087,High Street Grill,food,Restaurant · open 08:00-00:00,food; eat; restaurant,22.285106,114.141693
+F088,食神,food,Restaurant serving chinese,food; eat; restaurant,22.2874,114.13909
+F089,Katsuisen,food,"Restaurant serving japanese, sushi",food; eat; restaurant,22.286554,114.133627
+F090,Dim Sum Restaurant,food,Restaurant,food; eat; restaurant,22.287642,114.138651
+F091,Feather and Bone,food,Restaurant serving steak house,food; eat; restaurant,22.287613,114.138892
+F092,Sushi Shiawase,food,Restaurant serving sushi,food; eat; restaurant,22.2866,114.133472
+F093,Ollies Cafe & Restaurant,food,Restaurant,food; eat; restaurant,22.285038,114.141993
+F094,川之源,food,Restaurant serving chinese,food; eat; restaurant,22.284888,114.142111
+F095,Malacca Cuisine,food,Restaurant,food; eat; restaurant,22.286646,114.133347
+F096,Starbucks (Hing Wah Mansion Block M),food,Cafe serving coffee shop,food; eat; cafe,22.284241,114.142371
+F097,澄居,food,Restaurant serving japanese,food; eat; restaurant,22.286604,114.140931
+F098,Yeon Nam Dong,food,"Restaurant serving korean · open G/F, 46C High St, Sai Ying Pun, 홍콩",food; eat; restaurant,22.285101,114.14206
+F099,Ka Hing Restaurant,food,Restaurant,food; eat; restaurant,22.286459,114.133106
+F100,Modern Cafe,food,Restaurant,food; eat; restaurant,22.28789,114.138585
+F101,Metropolitan,food,Restaurant,food; eat; restaurant,22.285034,114.142125
+F102,Momo Cafe,food,Cafe,food; eat; cafe,22.287932,114.138783
+F103,E.Tea,food,Cafe serving bubble tea,food; eat; cafe,22.284626,114.131694
+F104,茶餐A,food,Restaurant,food; eat; restaurant,22.288019,114.139117
+F105,Pizzeria Italia (Kam Lun Mansion),food,Restaurant serving pizza,food; eat; restaurant,22.285194,114.142447
+F106,Aspho Deli,food,Cafe serving chicken,food; eat; cafe,22.285407,114.131798
+F107,Thai On High,food,Restaurant serving thai,food; eat; restaurant,22.285188,114.142542
+F108,House of Culture,food,"Restaurant · open Mo-Sa 18:00-23:00,Su off",food; eat; restaurant,22.287058,114.141297
+F109,Twelve Flavors,food,Restaurant,food; eat; restaurant,22.284244,114.131178
+F110,Pesto Cafe,food,Cafe,food; eat; cafe,22.284229,114.143029
+F111,Thank God it's Friday TGIF,food,"Cafe serving coffee shop, pizza, burger, chicken, breakfast, brunch · open Mo-Su 08:30-18:30",food; eat; cafe,22.286776,114.132558
+F112,Momo N Curry,food,"Restaurant serving curry · open Mo-Su 11:30-15:00,18:00-23:30",food; eat; restaurant,22.287056,114.141366
+F113,Centre Street Market Cooked Food Centre,food,Food court,food; eat; food court,22.286374,114.142045
+F114,Wheat And Wood,food,Cafe,food; eat; cafe,22.28451,114.131162
+F115,Wako2ffee House,food,Cafe,food; eat; cafe,22.287393,114.141154
+F116,東北餃子,food,Restaurant,food; eat; restaurant,22.283728,114.130838
+F117,Kennedy Cafe,food,Restaurant,food; eat; restaurant,22.283676,114.130802
+F118,Café de Coral (Federate Building),food,"Fast food serving cantonese, western",food; eat; fast food,22.286676,114.142163
+F119,Bar near Ko Chun Court,food,Bar,food; eat; bar,22.285176,114.143152
+F120,Vegetarian Food,food,Restaurant serving chinese,food; eat; restaurant,22.287032,114.141989
+F121,Fairwood (Federate Building),food,"Fast food serving cantonese, western",food; eat; fast food,22.286817,114.142232
+F122,Star Seafood Restaurant,food,Restaurant serving chinese,food; eat; restaurant,22.288094,114.140749
+F123,Electric Ave,food,"Restaurant serving burger, western",food; eat; restaurant,22.286996,114.142239
+F124,海南,food,Restaurant,food; eat; restaurant,22.283092,114.130362
+F125,Summer Ice,food,Cafe,food; eat; cafe,22.282931,114.130332
+F126,Quench K-Town,food,Bar,food; eat; bar,22.282964,114.130302
+F127,華記潮洲滷水車仔麵,food,Restaurant serving chinese,food; eat; restaurant,22.28718,114.142253
+F128,Cafe near Tak Lee Building,food,Cafe,food; eat; cafe,22.28682,114.14272
+F129,Nggy &,food,Cafe,food; eat; cafe,22.286067,114.143236
+F130,Soo Viet,food,Restaurant · open Mo-Su 11:30-22:00,food; eat; restaurant,22.288038,114.141502
+F131,New Hing Dim Sum,food,Restaurant,food; eat; restaurant,22.288037,114.141583
+F132,粥君好,food,Restaurant,food; eat; restaurant,22.283094,114.130066
+F133,El Macho,food,Restaurant serving mexican,food; eat; restaurant,22.285668,114.143584
+F134,HKU Hill View Restaurant,food,Restaurant serving chinese,food; eat; restaurant,22.27998,114.130788
+F135,金豐粥店,food,Restaurant,food; eat; restaurant,22.286777,114.142946
+F136,Pasta de Show,food,"Restaurant serving pasta · open Mo-Su 12:00-15:30,18:00-22:00",food; eat; restaurant,22.28336,114.129961
+F137,正斗滷鵝,food,Restaurant,food; eat; restaurant,22.286793,114.143026
+F138,McDonald's (Flora Court),food,Fast food serving burger,food; eat; fast food,22.286993,114.142883
+F139,鳴人燒臘飯店,food,Restaurant,food; eat; restaurant,22.287555,114.142404
+F140,包點鉅人,food,Fast food,food; eat; fast food,22.287795,114.142198
+F141,Dachiji Gourmet Food,food,Restaurant,food; eat; restaurant,22.287612,114.142406
+F142,銘師傅潮州粉麵,food,Restaurant,food; eat; restaurant,22.287646,114.142407
+F143,Shaz Confections Bakery Cafe,food,"Cafe serving cake, coffee shop · open Mo-Sa 10:00-19:00",food; eat; cafe,22.286556,114.143332
+F144,豪景茶餐廳,food,Restaurant,food; eat; restaurant,22.283123,114.129786
+F145,Kwun Kee Claypot Specialist,food,Restaurant · open Mo-Sa 11:00-00:30; Su 18:00-00:30,food; eat; restaurant,22.287066,114.143035
+F146,Restaurant near Flora Court,food,Restaurant,food; eat; restaurant,22.286992,114.143107
+F147,Pier,food,Restaurant,food; eat; restaurant,22.288067,114.142088
+F148,楊恩記麵家,food,Restaurant serving noodle · open Mo-Su 10:00-23:00,food; eat; restaurant,22.288065,114.142126
+F149,King Prawn Restaurant (Good Times Building),food,Restaurant,food; eat; restaurant,22.286793,114.143373
+F150,The Bottle & Steak,food,Bar,food; eat; bar,22.28655,114.143637
+F151,嚐囍煲仔小菜,food,"Restaurant · open Mo-Su 10:00-15:00, 18:00-22:30",food; eat; restaurant,22.28307,114.129251
+F152,Yuan is Here,food,Restaurant serving taiwanese · open Mo-Su 11:00-21:00,food; eat; restaurant,22.282385,114.129234
+F153,Shanghai Lao Lao,food,Restaurant,food; eat; restaurant,22.282236,114.129095
+F154,兄弟記海鮮飯店,food,Restaurant · open Mo-Su 04:30-01:30,food; eat; restaurant,22.286795,114.144092
+F155,Café de Coral (Rock Hill Street),food,"Fast food serving cantonese, western",food; eat; fast food,22.28221,114.128964
+F156,The Seafood Kitchen,food,Restaurant serving seafood,food; eat; restaurant,22.283293,114.128841
+F157,Yee Kee Restaurant,food,Restaurant serving dessert · open 18:00-03:00; Sa off,food; eat; restaurant,22.280409,114.129311
+F158,Craft Brew & Co.,food,Restaurant,food; eat; restaurant,22.283491,114.128832
+F159,Winstons Coffee (Rich Court),food,Cafe,food; eat; cafe,22.286975,114.144276
+F160,Dough Bros.,food,"Fast food serving pizza, donut",food; eat; fast food,22.283765,114.12876
+F161,利隆火鍋食店,food,Restaurant,food; eat; restaurant,22.281798,114.128802
+F162,Waffling Beans,food,Cafe serving waffle,food; eat; cafe,22.283933,114.128734
+F163,Zeppelin Hot Dog,food,Fast food serving hot dog · open Mo-Su 11:30-20:30,food; eat; fast food,22.280245,114.129207
+F164,Starbucks (Imperial Kennedy),food,Cafe serving coffee shop,food; eat; cafe,22.282588,114.128614
+F165,珍品小炒,food,Restaurant,food; eat; restaurant,22.281788,114.128684
+F166,Bengal Brothers,food,Fast food serving indian,food; eat; fast food,22.280669,114.128954
+F167,誠記,food,Restaurant,food; eat; restaurant,22.281821,114.128673
+F168,Smithfield Market Cooked Food Centre,food,Food court,food; eat; food court,22.281711,114.128685
+F169,友明,food,Restaurant,food; eat; restaurant,22.281792,114.128607
+F170,Cafe near Tat Hing Building,food,Cafe,food; eat; cafe,22.287008,114.144664
+F171,Cotto Crudo,food,Restaurant serving italian,food; eat; restaurant,22.283971,114.128442
+F172,祥香茶餐廳,food,Restaurant · open Mo-Su 06:00-17:30,food; eat; restaurant,22.282711,114.128382
+F173,McDonald's (Smithfield Sports Centre),food,Fast food serving burger · open 24/7,food; eat; fast food,22.282124,114.128423
+F174,Sushi Take Out,food,Restaurant serving sushi,food; eat; restaurant,22.28225,114.128379
+F175,點點心,food,Restaurant serving chinese · open 24/7,food; eat; restaurant,22.282199,114.12838
+F176,香港仔君豪魚蛋王,food,Restaurant,food; eat; restaurant,22.282703,114.128331
+F177,Sun Hing Restaurant,food,Restaurant,food; eat; restaurant,22.282951,114.128245
+F178,Ban Chun Tea,food,Cafe,food; eat; cafe,22.282841,114.128207
+F179,Sun Hing,food,Restaurant,food; eat; restaurant,22.282935,114.128181
+F180,紅興港式懷舊小食,food,Restaurant,food; eat; restaurant,22.283209,114.128179
+F181,Lex Coffee,food,"Cafe serving pasta, burger",food; eat; cafe,22.282508,114.128039
+F182,The Farm Cafe,food,Restaurant,food; eat; restaurant,22.283181,114.127998
+F183,New Korean BBQ Restaurant,food,Restaurant,food; eat; restaurant,22.282622,114.127995
+F184,PizzaExpress,food,Restaurant serving pizza,food; eat; restaurant,22.287465,114.144904
+F185,Sweet Dreamer Dessert,food,Cafe serving dessert,food; eat; cafe,22.283459,114.127948
+F186,平記餐廳,food,Restaurant,food; eat; restaurant,22.286788,114.145373
+F187,For Single,food,Cafe serving coffee shop,food; eat; cafe,22.282831,114.127861
+F188,Wai Kee Cafe,food,Restaurant,food; eat; restaurant,22.281543,114.127992
+F189,Beeger,food,Restaurant serving burger,food; eat; restaurant,22.283755,114.127882
+F190,Thai Heng Thai Food Restaurant,food,Restaurant,food; eat; restaurant,22.283154,114.127814
+F191,One One Roast Goose Restaurant,food,Restaurant,food; eat; restaurant,22.281522,114.127868
+F192,Artzbrew,food,Cafe,food; eat; cafe,22.286183,114.145869
+F193,Subway (Luen Fat Apartments),food,Fast food serving sandwich,food; eat; fast food,22.281727,114.127742
+F194,Affee,food,Cafe serving coffee shop,food; eat; cafe,22.282912,114.127616
+F195,Genki Sushi,food,Restaurant serving sushi,food; eat; restaurant,22.281499,114.127739
+F196,Enso,food,Restaurant,food; eat; restaurant,22.2838,114.127582
+F197,Nam Kee Noodles,food,Restaurant serving noodle,food; eat; restaurant,22.282275,114.127553
+F198,KFC,food,Fast food serving chicken · open Mo-Su 07:00-22:00,food; eat; fast food,22.282383,114.12754
+F199,Fish 'n' Chick,food,Restaurant,food; eat; restaurant,22.283786,114.127465
+F200,Restaurant near Chartered Bank Building,food,Restaurant,food; eat; restaurant,22.286114,114.146213
+F201,Jollibee,food,Fast food serving burger,food; eat; fast food,22.281455,114.127484
+F202,Oolaa,food,Restaurant,food; eat; restaurant,22.283221,114.127149
+F203,11 Westside,food,Restaurant serving mexican,food; eat; restaurant,22.281631,114.127233
+F204,Creo by Brentwood,food,Cafe,food; eat; cafe,22.281422,114.127259
+F205,Bresola,food,Restaurant,food; eat; restaurant,22.28303,114.127113
+F206,Nodi Coffee Works,food,Cafe,food; eat; cafe,22.281412,114.127205
+F207,Eric Kayser,food,Cafe,food; eat; cafe,22.281734,114.127142
+F208,No Boundary,food,Restaurant,food; eat; restaurant,22.283024,114.127037
+F209,Winstons Coffee (The Hudson),food,Cafe,food; eat; cafe,22.281403,114.127156
+F210,Falafel Hut,food,Fast food,food; eat; fast food,22.283002,114.126947
+F211,Mars Bar,food,Bar · open Mo-Su 16:00-02:00,food; eat; bar,22.286273,114.14663
+F212,The Cofftea Shop,food,Cafe,food; eat; cafe,22.282988,114.126872
+F213,42 Davis,food,Bar,food; eat; bar,22.281458,114.126988
+F214,Canadian Pizza,food,Restaurant serving pizza,food; eat; restaurant,22.281381,114.127001
+F215,Bistronomique,food,Restaurant,food; eat; restaurant,22.28369,114.126851
+F216,Chicken Factory,food,Fast food serving chicken · open Mo-Su 11:00-21:00,food; eat; fast food,22.28179,114.12686
+F217,Harbour Restaurant,food,Restaurant,food; eat; restaurant,22.28368,114.126792
+F218,Kefi,food,Cafe,food; eat; cafe,22.282569,114.126771
+F219,厚興瑜記,food,Restaurant,food; eat; restaurant,22.282234,114.126785
+F220,Piccollo,food,Restaurant serving pizza,food; eat; restaurant,22.283396,114.126743
+F221,Tequila on Davis,food,Restaurant,food; eat; restaurant,22.283469,114.126737
+F222,Bash 99,food,Restaurant,food; eat; restaurant,22.283456,114.126735
+F223,Comptoir,food,Restaurant serving french,food; eat; restaurant,22.281349,114.126862
+F224,Hotspot Instinct,food,Restaurant,food; eat; restaurant,22.282252,114.126721
+F225,Mama Maloom Lebanese Restaurant,food,Restaurant,food; eat; restaurant,22.283063,114.126689
+F226,% Arabica,food,Cafe serving coffee shop,food; eat; cafe,22.283652,114.126703
+F227,Wah Fung,food,Restaurant,food; eat; restaurant,22.282425,114.126678
+F228,Pizzeria Italia (Concord Hotel),food,Restaurant serving pizza,food; eat; restaurant,22.282252,114.126663
+F229,Ktown Bar and Grill,food,Restaurant,food; eat; restaurant,22.281314,114.126668
+F230,Missy Ho's,food,Restaurant,food; eat; restaurant,22.281304,114.126598
+F231,KTM Bar Kitchen,food,Restaurant serving nepalese,food; eat; restaurant,22.281287,114.126474
+F232,Chill and Grill,food,Restaurant serving italian,food; eat; restaurant,22.281708,114.126392
+F233,Pici,food,Restaurant serving italian,food; eat; restaurant,22.281874,114.126352
+F234,Mangzane,food,Restaurant,food; eat; restaurant,22.281966,114.126328
+F235,Luk On Kui,food,Restaurant serving cantonese,food; eat; restaurant,22.287554,114.146844
+F236,Le Goûter,food,"Restaurant serving french, breakfast, coffee",food; eat; restaurant,22.282856,114.126114
+S001,iBakery (Run Run Shaw Building),shop,"Bakery: bread, buns and pastries · open Mo-Fr 08:00-17:00; PH Sa-Su off",bread; snacks; breakfast,22.282652,114.138131
+S002,Supermarket shop near Chong Yuet Ming Amenities Centre,shop,Supermarket: groceries and daily items,groceries; food shopping,22.282642,114.13916
+S003,Hong Kong University Press Bookshop,shop,Bookshop · open Mo-Fr 10:00-17:00; Sa-Su PH off,books; stationery,22.283859,114.134591
+S004,Kai Bo Food Supermarket (HKU Station Exit B1),shop,Supermarket: groceries and daily items,groceries; food shopping,22.285576,114.136734
+S005,Shek Tong Tsui Market,shop,Shop shop · open Mo-Su 06:00-20:00,shop; buy,22.285482,114.136274
+S006,Paper Max Corp.,shop,Yes shop,shop; buy,22.285065,114.138872
+S007,Yan Ngai,shop,Yes shop,shop; buy,22.285055,114.138903
+S008,Hang Tong Technology,shop,Electronics shop,electronics; gadgets,22.285891,114.136539
+S009,Hair Treatment Centre,shop,Beauty salon,beauty,22.285904,114.136481
+S010,Ameyokocho,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.285915,114.136436
+S011,MINISO,shop,Department store shop,shop; buy,22.28594,114.136241
+S012,SOFT PET PET SALON,shop,"Pet grooming shop · open ""By appointment""",shop; buy,22.286019,114.136622
+S013,Wellcome (Wing Hing House),shop,Supermarket: groceries and daily items,groceries; food shopping,22.285864,114.135752
+S014,Fresh Everyday,shop,Fruit and vegetable shop,fruit; vegetables; market,22.285985,114.136034
+S015,The Groomers Centre,shop,Yes shop,shop; buy,22.285945,114.1384
+S016,7-Eleven (Third Street Playground),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.28578,114.138773
+S017,Best Mart 360,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.285905,114.13557
+S018,Sky Blue Bikes,shop,Bicycle shop · open Mo-Sa 11:00-19:30; Su 13:00-18:00,shop; buy,22.286233,114.137429
+S019,The Rockpool,shop,Mall shop,shop; buy,22.286324,114.136825
+S020,H Hair,shop,Hair salon,haircut,22.286319,114.137634
+S021,759 Store (Sun On Building),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.285894,114.13525
+S022,Times Fly Pro Shop,shop,Yes shop,shop; buy,22.28633,114.137665
+S023,Outlet,shop,Clothes shop,clothes; fashion,22.286084,114.13561
+S024,7-Eleven (Hotel Jen Hong Kong),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.285777,114.135008
+S025,Daiso,shop,Yes shop,shop; buy,22.286386,114.136819
+S026,Hair Terminal,shop,Beauty salon,beauty,22.28565,114.139398
+S027,7-Eleven (Whitty Street Children's Playground),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.286383,114.136572
+S028,Arome,shop,Yes shop,shop; buy,22.285946,114.135113
+S029,Man Fung,shop,Houseware shop,shop; buy,22.28642,114.13781
+S030,Tea Time,shop,Yes shop,shop; buy,22.285574,114.139901
+S031,Tung Tai Supermarket,shop,Supermarket: groceries and daily items,groceries; food shopping,22.286406,114.138572
+S032,Hung Cheung Packing & Stationery Co.,shop,Stationery shop,stationery; printing,22.286586,114.136148
+S033,華偉行,shop,Appliance shop,shop; buy,22.2866,114.136195
+S034,Look,shop,Yes shop,shop; buy,22.285647,114.139919
+S035,7-Eleven (Second Street),shop,"Convenience store: snacks, drinks, daily items · open 24/7",snacks; drinks; 7-Eleven; Circle K,22.286443,114.138741
+S036,759 Store (Sai On Lane Children's Playground),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.28657,114.138408
+S037,Fortress,shop,Electronics shop,electronics; gadgets,22.286782,114.136884
+S038,Watsons (Fairchild),shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.286799,114.136935
+S039,Force HK,shop,Yes shop,shop; buy,22.286583,114.138493
+S040,Beauty Life,shop,Clothes shop,clothes; fashion,22.28689,114.137253
+S041,Genus Optical & Contact Lense Centre,shop,Optician,glasses,22.286081,114.134517
+S042,Takad Furniture,shop,Furniture shop,shop; buy,22.286808,114.136133
+S043,Blue Outlet,shop,Clothes shop,clothes; fashion,22.28691,114.137324
+S044,Ocean Tailor,shop,Tailor shop,shop; buy,22.286864,114.13638
+S045,U Select,shop,Supermarket: groceries and daily items · open Mo-Su 08:30-21:30,groceries; food shopping,22.286938,114.137406
+S046,Top-hit Plaza,shop,Mall shop,shop; buy,22.286898,114.136315
+S047,Potato Head,shop,Yes shop,shop; buy,22.285662,114.140271
+S048,Just Med LTD,shop,Yes shop,shop; buy,22.286966,114.136726
+S049,So. G. Hair,shop,Hair salon,haircut,22.286309,114.134706
+S050,COMEBUYTEA,shop,Beverages shop,shop; buy,22.286716,114.135509
+S051,Y-Design,shop,Yes shop,shop; buy,22.286651,114.138861
+S052,10M,shop,Yes shop,shop; buy,22.286976,114.136513
+S053,Wah Yee Tang Cake Shop,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.286174,114.139791
+S054,Wellcome (Tower 5),shop,Supermarket: groceries and daily items,groceries; food shopping,22.284948,114.133293
+S055,Care Optometric Centre,shop,Optician,glasses,22.285754,114.140288
+S056,Yata,shop,Supermarket: groceries and daily items,groceries; food shopping,22.286884,114.135752
+S057,DS Groceries (Ning Yeung Terrace),shop,Supermarket: groceries and daily items · open Mo-Su 09:30-21:00,groceries; food shopping,22.284779,114.141042
+S058,Lung Wah Food Products Co. Ltd.,shop,Frozen food shop,shop; buy,22.285765,114.13385
+S059,DS Groceries (Sitting Out Area Under Flyover in Hill Road),shop,Supermarket: groceries and daily items · open Mo-Su 09:00-21:30,groceries; food shopping,22.286754,114.135271
+S060,Classified,shop,Yes shop,shop; buy,22.287124,114.137202
+S061,Vanguard,shop,Supermarket: groceries and daily items,groceries; food shopping,22.285644,114.1405
+S062,Sage World (Sai Ying Pun),shop,Yes shop,shop; buy,22.285753,114.140453
+S063,404 Store,shop,Yes shop,shop; buy,22.286613,114.139334
+S064,Mannings (Sai On Lane Children's Playground),shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.287095,114.137967
+S065,The Hong Kong Jockey Club (Fairchild),shop,Bookmaker shop,shop; buy,22.28714,114.136462
+S066,Fotomax,shop,Photo shop,shop; buy,22.28485,114.141144
+S067,Wing Wah,shop,Yes shop,shop; buy,22.286223,114.134194
+S068,El Fishawy,shop,Yes shop,shop; buy,22.285754,114.140521
+S069,Elegence Beauty Centre,shop,Beauty salon,beauty,22.286797,114.13514
+S070,Film & Design,shop,Car parts shop,shop; buy,22.286634,114.139414
+S071,VIP Music Centre,shop,Music shop,shop; buy,22.286752,114.13924
+S072,7-Eleven (Ning Yeung Terrace),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.284866,114.141199
+S073,Eat My Cakes,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.285645,114.140689
+S074,759,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.287242,114.137586
+S075,Panda Music Zone,shop,Music shop,shop; buy,22.28567,114.140689
+S076,LN Coffee,shop,Coffee shop,shop; buy,22.286174,114.140271
+S077,Continental Enterprises,shop,Yes shop,shop; buy,22.286676,114.139573
+S078,Optical 88 (Yat Fu Lane),shop,Optician,glasses,22.286274,114.134024
+S079,Fancy Home,shop,Houseware shop,shop; buy,22.286817,114.139447
+S080,Harmony Beauty House,shop,Beauty salon,beauty,22.286857,114.134797
+S081,Feng Yang Fang Chinese Medicine,shop,Herbalist shop,shop; buy,22.286823,114.139481
+S082,uSmile,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.281645,114.132545
+S083,L 88,shop,Yes shop,shop; buy,22.287377,114.138137
+S084,My Dear Pet Shop,shop,Pet shop,shop; buy,22.286735,114.139823
+S085,Daily Bread,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.287278,114.138655
+S086,Upton,shop,Yes shop,shop; buy,22.287519,114.137277
+S087,Man Chai Salon,shop,Hair salon,haircut,22.287397,114.138243
+S088,7-Eleven (Best Western Plus Hotel Hong Kong),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.287291,114.138711
+S089,The Westwood (Tower 8),shop,Mall shop,shop; buy,22.285745,114.133187
+S090,Wellcome (Yat Fu Lane),shop,Supermarket: groceries and daily items,groceries; food shopping,22.286322,114.133724
+S091,So So,shop,Massage shop,shop; buy,22.28746,114.138506
+S092,Mannings (Yat Fu Lane),shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.286354,114.133579
+S093,華成文具紙業,shop,Stationery shop · open Mo-Fr 09:00-18:00,stationery; printing,22.286955,114.13434
+S094,7-Eleven (Yat Fu Lane),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.28656,114.133741
+S095,International by PARKnSHOP,shop,Supermarket: groceries and daily items · open 08:00-22:00,groceries; food shopping,22.284723,114.141846
+S096,In Technologies,shop,Electronics shop,electronics; gadgets,22.28751,114.138693
+S097,Pong's,shop,Yes shop,shop; buy,22.286954,114.139926
+S098,Circle K (Courtyard by Marriott Hong Kong),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.28754,114.138625
+S099,Pandamart,shop,Yes shop,shop; buy,22.286373,114.133492
+S100,沐容莊,shop,Beauty salon,beauty,22.287406,114.139123
+S101,N.G. Overseas Trading Co,shop,Yes shop,shop; buy,22.287708,114.138077
+S102,Lego Pet,shop,Pet shop,shop; buy,22.286391,114.133416
+S103,Beauty Photo Supplies Co.,shop,Photo shop,shop; buy,22.286558,114.133593
+S104,Ki Yip Spare Parts,shop,Car parts shop,shop; buy,22.287744,114.138215
+S105,Suing Kee Motors Company,shop,Car repair shop,shop; buy,22.28777,114.138318
+S106,林品珍茶行,shop,Tea shop,shop; buy,22.286412,114.133317
+S107,Mayce Cut,shop,Yes shop,shop; buy,22.286851,114.140377
+S108,Top Beauty,shop,Beauty salon,beauty,22.286422,114.133272
+S109,Worthy Dispensary,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.287737,114.138627
+S110,Po Wah Auto Repairing Service Company,shop,Car repair shop,shop; buy,22.287788,114.138612
+S111,Royal,shop,Yes shop,shop; buy,22.285178,114.13217
+S112,LaundrYup (Belcher's Street Sitting-out Area),shop,Laundry,laundry; washing,22.285212,114.132187
+S113,Ka Wing Motor,shop,Car repair shop,shop; buy,22.285272,114.13221
+S114,AA Place,shop,Yes shop,shop; buy,22.285331,114.132241
+S115,Tai Yuen Electrical,shop,Electronics shop,electronics; gadgets,22.284968,114.132021
+S116,Volkswagen Hong Kong Service Centre,shop,Car repair shop,shop; buy,22.287111,114.133803
+S117,Parker Plastic Works Company,shop,Yes shop,shop; buy,22.284947,114.132001
+S118,Ocean City,shop,Yes shop,shop; buy,22.284923,114.131989
+S119,迦南麵包西餅店,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.286472,114.133035
+S120,富雅時裝公司,shop,Clothes shop,clothes; fashion,22.285839,114.132401
+S121,7-Eleven (The Westpoint),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.287693,114.139557
+S122,MC2,shop,Yes shop,shop; buy,22.285862,114.132411
+S123,Sunny Boy,shop,Yes shop,shop; buy,22.285953,114.132443
+S124,Dch Food Mart Deluxe,shop,Supermarket: groceries and daily items,groceries; food shopping,22.286141,114.141618
+S125,Chun Ying Hong,shop,Appliance shop,shop; buy,22.284686,114.131757
+S126,Safewell,shop,Security shop,shop; buy,22.286095,114.132493
+S127,Pink Lady,shop,Clothes shop,clothes; fashion,22.284603,114.131659
+S128,Happiness Single Coffee,shop,Coffee shop,shop; buy,22.284806,114.142521
+S129,7-Eleven (Tang Wong Court),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.285606,114.142149
+S130,Star Mart,shop,Supermarket: groceries and daily items,groceries; food shopping,22.286376,114.132591
+S131,Kwan Hing Kee,shop,Grocery shop,shop; buy,22.285706,114.142111
+S132,Vaily Beauty,shop,Beauty salon,beauty,22.287058,114.140967
+S133,Shi Yan Jewelry,shop,Jewelry shop,shop; buy,22.286524,114.132647
+S134,Bulls,shop,Yes shop,shop; buy,22.285932,114.132139
+S135,Live Zero,shop,"Convenience store: snacks, drinks, daily items · open Mo-Sa 11:00-20:00; Su 11:00-18:00",snacks; drinks; 7-Eleven; Circle K,22.285097,114.142572
+S136,Circle K (Kam Ning Mansion),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.284455,114.14287
+S137,Shun Ya,shop,Supermarket: groceries and daily items,groceries; food shopping,22.284341,114.131298
+S138,Kwok Kwong Book Shop,shop,Stationery shop,stationery; printing,22.287398,114.140891
+S139,Ingrid Millet,shop,Yes shop,shop; buy,22.284219,114.143072
+S140,Centre Street Market,shop,Shop shop,shop; buy,22.286347,114.142056
+S141,Queenland,shop,Beauty salon,beauty,22.28389,114.131048
+S142,Tuck Chong Sum Kee Bamboo Steamer,shop,Yes shop,shop; buy,22.287487,114.140895
+S143,Lavande,shop,Yes shop,shop; buy,22.284212,114.14311
+S144,Kin Hing Hong co,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.284997,114.131325
+S145,Alpha,shop,Yes shop,shop; buy,22.287527,114.140899
+S146,Puppy Doggy,shop,Pet shop,shop; buy,22.284969,114.131288
+S147,Organic Oasis,shop,Yes shop,shop; buy,22.284202,114.143149
+S148,DS Groceries (Kennedy Town Centre Shopping Centre),shop,Supermarket: groceries and daily items · open Mo-Su 09:00-21:30,groceries; food shopping,22.283852,114.130981
+S149,Sai Ying Pun Market,shop,Shop shop,shop; buy,22.285911,114.142445
+S150,Hing Tat Trading,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.28489,114.131199
+S151,7-Eleven (Kennedy Town Centre Shopping Centre),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.283778,114.130904
+S152,Kai Bo Food Supermarket (San Hey Lou),shop,Supermarket: groceries and daily items,groceries; food shopping,22.285711,114.142658
+S153,Yes shop near Park Height,shop,Yes shop,shop; buy,22.284171,114.143263
+S154,Wellcome (Federate Building),shop,Supermarket: groceries and daily items,groceries; food shopping,22.286587,114.142115
+S155,SKG G'zox,shop,Car repair shop,shop; buy,22.284793,114.131074
+S156,Shipped Foot,shop,Massage shop,shop; buy,22.288011,114.140533
+S157,Keat,shop,Yes shop,shop; buy,22.283628,114.130752
+S158,Apps Hair Salon,shop,Hair salon,haircut,22.287816,114.140913
+S159,Magic,shop,Yes shop,shop; buy,22.288031,114.140607
+S160,Family Store,shop,Second hand shop,shop; buy,22.283527,114.130629
+S161,Korean,shop,Clothes shop,clothes; fashion,22.28806,114.140684
+S162,Triumph,shop,Motorcycle shop,shop; buy,22.28462,114.130822
+S163,PARKnSHOP (Yuet Sum Mansion),shop,Supermarket: groceries and daily items,groceries; food shopping,22.288076,114.140712
+S164,Hung Shing Property Agency Limited,shop,Estate agent shop,shop; buy,22.28376,114.130604
+S165,偉業冷氣水電工程,shop,Yes shop,shop; buy,22.284423,114.130728
+S166,PARKnSHOP (Kennedy Town Centre Shopping Centre),shop,Supermarket: groceries and daily items,groceries; food shopping,22.284069,114.130642
+S167,Market Place by Jasons,shop,"Supermarket: groceries and daily items · open Mo-Su,PH 08:00-22:00",groceries; food shopping,22.286292,114.142651
+S168,Andre Music,shop,Music shop,shop; buy,22.288012,114.140971
+S169,Mahayana Tyre,shop,Tyres shop,shop; buy,22.285685,114.143112
+S170,Hair Revive,shop,Hair salon,haircut,22.283644,114.13044
+S171,Wellcome (Ching Tak Building),shop,Supermarket: groceries and daily items,groceries; food shopping,22.287789,114.141419
+S172,Nan Hai Plaza,shop,Mall shop,shop; buy,22.283806,114.130441
+S173,Century Auto Service,shop,Car repair shop,shop; buy,22.285558,114.143235
+S174,Wellcome (Yee Ga Court),shop,Supermarket: groceries and daily items,groceries; food shopping,22.284164,114.143708
+S175,British Repair & Auto Service,shop,Car repair shop,shop; buy,22.285682,114.143193
+S176,Laundry shop near Rock Hill Street Sitting-out Area,shop,Laundry,laundry; washing,22.283127,114.13032
+S177,Wah Kwong Stationary Printing Company,shop,Stationery shop,stationery; printing,22.285554,114.143324
+S178,堅尼地脆,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.283155,114.130297
+S179,Ocean Salon,shop,Hair salon,haircut,22.282988,114.130282
+S180,La Pur,shop,Hair salon,haircut,22.283029,114.130246
+S181,明輝電訊,shop,Yes shop,shop; buy,22.283239,114.13024
+S182,A. X. Hair,shop,Hair salon,haircut,22.283458,114.130214
+S183,Ninoen,shop,Yes shop,shop; buy,22.286818,114.142679
+S184,Tin Shing Curtain,shop,Curtain shop,shop; buy,22.283428,114.130178
+S185,Circle K (Rock Hill Street Sitting-out Area),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.283406,114.130151
+S186,Tai Yip Motors,shop,Car repair shop,shop; buy,22.284126,114.143964
+S187,Kana,shop,Clothes shop,clothes; fashion,22.284047,114.13016
+S188,Yau Sang Garage,shop,Car repair shop,shop; buy,22.285668,114.14355
+S189,Watsons (Kaiser Centre),shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.287358,114.142397
+S190,The Hong Kong Jockey Club (Kennedy Town Centre),shop,Bookmaker shop,shop; buy,22.284006,114.1301
+S191,DS Groceries (Kwai Cheong Building),shop,Supermarket: groceries and daily items · open Mo-Su 08:30-21:30,groceries; food shopping,22.287805,114.142005
+S192,WCT Medicine,shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.287479,114.142402
+S193,Kam Ngar Cakeshop,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.287522,114.142402
+S194,Circle K (Kwai Cheong Building),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.287797,114.142149
+S195,Free Market,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.283848,114.129905
+S196,New 21,shop,Clothes shop,clothes; fashion,22.283166,114.129842
+S197,錢大媽,shop,Butcher,meat; market,22.287793,114.142244
+S198,Doors shop near 錦翠園,shop,Doors shop,shop; buy,22.284133,114.144275
+S199,San Shing Hong Medicine,shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.288068,114.142036
+S200,Watsons (Rock Hill Street Sitting-out Area),shop,"Personal care and pharmacy goods (e.g. Watsons, Mannings)",toiletries; medicine,22.282847,114.129724
+S201,佳景地產,shop,Estate agent shop,shop; buy,22.283499,114.129739
+S202,7-Eleven (Good Times Building),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.286794,114.143328
+S203,Wellcome (Public Open Space),shop,Supermarket: groceries and daily items,groceries; food shopping,22.28272,114.129389
+S204,Paws Buddy,shop,Pet shop,shop; buy,22.283564,114.129291
+S205,SmarTone,shop,Telecommunication shop,shop; buy,22.28287,114.12919
+S206,Circle K (Public Open Space),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.283369,114.129164
+S207,Hamilton & Spill Ltd,shop,Furniture shop,shop; buy,22.28827,114.14282
+S208,Laundry shop near WE hotel,shop,Laundry · open 24/7,laundry; washing,22.287375,114.143706
+S209,7-Eleven (Public Open Space),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.282664,114.128989
+S210,Leighton Piano Studio,shop,Musical instrument shop,shop; buy,22.2835,114.128997
+S211,Shun Yuen Trading Co.,shop,Yes shop,shop; buy,22.28734,114.143822
+S212,Family Optical,shop,Optician,glasses,22.282794,114.128877
+S213,Blue Place,shop,Clothes shop,clothes; fashion,22.282788,114.128813
+S214,Jin Yuan tea shop,shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.286887,114.144361
+S215,SmartBuyGlasses Outlet Store,shop,Accessories shop,shop; buy,22.280865,114.128978
+S216,Smithfield Market,shop,Shop shop,shop; buy,22.281875,114.128734
+S217,Lattitude,shop,Yes shop,shop; buy,22.282591,114.128652
+S218,Gigi Nails,shop,Beauty salon,beauty,22.28054,114.129054
+S219,Yin Yang Laundry,shop,Laundry,laundry; washing,22.279595,114.129433
+S220,7-Eleven (MTR Kennedy Town Exit A (Smithfield)),shop,"Convenience store: snacks, drinks, daily items · open Mo-Su 07:00-23:00",snacks; drinks; 7-Eleven; Circle K,22.281199,114.1288
+S221,總部,shop,Hair salon,haircut,22.279482,114.129442
+S222,JHC (Imperial Kennedy),shop,Houseware shop,shop; buy,22.28258,114.128533
+S223,江記士多,shop,Houseware shop,shop; buy,22.27914,114.129542
+S224,Shearer Butcher,shop,Butcher,meat; market,22.28272,114.128431
+S225,Wellcome (MTR Kennedy Town Exit A (Smithfield)),shop,Supermarket: groceries and daily items,groceries; food shopping,22.280817,114.128745
+S226,7-Eleven (Imperial Kennedy),shop,"Convenience store: snacks, drinks, daily items · open 24/7",snacks; drinks; 7-Eleven; Circle K,22.282184,114.128393
+S227,Optical 88 (Mia Casa),shop,Optician,glasses,22.282689,114.128267
+S228,7-Eleven (Smithfield Sports Centre),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.282013,114.12824
+S229,A-1 Bakery,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.282059,114.128228
+S230,First Home Property Agency Ltd,shop,Estate agent shop,shop; buy,22.283204,114.128151
+S231,Kodak Express,shop,Photo shop,shop; buy,22.28227,114.12818
+S232,It's Salon,shop,Hair salon,haircut,22.282413,114.128153
+S233,7-Eleven (Forbes Street),shop,"Convenience store: snacks, drinks, daily items · open Mo-Su 07:00-24:00",snacks; drinks; 7-Eleven; Circle K,22.281127,114.128358
+S234,The Hong Kong Jockey Club (Hung Cheong House),shop,Bookmaker shop,shop; buy,22.288017,114.14428
+S235,7-Eleven (Luen Tak Apartments),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.281599,114.128251
+S236,Arome Bakery,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.282519,114.128132
+S237,QB HOUSE,shop,Hair salon,haircut,22.282988,114.128063
+S238,JHC (Luen Tak Apartments),shop,Houseware shop,shop; buy,22.281758,114.128052
+S239,Hang Way Dry Cleaning,shop,Dry cleaner,laundry,22.283173,114.127952
+S240,7-Eleven (Tai Hing Building),shop,"Convenience store: snacks, drinks, daily items · open 24/7",snacks; drinks; 7-Eleven; Circle K,22.287898,114.144592
+S241,PARKnSHOP (Luen Hing Apartments),shop,Supermarket: groceries and daily items,groceries; food shopping,22.281721,114.127823
+S242,Franklin Property Agency,shop,Estate agent shop,shop; buy,22.283121,114.127696
+S243,Wellcome (Cartwright Gardens),shop,Supermarket: groceries and daily items,groceries; food shopping,22.28373,114.146563
+S244,Doggy,shop,Pet shop,shop; buy,22.283106,114.127585
+S245,Kim Sang Optical,shop,Optician,glasses,22.283256,114.127588
+S246,7-Eleven (Block E),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.280697,114.127885
+S247,Marks & Spencer Food,shop,Deli shop,shop; buy,22.28148,114.127627
+S248,Pet West,shop,Pet shop,shop; buy,22.282892,114.127471
+S249,7-Eleven (Luen Hong Apartments),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.282362,114.127395
+S250,Diyi,shop,Yes shop,shop; buy,22.283068,114.127364
+S251,LaundrYup (Mia Casa),shop,Laundry,laundry; washing,22.283035,114.127327
+S252,PRICERITE,shop,Supermarket: groceries and daily items,groceries; food shopping,22.282192,114.127347
+S253,Fusion,shop,Supermarket: groceries and daily items · open Mo-Su 10:00-22:00,groceries; food shopping,22.283241,114.127268
+S254,Three Dog Bakery,shop,"Bakery: bread, buns and pastries",bread; snacks; breakfast,22.283033,114.127245
+S255,Cooper Laundry,shop,Laundry,laundry; washing,22.283033,114.1272
+S256,Yue Sang Seaproduct,shop,Food shop,shop; buy,22.287688,114.145645
+S257,Slowood,shop,Supermarket: groceries and daily items,groceries; food shopping,22.281516,114.127185
+S258,7-Eleven (Luen Wai Apartments),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.282691,114.126999
+S259,Hanyinhong,shop,Deli shop,shop; buy,22.28762,114.14592
+S260,Circle K (Luen Wai Apartments),shop,"Convenience store: snacks, drinks, daily items",snacks; drinks; 7-Eleven; Circle K,22.282301,114.126972
+S261,Wellcome (Princeton Tower),shop,"Supermarket: groceries and daily items · open Mo-Su,PH 08:00-22:00",groceries; food shopping,22.28761,114.14603
+S262,YG Pet Pet Club,shop,Pet shop,shop; buy,22.281562,114.126433
+S263,Dogger,shop,Pet shop,shop; buy,22.282878,114.126247
+S264,Potwest Dog Grooming,shop,Pet shop,shop; buy,22.282852,114.12624
+S265,ID Art,shop,Yes shop,shop; buy,22.281636,114.12618
+S266,iBakery (Cadogan),shop,"Bakery: bread, buns and pastries · open Mo-Su 07:00-20:00",bread; snacks; breakfast,22.281753,114.126107
+S267,Wellcome (Cadogan),shop,Supermarket: groceries and daily items · open Mo-Su 08:00-22:00,groceries; food shopping,22.282113,114.126026
+S268,Body & Foot Reflexlogy Center,shop,Massage shop,shop; buy,22.282092,114.125752
+S269,Kabo Laundry,shop,Laundry · open Mo-Su 08:00-22:00,laundry; washing,22.282088,114.125709
+P001,Mong Kwok Ping Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.282794,114.138452
+P002,Knowles Park,park,"Park: exercise, rest or meet friends",exercise; rest,22.283212,114.138562
+P003,HKU Archery,park,"Pitch: exercise, rest or meet friends",exercise; rest,22.282017,114.138565
+P004,Sitting-out Area under Flyover in Bonham Road,park,"Garden: exercise, rest or meet friends",exercise; rest,22.284815,114.137559
+P005,St. Paul's College Alumni Association Tse Yu Chuen Swimming Pool,park,"Swimming pool: exercise, rest or meet friends",exercise; rest,22.284343,114.138698
+P006,Hill Road Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.284631,114.135598
+P007,Clarence Terrace Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.28519,114.13637
+P008,Rooftop Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.283716,114.134432
+P009,Third Street Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.285599,114.138272
+P010,Shek Tong Tsui Sports Centre,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.28574,114.136026
+P011,Kotewall Road Sitting-Out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.280243,114.138313
+P012,Centennial Garden,park,"Park: exercise, rest or meet friends",exercise; rest,22.282915,114.133671
+P013,Whitty Street Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.286264,114.136246
+P014,Rose Lane Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.285489,114.139554
+P015,Sai On Lane Rest Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.286554,114.137486
+P016,Sitting Out Area Under Flyover in Hill Road,park,"Garden: exercise, rest or meet friends",exercise; rest,22.286429,114.135304
+P017,Sai On Lane Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.286905,114.138004
+P018,Kotewall Road Rest Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.281638,114.141542
+P019,Hatton Road Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.278668,114.138592
+P020,Lung Fu Shan Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.278595,114.138476
+P021,Third Street Sitting-out Area,park,"Playground: exercise, rest or meet friends",exercise; rest,22.285806,114.14104
+P022,Conduit Road Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.281156,114.141708
+P023,Belcher's Street Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.284943,114.132286
+P024,Conduit Road Rest Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.281806,114.142576
+P025,Centre Street Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.285904,114.142124
+P026,West End Park,park,"Park: exercise, rest or meet friends",exercise; rest,22.283407,114.143129
+P027,Fung Mat Road Sitting-out Area,park,"Dog park: exercise, rest or meet friends",exercise; rest,22.288526,114.138323
+P028,Kennedy Town Swimming Pool Sitting-out Area (Western District Public Cargo Working Area),park,"Garden: exercise, rest or meet friends",exercise; rest,22.286846,114.132201
+P029,Anytime Fitness - Sai Ying Pun,park,"Fitness centre: exercise, rest or meet friends",exercise; rest,22.28704,114.141818
+P030,Kennedy Town Swimming Pool (Island Waldorf School (Kindergarten)),park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.286278,114.131691
+P031,Kennedy Town Swimming Pool (Island Waldorf School (Kindergarten)) #2,park,"Sports hall: exercise, rest or meet friends",exercise; rest,22.286112,114.131556
+P032,Oaklands Avenue Sitting-out Area,park,"Dog park: exercise, rest or meet friends",exercise; rest,22.282927,114.143597
+P033,Ki Ling Lane Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.287439,114.141544
+P034,Rock Hill Street Sitting-out Area,park,"Park: exercise, rest or meet friends",exercise; rest,22.282807,114.130295
+P035,Belcher Bay Park (Kennedy Town Praya) #3,park,"Park: exercise, rest or meet friends",exercise; rest,22.284904,114.130275
+P036,Sung Hing Lane Children's Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.28724,114.142745
+P037,Mui Fong Street Sitting-out Area,park,"Park: exercise, rest or meet friends",exercise; rest,22.287186,114.143223
+P038,King George V Memorial Park,park,"Park: exercise, rest or meet friends",exercise; rest,22.285578,114.144379
+P039,Mui Fong Street Children's Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.287326,114.143445
+P040,Pok Fu Lam Road Playground (Mount Davis Road) #2,park,"Park: exercise, rest or meet friends",exercise; rest,22.277939,114.131227
+P041,Smithfield Sitting-out Area,park,"Park: exercise, rest or meet friends",exercise; rest,22.28154,114.129193
+P042,Pokfield Road Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.280244,114.129515
+P043,K-FARM,park,"Garden: exercise, rest or meet friends",exercise; rest,22.284922,114.129163
+P044,Public Open Space,park,"Garden: exercise, rest or meet friends",exercise; rest,22.282975,114.12883
+P045,Sai Woo Lane Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.287327,114.144208
+P046,Smithfield Sports Centre,park,"Sports centre: exercise, rest or meet friends · open Mo-Su 07:00-23:00",exercise; rest,22.281858,114.128466
+P047,Smithfield Road Children's Playground,park,"Playground: exercise, rest or meet friends",exercise; rest,22.283751,114.128237
+P048,Sai Ying Pun Harbourfront Park,park,"Park: exercise, rest or meet friends",exercise; rest,22.290302,114.141509
+P049,Li Sing Street Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.286959,114.145561
+P050,Bonham Road Rest Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.283726,114.146649
+P051,Forbes Street Temporary Playground,park,"Park: exercise, rest or meet friends",exercise; rest,22.28112,114.127652
+P052,London Mission Building,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.282722,114.146792
+P053,Sun Yat Sen Memorial Park Sports Centre,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.290061,114.143502
+P054,Kennedy Town Playground,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.280988,114.127039
+P055,Sun Yat Sen Memorial Park Swimming Pool,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.289984,114.144409
+P056,Kennedy Town Service Reservoir Playground,park,"Sports centre: exercise, rest or meet friends",exercise; rest,22.279121,114.127401
+P057,Catchick Street Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.283074,114.126365
+P058,Sun Yat Sen Memorial Park (Sun Yat-sen Statue),park,"Park: exercise, rest or meet friends",exercise; rest,22.289747,114.145644
+P059,Cadogan Street Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.28253,114.125359
+P060,Ka Wai Man Road Garden,park,"Garden: exercise, rest or meet friends",exercise; rest,22.281699,114.125328
+P061,Ka Wai Man Road Sitting-out Area,park,"Garden: exercise, rest or meet friends",exercise; rest,22.281963,114.12481
+L001,HKU Main Library,library,Library,,22.283327,114.137802
+L002,Music Library,library,Library,,22.283709,114.134566
+L003,Lui Che Woo Law Library,library,Library,,22.283316,114.13404
+L004,Shek Tong Tsui Public Library,library,Library,,22.28574,114.135979
+L005,Smithfield Public Library,library,Library,,22.281721,114.128484
+V001,Pillar of Shame,sight,Historic ruins,history; sight,22.283075,114.13661
+V002,Stephen Hui Geological Museum,sight,Museum,museum; gallery; sight,22.282832,114.137858
+V003,Statue of Sun Yat-sen,sight,Local sight or landmark,sight; landmark,22.282828,114.13846
+V004,University Museum and Art Gallery,sight,Museum,museum; gallery; sight,22.283745,114.139093
+V005,Lung Fu Shan Environmental Education Centre,sight,Museum,museum; gallery; sight,22.280856,114.138224
+V006,Hong Kong Resource Centre for Heritage,sight,Museum · open Mo-Fr 10:00-18:00,museum; gallery; sight,22.285979,114.141024
+V007,Pinewood Battery (Deserted),sight,Historic ruins,history; sight,22.27785,114.135876
+V008,"Praya, Kennedy Town (Island Waldorf School (Kindergarten))",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.286022,114.131862
+V009,"Praya, Kennedy Town (Island Waldorf School) #4",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.285268,114.131383
+V010,"Praya, Kennedy Town (Island Waldorf School)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.285205,114.131299
+V011,"Praya, Kennedy Town (Island Waldorf School) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.285295,114.131286
+V012,"Praya, Kennedy Town (Island Waldorf School) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.285375,114.131284
+V013,"Praya, Kennedy Town (Holland Street)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284934,114.130955
+V014,"Praya, Kennedy Town (Holland Street) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284498,114.130566
+V015,Inverted Siphon 2,sight,Historic ruins,history; sight,22.278391,114.132512
+V016,"Praya, Kennedy Town (Kennedy Town Praya)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284571,114.130507
+V017,Sun Museum,sight,Museum,museum; gallery; sight,22.287628,114.141786
+V018,Kennedy Town Praya,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284375,114.130375
+V019,"Praya, Kennedy Town (Kennedy Town Praya) #5",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284421,114.130323
+V020,"Praya, Kennedy Town (Kennedy Town Praya) #4",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284298,114.130174
+V021,"Boundary Stone, City of Victoria",sight,Historic monument,history; sight,22.279153,114.131271
+V022,Western District Public Cargo Working Area,sight,Local sight or landmark,sight; landmark,22.287594,114.131925
+V023,"Praya, Kennedy Town (Kennedy Town Praya) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284086,114.129922
+V024,Pier No. 1,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.289533,114.135138
+V025,Pier No. 2,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.289744,114.13598
+V026,Central and Western District Promenade - Western Wholesale Food Market Section,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.28982,114.136603
+V027,"Praya, Kennedy Town (Kennedy Town Praya) #6",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283932,114.129749
+V028,"New Praya, Kennedy Town (Kennedy Town Praya) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283961,114.129732
+V029,"Praya, Kennedy Town (Kennedy Town Praya) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283849,114.129659
+V030,Pier No. 3,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.290001,114.137005
+V031,"New Praya, Kennedy Town (Kennedy Town Praya)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283957,114.129621
+V032,"New Praya, Kennedy Town (Kennedy Town Praya) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283849,114.12955
+V033,"New Praya, Kennedy Town (Green Cook) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.28396,114.1295
+V034,"New Praya, Kennedy Town (Green Cook) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283932,114.129472
+V035,"New Praya, Kennedy Town (Green Cook) #4",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284042,114.129371
+V036,Pier No. 4,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.290336,114.138342
+V037,"New Praya, Kennedy Town (Green Cook) #5",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284278,114.129196
+V038,"New Praya, Kennedy Town (Green Cook)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284187,114.12901
+V039,Belcher Bay Promenade,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.285236,114.129178
+V040,"New Praya, Kennedy Town (New Fortune House) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284132,114.128821
+V041,"New Praya, Kennedy Town (New Fortune House)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.284032,114.128361
+V042,"New Praya, Kennedy Town (May Sun Building) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283956,114.12771
+V043,"New Praya, Kennedy Town (May Sun Building) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.28392,114.127544
+V044,"New Praya, Kennedy Town (May Sun Building)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283828,114.12702
+V045,"New Praya, Kennedy Town (Catchick Street Garden) #5",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283739,114.126515
+V046,"New Praya, Kennedy Town (Catchick Street Garden) #4",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283617,114.126228
+V047,"New Praya, Kennedy Town (Catchick Street Garden) #3",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283688,114.126202
+V048,Lugard Road Lookout,sight,Viewpoint,view; sight,22.278168,114.14681
+V049,Sun Yat-sen Statue,sight,Historic memorial,history; sight,22.289735,114.145546
+V050,"New Praya, Kennedy Town (Catchick Street Garden)",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283611,114.12588
+V051,"New Praya, Kennedy Town (Catchick Street Garden) #2",sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.283552,114.125836
+V052,Cadogan Street Promenade,sight,Waterfront by the harbour,waterfront; harbour; sea; sight,22.282957,114.124396
+V053,Mount Davis Battery,sight,Historic ruins,history; sight,22.276771,114.124373
+V054,Mount Davis Fort,sight,Historic fort,history; sight,22.276949,114.123249
+A001,ATM (The Bank of China) near Haking Wong Building,money,ATM: withdraw cash · open 24/7,cash; money; bank,22.282797,114.136667
+A002,HSBC,money,Bank branch on campus,bank; ATM,22.282522,114.138015
+A003,ATM near Lee Chi Hung Hall,money,ATM: withdraw cash · open 24/7,cash; money; bank,22.282611,114.138884
+A004,The Bank of East Asia HKU Branch,money,Bank branch on campus · open Mo-Fr 09:00-17:00; Sa Su PH off,bank; ATM,22.283278,114.134771
+A005,Bank of East Asia,money,Bank: cash and banking,bank; ATM; money,22.285427,114.136706
+A006,Hang Seng Bank (MTR HKU Exit B1 (Whitty Street)),money,Bank: cash and banking,bank; ATM; money,22.285875,114.136596
+A007,China CITIC Bank International,money,Bank: cash and banking,bank; ATM; money,22.28588,114.135494
+A008,DBS,money,Bank: cash and banking,bank; ATM; money,22.286168,114.135427
+A009,Hang Seng Bank (Fairchild),money,Bank: cash and banking,bank; ATM; money,22.28687,114.136407
+A010,Bank of China (Hong Kong) (Hotel Jen Hong Kong),money,Bank: cash and banking,bank; ATM; money,22.286153,114.134404
+A011,Chong Hing Bank,money,Bank: cash and banking,bank; ATM; money,22.287039,114.136824
+A012,Standard Chartered,money,Bank: cash and banking,bank; ATM; money,22.286358,114.134522
+A013,ICBC (Asia) (Oasis Aurum 181),money,Bank: cash and banking,bank; ATM; money,22.287166,114.137361
+A014,Public Bank (Hong Kong),money,Bank: cash and banking,bank; ATM; money,22.286958,114.135607
+A015,Nanyang Commercial Bank (Sai On Lane Children's Playground),money,Bank: cash and banking,bank; ATM; money,22.287171,114.138246
+A016,Foreign Exchange,money,Bureau de change: cash and banking,bank; ATM; money,22.28743,114.138399
+A017,Western Union,money,Money transfer: cash and banking,bank; ATM; money,22.287341,114.138754
+A018,CCB (Asia),money,Bank: cash and banking,bank; ATM; money,22.286541,114.133816
+A019,Max Luck Exchange,money,Bureau de change: cash and banking,bank; ATM; money,22.287525,114.138703
+A020,ICBC (Asia) (Good Times Building),money,Bank: cash and banking,bank; ATM; money,22.286796,114.143272
+A021,Fubon Bank,money,Bank: cash and banking,bank; ATM; money,22.28273,114.129457
+A022,Hang Seng Bank (Public Open Space),money,Bank: cash and banking,bank; ATM; money,22.282887,114.129297
+A023,HSBC Express Banking (MTR Kennedy Town Exit A (Smithfield)),money,ATM: withdraw cash · open Mo-Su 05:50-01:21,cash; money; bank,22.281154,114.128806
+A024,CMB Wing Lung Bank,money,Bank: cash and banking,bank; ATM; money,22.283243,114.128379
+A025,Dah Sing Bank,money,Bank: cash and banking,bank; ATM; money,22.282292,114.128378
+A026,Nanyang Commercial Bank (Wheelock Gallery),money,Bank: cash and banking,bank; ATM; money,22.282536,114.128326
+A027,Bank of Communications,money,Bank: cash and banking,bank; ATM; money,22.282667,114.128104
+A028,Bank of China (Hong Kong) (Lee Wah Mansion),money,Bank: cash and banking,bank; ATM; money,22.287893,114.144769
+A029,HSBC Express Banking (Concord Hotel),money,ATM: withdraw cash · open 24/7,cash; money; bank,22.282263,114.126781
+A030,Hang Seng Bank (Queen Street),money,Bank: cash and banking,bank; ATM; money,22.287566,114.146767
+D001,"University Health Service, The University of Hong Kong",health,Campus clinic for students and staff,clinic; doctor,22.282217,114.139153
+D002,Biorecovery Veterinary Clinic,health,Vet for pets,health; doctor; medicine,22.285748,114.138423
+D003,Department of Health Western Dental Clinic,health,Dentist,health; doctor; medicine,22.285218,114.139445
+D004,Mannings (Ning Yeung Terrace),health,Pharmacy: medicine,health; doctor; medicine,22.284822,114.141094
+D005,Dr. Lee Hon Kwan,health,Doctor's clinic,health; doctor; medicine,22.286649,114.139508
+D006,Abundant Life,health,Clinic: see a doctor,health; doctor; medicine,22.287344,114.138054
+D007,Dentist near Sai On Lane Children's Playground,health,Dentist,health; doctor; medicine,22.287414,114.138301
+D008,Foot Doc,health,Clinic: see a doctor,health; doctor; medicine,22.28745,114.138459
+D009,Chiu Sing Nam Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.286893,114.140378
+D010,"Dr. Chuh An Tung, Antonio",health,Doctor's clinic,health; doctor; medicine,22.286885,114.140853
+D011,"Dr. Li Joe Yan Joe, Dental Surgeon",health,Dentist,health; doctor; medicine,22.286884,114.140896
+D012,Shing Yick Chinese Medicine Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.28659,114.132509
+D013,Dr. Chan Cho Yin,health,Doctor's clinic,health; doctor; medicine,22.286866,114.141631
+D014,"Speech, Language and Hearing Clinic, The University of Hong Kong",health,Hospital,health; doctor; medicine,22.283949,114.130833
+D015,Dr. Lau Chi Ho Medical Practice,health,Doctor's clinic,health; doctor; medicine,22.283344,114.130379
+D016,Kennedy Town Dispensary,health,Pharmacy: medicine,health; doctor; medicine,22.283205,114.129895
+D017,Mannings (Rock Hill Street Sitting-out Area),health,Pharmacy: medicine,health; doctor; medicine,22.283055,114.129689
+D018,Fortune Pharmacy,health,Pharmacy: medicine,health; doctor; medicine,22.282706,114.129313
+D019,Ever Success Dispensary,health,Pharmacy: medicine,health; doctor; medicine,22.282699,114.12927
+D020,Tsan Yuk Hospital,health,Hospital,health; doctor; medicine,22.286326,114.144582
+D021,David Trench Rehabilitation Centre,health,Clinic: see a doctor,health; doctor; medicine,22.285543,114.145166
+D022,Kam Po Dispensary,health,Pharmacy: medicine,health; doctor; medicine,22.282745,114.128578
+D023,Sai Ying Pun Jockey Club Family Medicine Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.286503,114.144947
+D024,Sai Ying Pun Chest Cinic,health,Clinic: see a doctor,health; doctor; medicine,22.286451,114.145006
+D025,Sai Ying Pun Dermatological Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.286406,114.145052
+D026,Sai Ying Pun Dental Clinic,health,Dentist,health; doctor; medicine,22.28637,114.145098
+D027,Sai Ying Pun Maternal & Child Health Centre,health,Clinic: see a doctor,health; doctor; medicine,22.286337,114.145145
+D028,Sai Ying Pun Elderly Health Centre,health,Clinic: see a doctor,health; doctor; medicine,22.286286,114.14526
+D029,Nine Lives,health,Vet for pets,health; doctor; medicine,22.282942,114.127778
+D030,Dr. Rayson C.K. Tze,health,Doctor's clinic,health; doctor; medicine,22.28325,114.12754
+D031,Tung Wah Hospital,health,Hospital,health; doctor; medicine,22.285001,114.14674
+D032,T.W.G.H. Family Medicine Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.285424,114.146855
+D033,Dentada,health,Dentist,health; doctor; medicine,22.282362,114.126274
+D034,Kennedy Town Jockey Club Family Medicine Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.281802,114.124073
+D035,Kennedy Town Jockey Club Clinic,health,Clinic: see a doctor,health; doctor; medicine,22.281762,114.12395
+T001,Public toilet near Hill Road Garden,toilet,Public toilet · open 24/7,,22.284569,114.135694
+T002,Public toilet near The University of Hong Kong Run Run Shaw Tower,toilet,Public toilet,,22.283605,114.134435
+T003,Kotewall Road Public Toilet,toilet,Public toilet · open 24/7,,22.280534,114.138325
+T004,Public toilet near Fung Lam Building,toilet,Public toilet,,22.285149,114.139207
+T005,Water Street Public Toilet,toilet,Public toilet,,22.285245,114.139218
+T006,Public toilet near Pinewood Battery (Deserted) #2,toilet,Public toilet,,22.279535,114.135286
+T007,Public toilet near Hatton Road Sitting-out Area,toilet,Public toilet,,22.278741,114.138625
+T008,Public toilet near MTR HKU Exit C2 (Belcher's Street),toilet,Public toilet,,22.286272,114.132974
+T009,Centre Street Public Toilet,toilet,Public toilet,,22.286473,114.141876
+T010,Public toilet near Pinewood Battery (Deserted) #3,toilet,Public toilet,,22.2772,114.136433
+T011,Public toilet near Sun Museum,toilet,Public toilet,,22.287762,114.141836
+T012,Public toilet near Pier No. 1,toilet,Public toilet,,22.289276,114.135022
+T013,Public toilet near Kennedy Town Praya,toilet,Public toilet,,22.284272,114.129869
+T014,Public toilet near Hong Kong Society for the Protection of Children Thomas Tam Nursery School,toilet,Public toilet,,22.2854,114.144245
+T015,Kwai Heung Street Public Toilet,toilet,Public toilet,,22.287481,114.14311
+T016,Public toilet near Pinewood Battery (Deserted),toilet,Public toilet,,22.276376,114.134105
+T017,Public toilet near Pier No. 4 #2,toilet,Public toilet,,22.290139,114.138456
+T018,Public toilet near Mount Davis Road,toilet,Public toilet,,22.278005,114.13117
+T019,Public toilet near Pier No. 4,toilet,Public toilet,,22.29019,114.13924
+T020,Public toilet near Pokfulam Mansion,toilet,Public toilet,,22.276528,114.132762
+T021,Public toilet near Green Cook,toilet,Public toilet,,22.28468,114.128709
+T022,Public toilet near Smithfield Sports Centre,toilet,Public toilet,,22.281886,114.128596
+T023,Public toilet near MTR Kennedy Town Exit C (Forbes Street),toilet,Public toilet,,22.281143,114.128032
+T024,In Ku Lane Temporary Public Toilet,toilet,Public toilet,,22.286873,114.145859
+T025,Hospital Road Public Toilet,toilet,Public toilet,,22.283963,114.146923
+T026,Public toilet near Kennedy Town Service Reservoir,toilet,Public toilet,,22.279416,114.12772
+T027,Public toilet near Sun Yat Sen Memorial Park Swimming Pool,toilet,Public toilet,,22.289962,114.144803
+T028,Public toilet near Catchick Street Garden,toilet,Public toilet,,22.283466,114.126379
+T029,Public toilet near Sai Ying Pun Ventilation Building,toilet,Public toilet,,22.289608,114.146277
+T030,Public toilet near Ka Wai Man Road Garden,toilet,Public toilet,,22.281733,114.125124
+N001,Drinking water near Hui Oi Chow Science Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.282837,114.137647
+N002,Drinking water near Haking Wong Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.282933,114.136396
+N003,Drinking water near Knowles Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.28321,114.138329
+N004,Drinking water near Main Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.284052,114.137843
+N005,Drinking water near Runme Shaw Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.282497,114.138582
+N006,Drinking water near Chow Yei Ching Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.28312,114.135432
+N007,Drinking water near K.K. Leung Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.283298,114.139016
+N008,Drinking water near Chong Yuet Ming Amenities Centre,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.282748,114.139181
+N009,Drinking water near Meng Wah Complex,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.282354,114.139182
+N010,Drinking water near Lee Shau Kee Lecture Centre,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.28354,114.134881
+N011,Drinking water near The Jockey Club Tower,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.283251,114.134647
+N012,Drinking water near Chong Yuet Ming Chemistry Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.28295,114.139902
+N013,Drinking water near Swire Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.283859,114.139769
+N014,Drinking water near Run Run Shaw Tower,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.283702,114.134225
+N015,Vending machine (drinks) near Caritas Ling Yuet Sin Kindergarten,vending,Vending machine selling drinks,drinks; snacks; vending,22.284946,114.139264
+N016,Drinking water near Cheng Yu Tung Tower,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.283304,114.13385
+N017,Drinking water near MTR Kennedy Town Exit C (Forbes Street),vending,Drinking water fountain: refill a bottle,water; drink; refill,22.281168,114.128028
+N018,Vending machine (food) near Chi Sun College,vending,Vending machine selling food · open 24/7,drinks; snacks; vending,22.278986,114.128557
+N019,Drinking water near Sun Yat-sen Statue,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.28919,114.14613
+N020,Drinking water near Sai Ying Pun Ventilation Building,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.289632,114.146342
+N021,"Vending machine (water, soda, sport water) near Sai Ying Pun Ventilation Building",vending,"Vending machine selling water, soda, sport water",drinks; snacks; vending,22.289637,114.146381
+N022,Drinking water near Sai Ying Pun Ventilation Building #2,vending,Drinking water fountain: refill a bottle,water; drink; refill,22.289439,114.146541
+W001,St. Anthony's Church,worship,Place of worship (christian),church; temple; pray,22.284891,114.137042
+W002,St. Stephen's Church,worship,Place of worship (christian),church; temple; pray,22.285009,114.13809
+W003,Chinese Rhenish Church Hong Kong,worship,Place of worship (christian),church; temple; pray,22.283837,114.140728
+W004,Emmanuel House,worship,Place of worship (christian),church; temple; pray,22.283635,114.1408
+W005,Assemblies of God West Point Church,worship,Place of worship (christian),church; temple; pray,22.286888,114.136253
+W006,Hong Kong West Point Baptist Church,worship,Place of worship (christian),church; temple; pray,22.287111,114.137061
+W007,Tsung Tsin Mission of Hong Kong Kau Yan Church,worship,Place of worship (christian),church; temple; pray,22.285482,114.140863
+W008,Lo Pan Temple,worship,Place of worship (religion unknown) · open 09:30-17:00,church; temple; pray,22.282991,114.131941
+W009,Sheung Fung Lane Old Fuk Tak Kung,worship,Place of worship (religion unknown),church; temple; pray,22.286035,114.141363
+W010,Our Lady of the Rosary Church,worship,Place of worship (christian),church; temple; pray,22.280436,114.129876
+E001,Chiu Sheung School Hong Kong (Eivissa Crest),school,School (not part of HKU),,22.28393,114.136063
+E002,SKH St. Peter's Primary School (Yam Pak Building),school,School (not part of HKU),,22.284208,114.135657
+E003,South Wing (St. Paul's College Alumni Association Tse Yu Chuen Swimming Pool),school,School (not part of HKU),,22.284394,114.138756
+E004,St. Paul's College,school,School (not part of HKU),,22.284522,114.138798
+E005,St. Anthony's School,school,School (not part of HKU),,22.285192,114.137307
+E006,The Stewart Building,school,School (not part of HKU),,22.284768,114.138554
+E007,St. Stephen's Church Primary School,school,School (not part of HKU),,22.28494,114.1383
+E008,East Wing,school,School (not part of HKU),,22.284543,114.138984
+E009,St. Stephen's Church College (St. Stephen's Church Primary School),school,School (not part of HKU),,22.285117,114.138232
+E010,North Wing (East Wing),school,School (not part of HKU),,22.284812,114.138931
+E011,St. Louis School (Primary Section),school,School (not part of HKU),,22.285636,114.137389
+E012,St. Louis School (St. Louis School (Primary Section)),school,School (not part of HKU),,22.285726,114.137571
+E013,SKH St. Peter's Primary School (One South Lane),school,School (not part of HKU),,22.284921,114.134575
+E014,St Clare's Primary School,school,School (not part of HKU),,22.283532,114.140326
+E015,Caritas Ling Yuet Sin Kindergarten,school,School (not part of HKU),,22.285006,114.139661
+E016,St. Louis School (Sai On Lane Rest Garden),school,School (not part of HKU),,22.286067,114.137811
+E017,King's College (Western Barracks),school,School (not part of HKU),,22.284467,114.140282
+E018,Li Sing Primary School (Rose Lane Children's Playground),school,School (not part of HKU),,22.285305,114.139666
+E019,School near Honiton Mansion,school,School (not part of HKU),,22.283697,114.140849
+E020,Fairchild,school,School (not part of HKU),,22.286932,114.136634
+E021,School near Fook Wah Mansions,school,School (not part of HKU),,22.283372,114.14167
+E022,Kau Yan School,school,School (not part of HKU),,22.28545,114.141068
+E023,Island Waldorf School,school,School (not part of HKU),,22.285778,114.131985
+E024,Island Waldorf School (Kindergarten),school,School (not part of HKU),,22.285809,114.131992
+E025,June Li Building,school,School (not part of HKU),,22.283566,114.14379
+E026,St. Stephen's Girls' College (June Li Building) #2,school,School (not part of HKU),,22.283646,114.143998
+E027,Hong Kong Harmonica Academy,school,School (not part of HKU),,22.288121,114.141395
+E028,Bonham Road Government Primary School,school,School (not part of HKU),,22.284487,114.143926
+E029,Bonham Road Government Secondary School,school,School (not part of HKU),,22.284513,114.144062
+E030,Hsu Ta Tung Memorial Building,school,School (not part of HKU),,22.283556,114.144429
+E031,Mrs Yu Lee Mo Fan Memorial Building,school,School (not part of HKU),,22.28396,114.144614
+E032,St. Stephen's Girls' Primary School,school,School (not part of HKU),,22.283947,114.144619
+E033,Our Lady Of The Rosary Church St. Charles School,school,School (not part of HKU),,22.280542,114.129947
+E034,Hong Kong Society for the Protection of Children Thomas Tam Nursery School,school,School (not part of HKU),,22.285347,114.144457
+E035,Ellen Li Jubilee Building,school,School (not part of HKU),,22.283762,114.144995
+E036,Wilderness International Kindergarten,school,School (not part of HKU),,22.279358,114.129257
+E037,Lok Sin Tong Leung Kau Kui College,school,School (not part of HKU),,22.285612,114.14606
+E038,Ying Wa Girls' School (London Mission Building) #2,school,School (not part of HKU),,22.282827,114.146779
+E039,The SKH St. Matthew's School,school,School (not part of HKU),,22.285758,114.146667
+E040,SKH Lui Ming Choi Memorial Primary School,school,School (not part of HKU),,22.281469,114.124204
+G001,Water Street Public Bathhouse,service,"Shower · open 08:00-10:00,16:30-20:30",service,22.285301,114.139253
+G002,Kotewall Fire Station,service,Fire station,service,22.279688,114.138385
+G003,Sai Ying Poon Post Office Building,service,Post office,service,22.285986,114.139882
+G004,Post office near Second Street,service,Post office,service,22.285987,114.139907
+G005,Sai Ying Pun Post Office (Second Street) #2,service,Post office · open Mo-Fr 09:30-17:00; Sa 09:30-13:00,service,22.285997,114.139927
+G006,Internet Q,service,Internet cafe,service,22.286925,114.134545
+G007,Hang Fook Home for the Aged,service,Social facility,service,22.287441,114.138434
+G008,Western District Community Centre (Hong Kong Resource Centre for Heritage) #2,service,Community centre,service,22.285926,114.140942
+G009,Po Leung Kuk Chan Au Big Yan Home For The Elderly,service,Social facility,service,22.285217,114.13249
+G010,Social facility near Belcher's Street Sitting-out Area,service,Social facility,service,22.285217,114.132474
+G011,Western Magistracy Building (Imperial Terrace),service,Community centre,service,22.286762,114.140524
+G012,Saint Barnabas Society and Home,service,Community centre,service,22.287852,114.135398
+G013,CAI NIAO,service,Post office,service,22.285973,114.132448
+G014,Springfield Home for the Aged,service,Social facility,service,22.286687,114.133038
+G015,Western District Headquarters And Police Station,service,Police,service,22.28739,114.140263
+G016,Western Police Station (Ming Hing Building),service,Police,service,22.287646,114.140602
+G017,Waste transfer station near Harbour One,service,Waste transfer station · open 24/7,service,22.286925,114.132685
+G018,Third Street Refuse Collection Point,service,Waste transfer station,service,22.285538,114.143494
+G019,Sai Ying Pun Community Complex,service,Community centre,service,22.284839,114.14414
+G020,Caritas Mok Cheung Sui Kun Community Centre,service,Community centre,service,22.280248,114.129804
+G021,Golden Scene Cinema,service,Cinema,service,22.28334,114.129098
+G022,Kennedy Town Community Complex,service,Community centre,service,22.281803,114.12911
+G023,Kennedy Town Post Office,service,Post office · open Mo-Fr 09:30-17:00; Sa 09:30-13:00,service,22.281962,114.12908
+G024,BOOM THEATRE WEST END,service,Theatre,service,22.283738,114.128765
+G025,Kennedy Town Fire Station,service,Fire station,service,22.283732,114.128111
+G026,In Ku Lane Refuse Collection Point,service,Waste transfer station,service,22.286614,114.145941
+G027,Po Leung Kuk Kwok Law Kwai Chun Home For The Elderly,service,Social facility,service,22.28699,114.146691
+G028,Soho House Hong Kong,service,Social club,service,22.287903,114.146662
+G029,Jockey Club Western District Integrated Social Service Centre,service,Social facility,service,22.2821,114.12583
+G030,Sai See Street Refuse Collection Point,service,Waste trasnfer centre,service,22.282575,114.12484
+K001,Rose Villas,building,Residential building: people's homes,building,22.283735,114.136464
+K002,Bowie Court,building,Residential building: people's homes,building,22.283858,114.136467
+K003,Fairview Court,building,Residential building: people's homes,building,22.283952,114.136512
+K004,Charmview Court,building,Residential building: people's homes,building,22.284054,114.136559
+K005,Tsui On Court,building,Residential building: people's homes,building,22.284152,114.136627
+K006,Kai Fung Building,building,Residential building: people's homes,building,22.284109,114.136397
+K007,Eivissa Crest,building,Residential building: people's homes,building,22.284129,114.136244
+K008,Fuk Hing Lau,building,Residential building: people's homes,building,22.284377,114.136551
+K009,Good Luck Mansion,building,Residential building: people's homes,building,22.284538,114.136893
+K010,Wing Ga Building,building,Residential building: people's homes,building,22.284554,114.136758
+K011,Salesians of Don Bosco Provincial Office,building,Building,building,22.284612,114.137026
+K012,Hai Kwong Mansion,building,Residential building: people's homes,building,22.284456,114.136276
+K013,Cheung Po Building,building,Residential building: people's homes,building,22.28462,114.136635
+K014,Fortune Villa,building,Residential building: people's homes,building,22.284399,114.13606
+K015,Cheong Wan Mansion,building,Residential building: people's homes,building,22.284563,114.136004
+K016,Yen Oi Garden,building,Residential building: people's homes,building,22.28469,114.136195
+K017,Tuck Ga Building,building,Residential building: people's homes,building,22.284855,114.136554
+K018,Block A (Sitting-out Area under Flyover in Bonham Road),building,Residential building: people's homes,building,22.284954,114.137637
+K019,Po Ga Building,building,Residential building: people's homes,building,22.284882,114.136276
+K020,Intelligent Court,building,Residential building: people's homes,building,22.285019,114.136685
+K021,Ka Fai Court,building,Residential building: people's homes,building,22.285009,114.136508
+K022,Block B (Sitting-out Area under Flyover in Bonham Road),building,Residential building: people's homes,building,22.285029,114.137872
+K023,Lok Po House,building,Residential building: people's homes,building,22.284929,114.136047
+K024,Clarence Court,building,Residential building: people's homes,building,22.28506,114.1363
+K025,MTR HKU Station Ventilation and Plant Building,building,Building,building,22.284367,114.135182
+K026,Wing Fu Lau,building,Residential building: people's homes,building,22.285103,114.136109
+K027,Block A (Hill Road Garden),building,Residential building: people's homes,building,22.284746,114.135267
+K028,Smiling Court,building,Building,building,22.284272,114.139387
+K029,Novum West,building,Residential building: people's homes,building,22.285431,114.136506
+K030,Kotewall Road Fresh Water Service Reservoir,building,Building,building,22.281057,114.138876
+K031,Emerald House,building,Residential building: people's homes,building,22.285399,114.138078
+K032,HKU Station Exit B1,building,Building,building,22.28558,114.136827
+K033,Block B (One South Lane),building,Residential building: people's homes,building,22.284812,114.13499
+K034,Shek Tong Tsui Municipal Services Building,building,Building,building,22.285511,114.136101
+K035,Amber House,building,Residential building: people's homes,building,22.28544,114.138349
+K036,Fung Lam Building,building,Residential building: people's homes,building,22.285221,114.138802
+K037,Tower 1 (St. Louis School (Primary Section)),building,Residential building: people's homes,building,22.285699,114.137769
+K038,Tower 1 (Caritas Ling Yuet Sin Kindergarten),building,Residential building: people's homes,building,22.284752,114.139444
+K039,HKU Station Exit C1,building,Building,building,22.284495,114.134529
+K040,Fu Yin Court (Graceful Court),building,Residential building: people's homes,building,22.285532,114.135753
+K041,Fu Yin Court (Graceful Court) #2,building,Residential building: people's homes,building,22.285539,114.13575
+K042,Tower 2 (Third Street Playground),building,Residential building: people's homes,building,22.285752,114.138065
+K043,Graceful Court,building,Residential building: people's homes,building,22.28558,114.135588
+K044,Stone House,building,Building,building,22.280888,114.139305
+K045,One South Lane,building,Residential building: people's homes,building,22.285213,114.13491
+K046,Tower 2 (Caritas Ling Yuet Sin Kindergarten),building,Residential building: people's homes,building,22.284697,114.139781
+K047,Wing Hing House,building,Residential building: people's homes,building,22.285792,114.135749
+K048,Block C (MTR HKU Exit B1 (Whitty Street)),building,Residential building: people's homes,building,22.286061,114.136941
+K049,Wing Wah Mansion,building,Residential building: people's homes,building,22.286011,114.136278
+K050,Western Barracks,building,Residential building: people's homes,building,22.283818,114.140332
+K051,Sun On Building,building,Residential building: people's homes,building,22.285821,114.135422
+K052,Block A (Sai On Lane Rest Garden),building,Residential building: people's homes,building,22.286254,114.13721
+K053,Wah Ming Centre (Sai On Lane Rest Garden) #2,building,Office or commercial building,building,22.286298,114.137169
+K054,Block B (Stone House),building,Residential building: people's homes,building,22.280544,114.13951
+K055,Block 1 (Third Street Playground),building,Residential building: people's homes,building,22.286077,114.138495
+K056,Wah Ming Centre (Sai On Lane Rest Garden),building,Office or commercial building,building,22.286351,114.13718
+K057,Block A (Hatton Road),building,Residential building: people's homes,building,22.280779,114.139794
+K058,Block B (Whitty Street Children's Playground),building,Residential building: people's homes,building,22.286366,114.136848
+K059,Block 2 (Third Street Playground),building,Residential building: people's homes,building,22.286,114.138775
+K060,Hatton Road Salt Water Service Reservoir,building,Building,building,22.279635,114.137464
+K061,Sang Cheong Building,building,Residential building: people's homes,building,22.286127,114.135652
+K062,Tower 3 (HKU Station),building,Residential building: people's homes,building,22.284724,114.133944
+K063,Elegant Garden,building,Residential building: people's homes,building,22.283326,114.140791
+K064,Block B (Sai On Lane Rest Garden),building,Residential building: people's homes,building,22.286456,114.137147
+K065,Kam Ling Court,building,Residential building: people's homes,building,22.286305,114.135995
+K066,Chinese Rhenish Church Hong Kong Front Block,building,Church,building,22.283925,114.140682
+K067,Eight South Lane,building,Residential building: people's homes,building,22.285615,114.134576
+K068,Block 1 (Hatton Road),building,Building,building,22.280829,114.140081
+K069,Block C (Stone House),building,Building,building,22.280269,114.139514
+K070,Hang Lung Bank Western Branch Building,building,Office or commercial building,building,22.286183,114.13543
+K071,Hotel Jen Hong Kong,building,Hotel,stay; hotel,22.285924,114.134951
+K072,Block D (Stone House),building,Building,building,22.280115,114.139325
+K073,111 High Street,building,Residential building: people's homes,building,22.285318,114.140104
+K074,Des Voeux Road West Building,building,Residential building: people's homes,building,22.286551,114.136225
+K075,Cheung Fat Building,building,Industrial building,building,22.286369,114.135612
+K076,Honiton Mansion,building,Residential building: people's homes,building,22.283488,114.140975
+K077,Block A (Fairchild),building,Residential building: people's homes,building,22.286642,114.136748
+K078,Block C (Fairchild),building,Residential building: people's homes,building,22.286696,114.136972
+K079,Block 1 (Sai On Lane Children's Playground),building,Residential building: people's homes,building,22.286612,114.138092
+K080,Block 3 (Hatton Road),building,Building,building,22.280471,114.140045
+K081,Block B (Eight South Lane),building,Residential building: people's homes,building,22.28575,114.13439
+K082,Tower 5,building,Residential building: people's homes,building,22.285065,114.133725
+K083,Block 2 (Kotewall Road),building,Building,building,22.280794,114.140387
+K084,Rhine Court Block C,building,Residential building: people's homes,building,22.283834,114.141076
+K085,University Heights Tower 1,building,Residential building: people's homes,building,22.281499,114.140888
+K086,Pacific Plaza,building,Office or commercial building,building,22.286594,114.135656
+K087,Block 2 (Sai On Lane Children's Playground),building,Residential building: people's homes,building,22.286672,114.138306
+K088,Block A (Eight South Lane),building,Residential building: people's homes,building,22.286,114.134449
+K089,University Heights Tower 3,building,Residential building: people's homes,building,22.282129,114.141178
+K090,Babington House,building,Residential building: people's homes,building,22.283389,114.14129
+K091,University Heights Tower 2,building,Residential building: people's homes,building,22.281806,114.141112
+K092,Rhine Court Block B,building,Residential building: people's homes,building,22.284037,114.141175
+K093,Block 1 (Hotel Jen Hong Kong),building,Residential building: people's homes,building,22.28635,114.134749
+K094,Tower 2 (Ho Tim Hall),building,Residential building: people's homes,building,22.284655,114.13311
+K095,Block B (Rhine Court Block B),building,Residential building: people's homes,building,22.284418,114.141201
+K096,Tower 1 (Fairchild),building,Residential building: people's homes,building,22.287051,114.136543
+K097,Lai Yin Court,building,Residential building: people's homes,building,22.285122,114.140963
+K098,Tower 6,building,Residential building: people's homes,building,22.285483,114.133471
+K099,Block 2 (Hotel Jen Hong Kong),building,Residential building: people's homes,building,22.286424,114.134445
+K100,Fook Wah Mansions,building,Residential building: people's homes,building,22.283326,114.141691
+K101,Tower 2 (Oasis Aurum 181),building,Residential building: people's homes,building,22.287274,114.136469
+K102,Oasis Aurum 181,building,Hotel,stay; hotel,22.287359,114.136765
+K103,Block A (Ning Yeung Terrace),building,Residential building: people's homes,building,22.284555,114.141497
+K104,Pok Fu Lam Zone Substation,building,Building,building,22.283167,114.132396
+K105,Greenland Garden Block B,building,Residential building: people's homes,building,22.283081,114.141847
+K106,Lechler Court,building,Residential building: people's homes,building,22.285359,114.141125
+K107,Tower 1 (Belcher's Street Sitting-out Area),building,Residential building: people's homes,building,22.284744,114.132722
+K108,Block A (Sai On Lane Children's Playground),building,Residential building: people's homes,building,22.28743,114.137627
+K109,Zion Court,building,Residential building: people's homes,building,22.285304,114.141217
+K110,Western District Community Centre (Hong Kong Resource Centre for Heritage),building,Public building,building,22.285922,114.14086
+K111,Block B (Sai On Lane Children's Playground),building,Residential building: people's homes,building,22.287512,114.137873
+K112,Tower 8,building,Residential building: people's homes,building,22.285828,114.133243
+K113,First Mansion,building,Residential building: people's homes,building,22.282779,114.142059
+K114,Block B (Hong Kong Po Shan Seismograph Station),building,Residential building: people's homes,building,22.279994,114.140883
+K115,Aji House,building,Building,building,22.286941,114.139735
+K116,Best Western Plus Hotel Hong Kong,building,Hotel,stay; hotel,22.28726,114.139106
+K117,To Li Garden,building,Residential building: people's homes,building,22.282753,114.132109
+K118,Block C (Sai On Lane Children's Playground),building,Residential building: people's homes,building,22.287566,114.138107
+K119,Greenland Garden Block A,building,Residential building: people's homes,building,22.283132,114.142118
+K120,Block B (Yat Fu Lane),building,Residential building: people's homes,building,22.286595,114.133846
+K121,Block 1 (To Li Garden),building,Residential building: people's homes,building,22.282376,114.132095
+K122,Kwong Yuet Tong Public Office,building,Office building,building,22.283039,114.13202
+K123,Block D (Courtyard by Marriott Hong Kong),building,Residential building: people's homes,building,22.28762,114.138306
+K124,Second Street Public Bathhouse,building,"Building · open 07:00-09:00,16:30-20:30",building,22.286128,114.140956
+K125,The Nova,building,Residential building: people's homes,building,22.285523,114.141448
+K126,Highlight House,building,Residential building: people's homes,building,22.285284,114.141625
+K127,Alpine Court (Belmont Court),building,Residential building: people's homes,building,22.282187,114.142222
+K128,Block A (Yat Fu Lane),building,Residential building: people's homes,building,22.286837,114.133929
+K129,Block A (Hong Kong Po Shan Seismograph Station),building,Residential building: people's homes,building,22.280065,114.141271
+K130,Yin Tak Building,building,Residential building: people's homes,building,22.285297,114.141759
+K131,Western Magistracy Building (Imperial Terrace) #2,building,Building,building,22.286762,114.140524
+K132,Skyline Mansion Block 1,building,Residential building: people's homes,building,22.281268,114.142088
+K133,Western Magistracy Building (Imperial Terrace) #3,building,Building,building,22.286773,114.140571
+K134,Blk 2 Yue Sun Mansion,building,Residential building: people's homes,building,22.285832,114.14149
+K135,Block 2 (Ching Lin Terrace Residence),building,Residential building: people's homes,building,22.282235,114.131812
+K136,Marden Wing,building,Building,building,22.280915,114.13223
+K137,Evergreen Tower,building,Residential building: people's homes,building,22.286371,114.141066
+K138,Aspen Court,building,Building,building,22.285048,114.142039
+K139,Yue Sun Mansion,building,Residential building: people's homes,building,22.285931,114.141543
+K140,Ching Lin Terrace Residence,building,Residential building: people's homes,building,22.282746,114.131646
+K141,Skyline Mansion Block 2,building,Residential building: people's homes,building,22.281439,114.142298
+K142,Wealth Building,building,Residential building: people's homes,building,22.28528,114.141986
+K143,Block 1 (Yue Sun Mansion),building,Residential building: people's homes,building,22.286012,114.141509
+K144,Hing Wah Mansion Block B,building,Residential building: people's homes,building,22.283698,114.142519
+K145,Shun Tai Building,building,Shops and commercial building,building,22.286659,114.140948
+K146,Hing Wah Mansion Block A,building,Residential building: people's homes,building,22.283866,114.14252
+K147,Hing Wah Mansion Block M,building,Residential building: people's homes,building,22.284052,114.142494
+K148,Hatton Road No. 2 Fresh Water Service Reservoir,building,Building,building,22.278897,114.140421
+K149,Sun Luen Building,building,Residential building: people's homes,building,22.284602,114.142342
+K150,Courtyard by Marriott Hong Kong,building,Hotel,stay; hotel,22.287895,114.138865
+K151,Belmont Court,building,Residential building: people's homes,building,22.28241,114.142622
+K152,Chin Hom Court,building,Residential building: people's homes,building,22.283334,114.13155
+K153,Hong Kong Po Shan Seismograph Station,building,Industrial building,building,22.28005,114.141693
+K154,Courtyard Marriot,building,Hotel,building,22.287936,114.138853
+K155,Block 6,building,Residential building: people's homes,building,22.282996,114.131517
+K156,Imperial Terrace,building,Shops and commercial building,building,22.286817,114.140927
+K157,Block B (Cosco Hotel),building,Residential building: people's homes,building,22.285636,114.132253
+K158,Block A (Belcher's Street Sitting-out Area),building,Residential building: people's homes,building,22.285062,114.131924
+K159,Lung Fai Mansion,building,Residential building: people's homes,building,22.283397,114.13147
+K160,Block 3 (Academic Terrace),building,Residential building: people's homes,building,22.282094,114.131527
+K161,Ivy Tower,building,Residential building: people's homes,building,22.286358,114.141487
+K162,Block 5,building,Residential building: people's homes,building,22.282905,114.131405
+K163,Hing Wah House,building,Residential building: people's homes,building,22.285758,114.141973
+K164,Aw Boon Haw Wing,building,Building,building,22.280534,114.132047
+K165,Block 12,building,Residential building: people's homes,building,22.283123,114.131395
+K166,Hong Kong Tramways Limited,building,Industrial building,building,22.288317,114.1377
+K167,Ka Fu Building,building,Residential building: people's homes,building,22.28456,114.142588
+K168,Hatton Road Fresh Water Service Reservoir,building,Building,building,22.278506,114.140225
+K169,Yee Shun Mansion,building,Residential building: people's homes,building,22.286063,114.141849
+K170,Block 4,building,Residential building: people's homes,building,22.282816,114.131307
+K171,Shing Jack Lau,building,Residential building: people's homes,building,22.285239,114.142383
+K172,Block 11,building,Residential building: people's homes,building,22.283031,114.131284
+K173,Cosco Hotel,building,Hotel,stay; hotel,22.285733,114.132074
+K174,Kensington Mansion,building,Residential building: people's homes,building,22.287123,114.1409
+K175,Block B (Belcher's Street Sitting-out Area),building,Residential building: people's homes,building,22.285215,114.131769
+K176,Block A (Cosco Hotel),building,Residential building: people's homes,building,22.285652,114.131996
+K177,Liang Chi Hao Centre,building,Building,building,22.280539,114.131878
+K178,Tang Wong Court,building,Residential building: people's homes,building,22.285753,114.142152
+K179,Kam Lun Mansion,building,Residential building: people's homes,building,22.285236,114.142461
+K180,Comfort Court,building,Building,building,22.28554,114.142324
+K181,Wilton Place,building,Building,building,22.284191,114.142856
+K182,New Start Building,building,Shops and commercial building,building,22.286808,114.14137
+K183,Richsun Garden,building,Building,building,22.285388,114.142428
+K184,Block 3 (Block 4),building,Residential building: people's homes,building,22.282714,114.131187
+K185,Block 10,building,Residential building: people's homes,building,22.282954,114.131177
+K186,Kennedy Town Kai-Fong Welfare Association,building,Office or commercial building,building,22.283982,114.13126
+K187,Scenic Garden Block 2,building,Building,building,22.282128,114.142974
+K188,Po Lung Court,building,Residential building: people's homes,building,22.283441,114.131119
+K189,Wai Yuen Mansion,building,Residential building: people's homes,building,22.287115,114.141171
+K190,Hatton Road No. 1 Fresh Water Service Reservoir,building,Building,building,22.27807,114.139953
+K191,Serene Court,building,Residential building: people's homes,building,22.282527,114.143104
+K192,Block 2 (Block 8),building,Residential building: people's homes,building,22.282636,114.13108
+K193,Harbour One,building,Building,building,22.287158,114.13304
+K194,Block 9,building,Residential building: people's homes,building,22.282851,114.131058
+K195,Ko Wang Court (Kam Lun Mansion) #2,building,Building,building,22.285251,114.142647
+K196,Kam Ning Mansion,building,Residential building: people's homes,building,22.28452,114.142927
+K197,Ko Wang Court (Kam Lun Mansion),building,Residential building: people's homes,building,22.285244,114.142658
+K198,The Westpoint,building,Building,building,22.288055,114.139804
+K199,Chun Kwan Building,building,Residential building: people's homes,building,22.286817,114.141575
+K200,Kingsland Court,building,Residential building: people's homes,building,22.284154,114.143065
+K201,Kenbo Commercial Building,building,Office or commercial building,building,22.28711,114.141333
+K202,Block B (Holland Street),building,Residential building: people's homes,building,22.284395,114.131165
+K203,Fung Yat Building (San Hey Lou),building,Residential building: people's homes,building,22.28544,114.142656
+K204,Tai Pak Court,building,Residential building: people's homes,building,22.283315,114.130966
+K205,Block 8,building,Residential building: people's homes,building,22.282762,114.130959
+K206,Block 1 (Block 7),building,Residential building: people's homes,building,22.282545,114.130969
+K207,Fung Yat Building (San Hey Lou) #2,building,Building,building,22.285466,114.142668
+K208,Bon-Point,building,Residential building: people's homes,building,22.284695,114.142996
+K209,Scenic Garden Block 1,building,Building,building,22.28205,114.143208
+K210,Park Height,building,Building,building,22.28414,114.1432
+K211,Block 7,building,Residential building: people's homes,building,22.282671,114.130848
+K212,To Li Court,building,Residential building: people's homes,building,22.283189,114.130813
+K213,San Hey Lou,building,Building,building,22.285541,114.142833
+K214,Two•ArtLane,building,Residential building: people's homes,building,22.287414,114.141343
+K215,Block A (The Westpoint),building,Residential building: people's homes,building,22.288182,114.140207
+K216,Block A (Holland Street),building,Residential building: people's homes,building,22.284611,114.13096
+K217,Tong Nam Mansion (Wing Wah Building),building,Residential building: people's homes,building,22.285837,114.142715
+K218,Andes Plaza,building,Residential building: people's homes,building,22.287063,114.141794
+K219,Elite Court,building,Residential building: people's homes,building,22.28637,114.142389
+K220,Dragonview Court,building,Building,building,22.28206,114.143459
+K221,Federate Building,building,Residential building: people's homes,building,22.286722,114.142162
+K222,Tong Nam Mansion (Wing Wah Building) #2,building,Building,building,22.285889,114.142755
+K223,Kennedy Town Centre Shopping Centre,building,Building,building,22.283931,114.130715
+K224,Kiu Sen Court,building,Building,building,22.281756,114.143453
+K225,Vegetable Wholesale Market,building,Building,building,22.288939,114.135762
+K226,Ming Hing Building,building,Residential building: people's homes,building,22.28778,114.141117
+K227,High House (Ko Chun Court) #2,building,Building,building,22.285288,114.143152
+K228,Kennedy Town Commercial Centre,building,Office or commercial building,building,22.283866,114.130628
+K229,High House (Ko Chun Court),building,Residential building: people's homes,building,22.285332,114.143149
+K230,Wing Wah Building,building,Shops and commercial building,building,22.285726,114.142983
+K231,Charming Court,building,Residential building: people's homes,building,22.286626,114.142414
+K232,Tower 2 (Elite Court),building,Residential building: people's homes,building,22.286369,114.142669
+K233,Ching Tak Building,building,Residential building: people's homes,building,22.287757,114.141347
+K234,Block B (Yuet Sum Mansion),building,Residential building: people's homes,building,22.288285,114.140574
+K235,Yee Ga Court,building,Building,building,22.284041,114.143677
+K236,Fung King Court,building,Residential building: people's homes,building,22.286792,114.14242
+K237,Kennedy Town Centre,building,Residential building: people's homes,building,22.284187,114.130499
+K238,Western Wholesale Food Market,building,Industrial building,building,22.289262,114.136893
+K239,Wah Sen Court,building,Building,building,22.281725,114.1437
+K240,Fruits Wholesale Market,building,Building,building,22.289329,114.13732
+K241,Ko Chun Court,building,Residential building: people's homes,building,22.285218,114.143466
+K242,Ko Nga Court (Ko Chun Court) #2,building,Building,building,22.285427,114.143409
+K243,Western District Public Cargo Working Area Administration Building,building,Office building,building,22.288917,114.134581
+K244,Block B (Kennedy Town Commercial Centre),building,Residential building: people's homes,building,22.283701,114.130306
+K245,Tung Che Commercial Centre,building,Office or commercial building,building,22.287764,114.141655
+K246,KAZA,building,Residential building: people's homes,building,22.288123,114.141198
+K247,Tak Lee Building,building,Shops and commercial building,building,22.286773,114.142651
+K248,Ko Nga Court (Ko Chun Court),building,Residential building: people's homes,building,22.285428,114.143489
+K249,Emerald Garden,building,Residential building: people's homes,building,22.279008,114.131685
+K250,On Lok House,building,Residential building: people's homes,building,22.286595,114.142838
+K251,Yuet Sum Mansion,building,Residential building: people's homes,building,22.288343,114.140969
+K252,Wah Lap House,building,Residential building: people's homes,building,22.288134,114.141284
+K253,Yuen Fai Court,building,Residential building: people's homes,building,22.287589,114.141975
+K254,Island Crest,building,Shops and commercial building,building,22.286351,114.14304
+K255,Topworth Court,building,Residential building: people's homes,building,22.285712,114.143412
+K256,King's Garden,building,Building,building,22.2818,114.143947
+K257,West End Park Sub-station,building,Industrial building,building,22.282596,114.144058
+K258,Parksdale,building,Shops and commercial building,building,22.283979,114.144004
+K259,Siu On Building,building,Residential building: people's homes,building,22.288129,114.141458
+K260,Tower 1 (MTR Kennedy Town Exit B (Rock Hill Street)),building,Residential building: people's homes,building,22.281592,114.130244
+K261,Richwealth Mansion,building,Residential building: people's homes,building,22.288482,114.140975
+K262,Tai Yick House,building,Residential building: people's homes,building,22.286589,114.143
+K263,Tower 1 (Island Crest),building,Residential building: people's homes,building,22.286354,114.143157
+K264,Tak May House,building,Residential building: people's homes,building,22.288118,114.141543
+K265,Kaiser Centre,building,Office or commercial building,building,22.287582,114.142174
+K266,Block A (Kennedy Town Commercial Centre),building,Residential building: people's homes,building,22.283834,114.130087
+K267,Kwai Cheong Building,building,Residential building: people's homes,building,22.287753,114.142003
+K268,Block 1 (Richwealth Mansion),building,Residential building: people's homes,building,22.288405,114.141244
+K269,華業車房,building,Industrial building,building,22.27876,114.13159
+K270,Peace Court,building,Building,building,22.281774,114.144177
+K271,Hong Ming Building,building,Residential building: people's homes,building,22.288119,114.14176
+K272,Fairview Mansion,building,Residential building: people's homes,building,22.282805,114.144323
+K273,Flora Court,building,Residential building: people's homes,building,22.287049,114.14289
+K274,錦翠園,building,Residential building: people's homes,building,22.284054,114.144265
+K275,Richmond Court,building,Residential building: people's homes,building,22.282306,114.144324
+K276,Tung Cheung Building,building,Shops and commercial building,building,22.286218,114.143512
+K277,Cheong Kwai Building,building,Residential building: people's homes,building,22.287169,114.142854
+K278,Tak On Lau,building,Residential building: people's homes,building,22.288098,114.141932
+K279,Block 2 (Tak May House),building,Residential building: people's homes,building,22.288394,114.141586
+K280,Honey Court,building,Residential building: people's homes,building,22.278103,114.131963
+K281,Wing Kwai House,building,Residential building: people's homes,building,22.287258,114.142857
+K282,Connaught Garden (Hong Ming Building) #2,building,Residential building: people's homes,building,22.288363,114.141679
+K283,Hing Yip Building,building,Residential building: people's homes,building,22.286577,114.143386
+K284,Tower 2 (Pokfield Garden),building,Residential building: people's homes,building,22.281112,114.130016
+K285,Block D (Green Villa),building,Residential building: people's homes,building,22.277657,114.132379
+K286,Tone Hing Building,building,Residential building: people's homes,building,22.288099,114.14215
+K287,Beauty Court,building,Residential building: people's homes,building,22.283052,114.144561
+K288,Green Villa,building,Building,building,22.277871,114.132009
+K289,Tower 1 (Public Open Space),building,Residential building: people's homes,building,22.283538,114.129606
+K290,Block C (Green Villa),building,Residential building: people's homes,building,22.277626,114.13227
+K291,Good Times Building,building,Residential building: people's homes,building,22.286707,114.143489
+K292,Block 3 (Tak On Lau),building,Residential building: people's homes,building,22.288384,114.141932
+K293,Wing Lee Building,building,Residential building: people's homes,building,22.287567,114.142865
+K294,Glorious Commercial Building,building,Office or commercial building,building,22.287729,114.14274
+K295,Block B (Green Villa),building,Residential building: people's homes,building,22.277543,114.132105
+K296,202 Centre,building,Office or commercial building,building,22.287724,114.142915
+K297,Ramada Hong Kong Harbour View,building,Hotel,stay; hotel,22.287027,114.14352
+K298,Park View Court Block B,building,Building,building,22.28326,114.14484
+K299,Tower 2 (Public Open Space),building,Residential building: people's homes,building,22.283362,114.129325
+K300,Island Pacific Hotel (Singga Commercial Centre),building,Hotel,stay; hotel,22.288243,114.142498
+K301,Block A (Green Villa),building,Residential building: people's homes,building,22.277507,114.131976
+K302,Tower 1 (Bonham Road Government Secondary School),building,Residential building: people's homes,building,22.284585,114.144735
+K303,London Court,building,Residential building: people's homes,building,22.28174,114.144808
+K304,Wai Tak Building,building,Residential building: people's homes,building,22.287718,114.143102
+K305,Pokfield Garden,building,Residential building: people's homes,building,22.280832,114.129595
+K306,Hydroponic Garden,building,Building,building,22.285254,114.129554
+K307,Wah Lee Building,building,Residential building: people's homes,building,22.28667,114.143981
+K308,Poksmith Villa,building,Residential building: people's homes,building,22.280537,114.129608
+K309,Mui Fong Apartments,building,Residential building: people's homes,building,22.287714,114.143244
+K310,Tower 3 (Public Open Space),building,Residential building: people's homes,building,22.283252,114.129124
+K311,Paris Court,building,Residential building: people's homes,building,22.281841,114.145007
+K312,Koosing Building,building,Residential building: people's homes,building,22.288082,114.142979
+K313,WE hotel,building,Hotel,stay; hotel,22.28736,114.143619
+K314,Park View Court Block A,building,Building,building,22.283391,114.14512
+K315,Singga Commercial Centre,building,Office or commercial building,building,22.28832,114.142828
+K316,The Prince Philip Dental Hospital,building,Hospital building,building,22.286501,114.14429
+K317,Wing Fat Mansion,building,Residential building: people's homes,building,22.288052,114.143154
+K318,Kennedy Town Exchange,building,Building,building,22.280069,114.129595
+K319,Luen Tak Building,building,Residential building: people's homes,building,22.287707,114.143505
+K320,Tower 2 (Hing Ying Mansion),building,Residential building: people's homes,building,22.284574,114.145107
+K321,Venice Court,building,Residential building: people's homes,building,22.281933,114.145256
+K322,Ngan Yu Building,building,Residential building: people's homes,building,22.286986,114.14415
+K323,Empire Building,building,Residential building: people's homes,building,22.2877,114.143666
+K324,Bupa Centre,building,Office or commercial building,building,22.288311,114.14313
+K325,Fulful Building,building,Residential building: people's homes,building,22.286806,114.144327
+K326,Kam Kwan Building,building,Residential building: people's homes,building,22.288068,114.143415
+K327,Rich Court,building,Residential building: people's homes,building,22.287012,114.144272
+K328,Hing Tai Building,building,Residential building: people's homes,building,22.288307,114.143241
+K329,Green Cook,building,Building,building,22.284578,114.128839
+K330,The Connaught,building,Residential building: people's homes,building,22.288304,114.143329
+K331,Imperial Kennedy,building,Residential building: people's homes,building,22.282387,114.128672
+K332,Tak Tung House,building,Residential building: people's homes,building,22.288054,114.143631
+K333,Rome Court,building,Residential building: people's homes,building,22.281967,114.145517
+K334,Town Place,building,Residential building: people's homes,building,22.283024,114.1286
+K335,Tresend Garden,building,Residential building: people's homes,building,22.279893,114.129279
+K336,Kam Teem Industrial Building,building,Industrial building,building,22.288301,114.143418
+K337,Block A (New Fortune House),building,Residential building: people's homes,building,22.283833,114.128644
+K338,South Wing (College View Mansion),building,Office building,building,22.285256,114.145264
+K339,Hing Ying Mansion,building,Residential building: people's homes,building,22.284797,114.145399
+K340,Western House,building,Residential building: people's homes,building,22.28768,114.143984
+K341,Smithfield Municipal Services Building,building,Building,building,22.28174,114.128685
+K342,Breezy Court,building,Residential building: people's homes,building,22.283437,114.14562
+K343,Smith Court,building,Residential building: people's homes,building,22.279632,114.129357
+K344,2 Park Road,building,Residential building: people's homes,building,22.283984,114.145602
+K345,Tat Hing Building,building,Residential building: people's homes,building,22.286926,114.144564
+K346,Wah Fai House,building,Residential building: people's homes,building,22.279082,114.129614
+K347,Apple Hotel - Sai Ying Pun,building,Hostel,stay; hotel,22.288358,114.143509
+K348,New Fortune House,building,Shops and commercial building,building,22.283798,114.128518
+K349,Breezy Mansion,building,Residential building: people's homes,building,22.284742,114.145526
+K350,North Wing (Sai Ying Pun Zone Substation (West Block)),building,Building,building,22.285706,114.145249
+K351,Block B (Tresend Garden),building,Residential building: people's homes,building,22.28032,114.128926
+K352,Block C (Pokfield Road Sitting-out Area),building,Residential building: people's homes,building,22.280519,114.128852
+K353,Block A (Tresend Garden),building,Residential building: people's homes,building,22.280122,114.129
+K354,Eco Tree Hotel,building,Hotel,stay; hotel,22.287653,114.144186
+K355,Mei Wah Mansion,building,Residential building: people's homes,building,22.278923,114.129592
+K356,Vienna Court,building,Residential building: people's homes,building,22.28197,114.145739
+K357,Ying Piu Mansion,building,Building,building,22.283663,114.145785
+K358,Wilmer St 6 Substation,building,Building,building,22.287365,114.144451
+K359,Block B (New Fortune House),building,Residential building: people's homes,building,22.283793,114.128405
+K360,Queen's Hotel,building,Hotel,stay; hotel,22.287171,114.144603
+K361,Block D (MTR Kennedy Town Exit A (Smithfield)),building,Residential building: people's homes,building,22.280691,114.128709
+K362,Kennedy Town,building,Building,building,22.281496,114.128468
+K363,Block A (Wilderness International Kindergarten),building,Residential building: people's homes,building,22.279157,114.129291
+K364,Hung Cheong House,building,Office or commercial building,building,22.288076,114.144098
+K365,College View Mansion,building,Residential building: people's homes,building,22.285353,114.145601
+K366,Pokfulam Mansion,building,Building,building,22.276763,114.131281
+K367,Wai Lee Building,building,Residential building: people's homes,building,22.287286,114.144689
+K368,Po Fung Mansion,building,Residential building: people's homes,building,22.288337,114.143895
+K369,Sai Ying Pun Zone Substation (West Block),building,Building,building,22.285754,114.145496
+K370,Wai Wah Commercial Centre,building,Office or commercial building,building,22.287376,114.144662
+K371,Chung Yin Court,building,Residential building: people's homes,building,22.28551,114.145608
+K372,Mount Davis Ambulance Depot,building,Building,building,22.27948,114.129012
+K373,Panorama Gardens,building,Residential building: people's homes,building,22.282722,114.146023
+K374,Block B (Mei Wah Mansion),building,Residential building: people's homes,building,22.278961,114.129266
+K375,On Shun Building,building,Residential building: people's homes,building,22.288334,114.143985
+K376,Teen Wo Building,building,Residential building: people's homes,building,22.28661,114.145192
+K377,Lap Poon Building,building,Office or commercial building,building,22.288287,114.144073
+K378,Sing Fai Building,building,Residential building: people's homes,building,22.28753,114.144672
+K379,Luen Tak Apartments,building,Residential building: people's homes,building,22.281711,114.12816
+K380,Fu Tai Mansion,building,Residential building: people's homes,building,22.286491,114.145342
+K381,Block C (Shun Hing College),building,Residential building: people's homes,building,22.278976,114.129133
+K382,Mia Casa,building,Hotel,stay; hotel,22.282817,114.128015
+K383,Qualipak Tower,building,Office or commercial building,building,22.288328,114.144164
+K384,Wheelock Gallery,building,Office or commercial building,building,22.282426,114.128029
+K385,Block 1 (Wheelock Gallery),building,Residential building: people's homes,building,22.282144,114.12805
+K386,Pokfulam Court,building,Building,building,22.276735,114.130928
+K387,Sai Ying Pun Zone Substation (East Block),building,Building,building,22.285469,114.145843
+K388,yoo 18 Bonham,building,Residential building: people's homes,building,22.28362,114.14622
+K389,Tak Yan Building,building,Residential building: people's homes,building,22.287687,114.144737
+K390,Block B (Sai Wan (Kwun Lung Lau)),building,Residential building: people's homes,building,22.280178,114.128469
+K391,Tai Hing Building,building,Residential building: people's homes,building,22.288009,114.144506
+K392,Chi Residences 120,building,Residential building: people's homes,building,22.288325,114.144254
+K393,Centre Place,building,Building,building,22.284872,114.146045
+K394,Golden Lodge,building,Residential building: people's homes,building,22.284028,114.146208
+K395,Soho 189,building,Residential building: people's homes,building,22.2873,114.145058
+K396,Bonham Court,building,Residential building: people's homes,building,22.283538,114.146285
+K397,May Sun Building,building,Residential building: people's homes,building,22.283579,114.127886
+K398,Bonham Ville,building,Residential building: people's homes,building,22.283937,114.146289
+K399,118 Connaught Road West,building,Office or commercial building,building,22.288196,114.14449
+K400,Wo Fu Building,building,Residential building: people's homes,building,22.286736,114.145478
+K401,Jockey Club Student Village III,building,Building,building,22.279132,114.128784
+K402,Luen Yau Apartments,building,Residential building: people's homes,building,22.282404,114.127822
+K403,Luen Hing Apartments,building,Residential building: people's homes,building,22.28167,114.127908
+K404,Bonanza Court,building,Residential building: people's homes,building,22.283866,114.146377
+K405,Block C (Block E),building,Residential building: people's homes,building,22.280469,114.128181
+K406,Lee Wah Mansion,building,Residential building: people's homes,building,22.288012,114.144723
+K407,AVA128,building,Residential building: people's homes,building,22.287643,114.144988
+K408,Block A (Sai Wan (Kwun Lung Lau)),building,Residential building: people's homes,building,22.279782,114.128416
+K409,Hospital Quarters,building,Residential building: people's homes,building,22.284455,114.146352
+K410,Block 2 (Luen Yau Apartments),building,Residential building: people's homes,building,22.282084,114.127768
+K411,Beak Lane,building,Residential building: people's homes,building,22.286126,114.145865
+K412,Block B (May Sun Building),building,Residential building: people's homes,building,22.283434,114.127662
+K413,Cartwright Gardens,building,Residential building: people's homes,building,22.283783,114.146532
+K414,Winner Court Block 1,building,Residential building: people's homes,building,22.284269,114.146519
+K415,Block A (May Sun Building) #2,building,Residential building: people's homes,building,22.283685,114.127604
+K416,Block A (May Sun Building),building,Residential building: people's homes,building,22.283415,114.127546
+K417,Luen Fat Apartments,building,Residential building: people's homes,building,22.281627,114.127649
+K418,Savoy Court,building,Residential building: people's homes,building,22.28238,114.146644
+K419,Block D (Block E),building,Residential building: people's homes,building,22.280652,114.127834
+K420,Block 1 (Bonham Road Rest Garden),building,Residential building: people's homes,building,22.283381,114.14671
+K421,Elite's Place,building,Residential building: people's homes,building,22.287311,114.145544
+K422,Block B (May Sun Building) #2,building,Residential building: people's homes,building,22.28366,114.127484
+K423,Cupford House,building,Residential building: people's homes,building,22.286123,114.146149
+K424,Winner Court,building,Residential building: people's homes,building,22.284207,114.146668
+K425,Yu Chu Lam Building,building,Residential building: people's homes,building,22.287635,114.145431
+K426,Winner Court Block 2,building,Residential building: people's homes,building,22.284097,114.146746
+K427,Luen Hong Apartments,building,Residential building: people's homes,building,22.282227,114.127412
+K428,Chartered Bank Building,building,Residential building: people's homes,building,22.286117,114.146236
+K429,Largos Residences,building,Residential building: people's homes,building,22.286401,114.146124
+K430,Centenary Building,building,Hospital building,building,22.28485,114.146631
+K431,Block 2 (London Mission Building),building,Residential building: people's homes,building,22.283121,114.146864
+K432,Wing Hing Commercial Building,building,Office or commercial building,building,22.287409,114.145667
+K433,Ko Shing Building,building,Residential building: people's homes,building,22.287028,114.145881
+K434,Luen Wai Commercial Building,building,Office or commercial building,building,22.288031,114.145265
+K435,New Mansion,building,Residential building: people's homes,building,22.285818,114.146418
+K436,Luen On Apartments,building,Residential building: people's homes,building,22.281586,114.127396
+K437,Kam Yu Mansion,building,Residential building: people's homes,building,22.286648,114.146133
+K438,Block E,building,Residential building: people's homes,building,22.280413,114.127645
+K439,Po Hing Mansion (Centenary Building),building,Building,building,22.284634,114.1468
+K440,Luen Gay Apartments,building,Residential building: people's homes,building,22.281938,114.127303
+K441,Yeo Wing,building,Hospital building,building,22.285248,114.146665
+K442,Manhattan Heights (May Sun Building),building,Building,building,22.283489,114.127201
+K443,Y Hotel Hong Kong,building,Hotel,stay; hotel,22.288018,114.145433
+K444,Manhattan Heights (May Sun Building) #2,building,Residential building: people's homes,building,22.283624,114.127185
+K445,Yick Fung Building,building,Residential building: people's homes,building,22.287581,114.14574
+K446,Po Hing Mansion (Winner Court Block 2),building,Residential building: people's homes,building,22.284285,114.146958
+K447,Centre for Food Safety,building,Building,building,22.283857,114.147023
+K448,Tai Fat Building,building,Residential building: people's homes,building,22.287258,114.145962
+K449,Block B (Kiu Fat Building),building,Residential building: people's homes,building,22.286428,114.146379
+K450,Chiu Chow Association Building,building,Building,building,22.287985,114.145543
+K451,The Hudson,building,Residential building: people's homes,building,22.281578,114.127175
+K452,Block F,building,Residential building: people's homes,building,22.279985,114.127593
+K453,Lop Po Building,building,Residential building: people's homes,building,22.28695,114.146213
+K454,Hawkins Wing,building,Hospital building,building,22.285473,114.146795
+K455,Luen Wai Apartments,building,Residential building: people's homes,building,22.282172,114.127078
+K456,Kiu Fat Building,building,Residential building: people's homes,building,22.286599,114.146402
+K457,Li Shiu Chung Memorial Building,building,Hospital building,building,22.285194,114.146907
+K458,Block A (Kiu Fat Building),building,Residential building: people's homes,building,22.286683,114.146407
+K459,Sze Yap Building,building,Building,building,22.287969,114.145704
+K460,Ha Lung Building,building,Office or commercial building,building,22.287239,114.146154
+K461,Universal Building,building,Residential building: people's homes,building,22.285958,114.146724
+K462,Urbana 38,building,Residential building: people's homes,building,22.28695,114.146323
+K463,Princeton Tower,building,Residential building: people's homes,building,22.287519,114.146022
+K464,Block 2 (Block E),building,Residential building: people's homes,building,22.280542,114.127268
+K465,Tung Hing Court,building,Residential building: people's homes,building,22.286114,114.146732
+K466,Hua Fu Commercial Building,building,Office or commercial building,building,22.286351,114.146666
+K467,Hang Cheong Tai Building,building,Residential building: people's homes,building,22.287222,114.14628
+K468,Everprofit Commercial Building,building,Office or commercial building,building,22.286984,114.146424
+K469,Tung Wah Group of Hospitals Wong Fung Ling Memorial Building,building,Hospital building,building,22.285599,114.146993
+K470,Wai Yue Building,building,Residential building: people's homes,building,22.285847,114.146958
+K471,On Wah Building,building,Residential building: people's homes,building,22.287509,114.146229
+K472,One Pacific Heights,building,Residential building: people's homes,building,22.28677,114.146632
+K473,Concord Hotel,building,Hotel,stay; hotel,22.281992,114.126779
+K474,Hing Lee Building,building,Office or commercial building,building,22.2875,114.146323
+K475,Block 1 (Block E),building,Residential building: people's homes,building,22.280295,114.127093
+K476,Ka Yue Building,building,Residential building: people's homes,building,22.287938,114.146108
+K477,Moetown,building,Residential building: people's homes,building,22.28728,114.146531
+K478,Block 3 (Catchick Street Garden),building,Residential building: people's homes,building,22.282822,114.12659
+K479,Kam Chuen Mansion,building,Residential building: people's homes,building,22.287926,114.146205
+K480,Shing Wan Building,building,Residential building: people's homes,building,22.28752,114.146467
+K481,Kennedy Town Service Reservoir,building,Building,building,22.279134,114.1274
+K482,Sea View Mansion,building,Residential building: people's homes,building,22.288199,114.14607
+K483,Overseas Trust Bank Building,building,Residential building: people's homes,building,22.287904,114.146355
+K484,60 West Hotel,building,Hotel,stay; hotel,22.287509,114.146584
+K485,Hollywood Centre,building,Office or commercial building,building,22.286564,114.1471
+K486,Sing Po Building,building,Residential building: people's homes,building,22.287148,114.146838
+K487,Cadogan,building,Residential building: people's homes,building,22.281962,114.126436
+K488,Winsing Building,building,Residential building: people's homes,building,22.287417,114.146729
+K489,Queen's Terrace Tower 2,building,Residential building: people's homes,building,22.286845,114.147027
+K490,Tak Fung Building,building,Office or commercial building,building,22.288179,114.14631
+K491,Rice Merchants Building,building,Office or commercial building,building,22.288168,114.146425
+K492,Block 2 (Catchick Street Garden),building,Residential building: people's homes,building,22.283158,114.126206
+K493,Queen's Terrace Tower 1,building,Residential building: people's homes,building,22.287176,114.147093
+K494,Western Centre,building,Office or commercial building,building,22.287443,114.146962
+K495,Chi Cheung Building,building,Residential building: people's homes,building,22.288155,114.146566
+K496,Block 1 (Catchick Street Garden),building,Residential building: people's homes,building,22.283438,114.126146
+K497,East Terrace,building,Residential building: people's homes,building,22.281086,114.126239
+K498,Gold Union Commercial Building,building,Office or commercial building,building,22.288141,114.146725
+K499,Western Commercial Building,building,Office or commercial building,building,22.287881,114.146907
+K500,Block 2 (Cadogan),building,Residential building: people's homes,building,22.281749,114.126023
+K501,Sing Kui Commercial Building,building,Office or commercial building,building,22.287844,114.146998
+K502,Central Terrace,building,Residential building: people's homes,building,22.280963,114.125962
+K503,Block 1 (Ka Wai Man Road Garden),building,Residential building: people's homes,building,22.281901,114.125775
+K504,North Terrace,building,Residential building: people's homes,building,22.281295,114.125756
+K505,South Terrace,building,Residential building: people's homes,building,22.28079,114.125719
+K506,Sai Ying Pun Ventilation Building,building,Building,building,22.289969,114.146315
+K507,Sai Wan Estate,building,Residential building: people's homes,building,22.280984,114.12535
+K508,Block 2 (Ka Wai Man Road Sitting-out Area),building,Residential building: people's homes,building,22.281672,114.124836
+K509,Block 1 (SKH Lui Ming Choi Memorial Primary School),building,Residential building: people's homes,building,22.28163,114.12452
+K510,Kennedy Town Salt Water Service Reservoir,building,Building,building,22.280196,114.123946

@@ -1,0 +1,7 @@
+group,label,people,trips,trips_per_person,walk_min_per_person,turns_per_trip,left_%,right_%,straight_%,back_%,p_shares_3,p_shares_5,busiest_road
+ug_hall,Undergrads in halls,2201,16013,7.28,67.4,22.3,26.8,27.2,45.4,0.6,0.8672,0.7633,path #1906
+ug_commute,Commuting undergrads,3983,23935,6.01,48.2,21.1,25.9,26.5,47.0,0.5,0.8784,0.7719,path #1906
+pg_hall,Postgrads in halls,177,1345,7.6,73.0,22.5,27.0,27.7,44.6,0.7,0.8308,0.7308,path #1906
+pg_commute,Commuting postgrads,1013,6017,5.94,47.3,20.6,26.1,26.7,46.6,0.6,0.866,0.7709,path #1906
+staff,Staff,1008,4065,4.03,38.5,25.0,23.4,23.8,52.1,0.6,0.9158,0.8098,path #1906
+resident,Local residents,1618,5848,3.61,35.0,28.2,26.7,26.5,46.2,0.5,0.6877,0.4856,path #1474
