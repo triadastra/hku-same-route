@@ -1,0 +1,259 @@
+<title>HKU Amenity Heat Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: function chips above one large map with a block panel beside it; eight small maps below for side-by-side comparison. */
+:root {
+  --bg: #f4f6f4; --surface: #ffffff; --ink: #18201c; --ink-2: #4c5650; --ink-3: #7d8781;
+  --line: #d9dfdb; --path: #7d8781; --chip: #e8ece9; --accent: #2a78d6; --tie: #a7b0aa;
+  --ramp-0: #cde2fb; --ramp-1: #86b6ef; --ramp-2: #3987e5; --ramp-3: #1c5cab; --ramp-4: #0d366b;
+  --f0: #2a78d6; --f1: #eb6834; --f2: #1baf7a; --f3: #eda100; --f4: #e87ba4; --f5: #008300; --f6: #6250d6; --f7: #e34948;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614; --surface: #1a1f1c; --ink: #eef1ef; --ink-2: #b9c1bc; --ink-3: #87918b;
+    --line: #2c3430; --path: #87918b; --chip: #252c28; --accent: #3987e5; --tie: #5f6a64;
+    --ramp-0: #0d366b; --ramp-1: #1c5cab; --ramp-2: #3987e5; --ramp-3: #86b6ef; --ramp-4: #cde2fb;
+    --f0: #3987e5; --f1: #d95926; --f2: #199e70; --f3: #c98500; --f4: #d55181; --f5: #008300; --f6: #9085e9; --f7: #e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121614; --surface: #1a1f1c; --ink: #eef1ef; --ink-2: #b9c1bc; --ink-3: #87918b;
+  --line: #2c3430; --path: #87918b; --chip: #252c28; --accent: #3987e5; --tie: #5f6a64;
+  --ramp-0: #0d366b; --ramp-1: #1c5cab; --ramp-2: #3987e5; --ramp-3: #86b6ef; --ramp-4: #cde2fb;
+  --f0: #3987e5; --f1: #d95926; --f2: #199e70; --f3: #c98500; --f4: #d55181; --f5: #008300; --f6: #9085e9; --f7: #e66767;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font-body); }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px; }
+h1 { font: 700 34px/1.1 var(--font-display); margin: 0; text-wrap: balance; }
+h2 { font: 700 20px/1.2 var(--font-display); margin: 0; }
+.lede { margin: 8px 0 0; max-width: 68ch; color: var(--ink-2); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 12px 0 0; padding: 0; list-style: none; color: var(--ink-2); font-size: 14px; }
+.facts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { font: 600 14px/1 var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.chips button span { color: var(--ink-3); font-weight: 400; font-variant-numeric: tabular-nums; }
+.chips button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chips button[aria-pressed="true"] span { color: var(--bg); opacity: .75; }
+.chips i, .legend i, .rows i, .places i { width: 10px; height: 10px; border-radius: 3px; flex: none; display: inline-block; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.mapcard, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.mapcard { padding: 12px; min-width: 0; }
+.mapcard h2 { padding: 2px 4px 0; }
+.sub { color: var(--ink-2); font-size: 14px; margin: 2px 4px 8px; }
+svg.map { display: block; width: 100%; height: auto; }
+svg .streets { fill: none; stroke: var(--path); stroke-width: 1; opacity: .5; vector-effect: non-scaling-stroke; pointer-events: none; }
+svg .cell { stroke: none; cursor: pointer; }
+svg .ring { fill: none; stroke: var(--ink); stroke-width: 2.5; vector-effect: non-scaling-stroke; pointer-events: none; }
+svg text.lm { font: 700 34px var(--font-display); fill: var(--ink); stroke: var(--surface); stroke-width: 9px; paint-order: stroke;
+  stroke-linejoin: round; text-anchor: middle; pointer-events: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 13px; color: var(--ink-2); padding: 10px 4px 2px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.legend .cap { color: var(--ink-3); }
+.panel { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0; }
+.panel h2 { font-size: 24px; }
+.total { color: var(--ink-2); font-size: 14px; margin: 2px 0 0; }
+.rows { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 8px; align-items: center; font-size: 14px; }
+.rows .bar { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; grid-column: 1 / -1; margin-top: -3px; }
+.rows .bar b { display: block; height: 100%; border-radius: 4px; }
+.rows .n { font-variant-numeric: tabular-nums; font-weight: 600; }
+.places { margin: 0; padding: 0; list-style: none; font-size: 14px; display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; }
+.places li { display: flex; gap: 8px; align-items: baseline; }
+.places i { transform: translateY(1px); }
+.top { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.top button { width: 100%; display: flex; justify-content: space-between; gap: 10px; font: inherit; font-size: 14px; color: var(--ink);
+  background: none; border: 0; border-radius: 6px; padding: 5px 6px; cursor: pointer; text-align: left; }
+.top button:hover { background: var(--chip); }
+.top button b { font-variant-numeric: tabular-nums; }
+.minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.minis button { font: inherit; color: var(--ink); text-align: left; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.minis button[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.minis strong { font: 700 16px/1.2 var(--font-display); }
+.minis small { color: var(--ink-2); font-size: 13px; line-height: 1.35; }
+.minis svg { width: 100%; height: auto; display: block; }
+.minis .ctx { fill: var(--chip); }
+.note { color: var(--ink-2); font-size: 14px; max-width: 78ch; margin: 0; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } h1 { font-size: 28px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>What each block is for, from Kennedy Town to Sai Ying Pun</h1>
+    <p class="lede">Every place on the map we built for the simulation, grouped by function and counted per block. A block here is a hexagon 104 m across, a little under one hectare. Darker blocks hold more places of the chosen function.</p>
+    <ul class="facts" id="facts"></ul>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Function shown on the map"></div>
+
+  <div class="main">
+    <section class="mapcard">
+      <h2 id="maptitle"></h2>
+      <p class="sub" id="mapsub"></p>
+      <svg class="map" id="map" role="img" aria-labelledby="maptitle"></svg>
+      <div class="legend" id="legend"></div>
+    </section>
+    <aside class="panel" aria-live="polite">
+      <div>
+        <p class="eyebrow">Selected block</p>
+        <h2 id="bname"></h2>
+        <p class="total" id="btotal"></p>
+      </div>
+      <div class="rows" id="brows"></div>
+      <ul class="places" id="bplaces"></ul>
+      <div>
+        <p class="eyebrow" id="toptitle" style="margin-bottom:6px"></p>
+        <ol class="top" id="top"></ol>
+      </div>
+    </aside>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <h2>The eight functions side by side</h2>
+    <p class="note">Each small map uses its own scale, so compare where a function concentrates, not how many places it has. Select one to show it on the large map.</p>
+    <div class="minis" id="minis"></div>
+  </section>
+
+  <p class="note">Places are points from OpenStreetMap, so a tower with a hundred flats counts once, the same as a noodle shop. Only buildings that carry a name are on the map. Blocks are a regular grid laid over the footpaths, not the street blocks themselves. Map data © OpenStreetMap contributors, ODbL.</p>
+</div>
+
+<script>
+const D = /*DATA*/null;
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, text) => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const sv = (tag, attrs = {}, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const F = D.fn.length;
+const cells = D.cells;
+cells.forEach(c => { c.t = c.c.reduce((a, b) => a + b, 0); const m = Math.max(...c.c); const w = c.c.map((v, i) => v === m ? i : -1).filter(i => i >= 0); c.main = w.length === 1 ? w[0] : -1; });
+const totals = D.fn.map((_, i) => cells.reduce((a, c) => a + c.c[i], 0));
+const fmt = n => n.toLocaleString("en-GB");
+const plural = (n, w) => `${fmt(n)} ${w}${n === 1 ? "" : "s"}`;
+
+let sel = "all";                      // "all" | "main" | 0..7
+let picked = cells.reduce((a, c) => c.t > a.t ? c : a, cells[0]);
+
+function hexPts(x, y, r) { let s = ""; for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (30 + 60 * k); s += (x + r * Math.cos(a)).toFixed(1) + "," + (y + r * Math.sin(a)).toFixed(1) + " "; } return s; }
+const val = (c, s) => typeof s === "number" ? c.c[s] : c.t;
+
+// Up to five count bins that grow roughly geometrically to the maximum
+function bins(max) {
+  if (max <= 5) return Array.from({ length: max }, (_, i) => [i + 1, i + 1]);
+  const ends = [...new Set([1, 2, 3, 4, 5].map(i => Math.max(i, Math.round(Math.pow(max, i / 5)))))];
+  ends[ends.length - 1] = max;
+  return ends.map((e, i) => [i ? ends[i - 1] + 1 : 1, e]);
+}
+function rampFill(v, bs) {
+  if (!v) return "var(--chip)";
+  const i = bs.findIndex(b => v <= b[1]);
+  const step = bs.length === 1 ? 2 : Math.round(i * 4 / (bs.length - 1));
+  return `var(--ramp-${step})`;
+}
+function fillFor(c, s, bs) {
+  if (s === "main") return c.main < 0 ? "var(--tie)" : `var(--f${c.main})`;
+  return rampFill(val(c, s), bs);
+}
+
+// Header facts
+[[fmt(D.meta.places), "places"], [fmt(cells.length), "blocks with at least one place"], [D.meta.km + " km", "of footpaths"], [fmt(D.meta.segments), "path segments"]]
+  .forEach(([b, t]) => { const li = el("li"); li.append(el("b", {}, b), " " + t); $("facts").append(li); });
+
+// Chips
+const options = [["all", "All places", D.meta.places], ["main", "Main function", null], ...D.fn.map((n, i) => [i, n, totals[i]])];
+options.forEach(([key, name, n]) => {
+  const b = el("button", { type: "button", id: "chip-" + key });
+  if (typeof key === "number") b.append(el("i", { style: `background:var(--f${key})` }));
+  b.append(name); if (n != null) b.append(el("span", {}, fmt(n)));
+  b.onclick = () => { sel = key; render(); };
+  $("chips").append(b);
+});
+
+// Large map
+const map = $("map");
+map.setAttribute("viewBox", `0 0 ${D.w} ${D.h}`);
+const gCells = sv("g"); map.append(gCells);
+map.append(sv("path", { class: "streets", d: D.streets }));
+const ring = sv("polygon", { class: "ring" }); map.append(ring);
+D.labels.forEach(([t, x, y]) => map.append(sv("text", { class: "lm", x, y: y - 70 }, t)));
+cells.forEach(c => {
+  c.node = sv("polygon", { class: "cell", points: hexPts(c.x, c.y, D.R - 2) });
+  c.node.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") showBlock(c); });
+  c.node.addEventListener("click", () => { picked = c; showBlock(c); });
+  gCells.append(c.node);
+});
+map.addEventListener("pointerleave", () => showBlock(picked));
+
+// Small maps
+const ctx = cells.map(c => "M" + hexPts(c.x, c.y, D.R).trim().split(" ").join("L") + "Z").join("");
+D.fn.forEach((name, i) => {
+  const b = el("button", { type: "button", id: "mini-" + i });
+  const s = sv("svg", { viewBox: `0 0 ${D.w} ${D.h}`, "aria-hidden": "true" });
+  s.append(sv("path", { class: "ctx", d: ctx }));
+  const bs = bins(Math.max(...cells.map(c => c.c[i])));
+  cells.forEach(c => { if (c.c[i]) s.append(sv("polygon", { points: hexPts(c.x, c.y, D.R), fill: rampFill(c.c[i], bs) })); });
+  const n = cells.filter(c => c.c[i]).length;
+  b.append(s, el("strong", {}, name), el("small", {}, `${plural(totals[i], "place")} in ${plural(n, "block")}. ${D.notes[i]}.`));
+  b.onclick = () => { sel = i; render(); $("chips").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); };
+  $("minis").append(b);
+});
+
+function showBlock(c) {
+  ring.setAttribute("points", hexPts(c.x, c.y, D.R - 2));
+  $("bname").textContent = c.n ? "Around " + c.n : "Unnamed block";
+  const top = c.main < 0 ? "no single main function" : "mainly " + D.fn[c.main].toLowerCase();
+  $("btotal").textContent = `${plural(c.t, "place")}, ${top}`;
+  const rows = $("brows"); rows.replaceChildren();
+  const max = Math.max(...c.c);
+  c.c.forEach((v, i) => {
+    if (!v) return;
+    const bar = el("div", { class: "bar" }); bar.append(el("b", { style: `width:${v / max * 100}%;background:var(--f${i})` }));
+    rows.append(el("i", { style: `background:var(--f${i})` }), el("span", {}, D.fn[i]), el("span", { class: "n" }, v), bar);
+  });
+  const list = $("bplaces"); list.replaceChildren();
+  c.p.forEach(([name, g]) => { const li = el("li"); li.append(el("i", { style: `background:var(--f${g})` }), el("span", {}, name)); list.append(li); });
+}
+
+function render() {
+  options.forEach(([key]) => $("chip-" + key).setAttribute("aria-pressed", String(key === sel)));
+  D.fn.forEach((_, i) => $("mini-" + i).setAttribute("aria-pressed", String(i === sel)));
+  const isFn = typeof sel === "number";
+  const max = Math.max(...cells.map(c => val(c, sel)));
+  const bs = bins(max);
+  cells.forEach(c => c.node.setAttribute("fill", fillFor(c, sel, bs)));
+  const legend = $("legend"); legend.replaceChildren();
+  const sw = (bg, text) => { const s = el("span"); s.append(el("i", { style: `background:${bg}` }), text); legend.append(s); };
+  if (sel === "main") {
+    $("maptitle").textContent = "The most common function in each block";
+    $("mapsub").textContent = "Each block takes the colour of the function with the most places in it.";
+    D.fn.forEach((n, i) => sw(`var(--f${i})`, `${n} (${cells.filter(c => c.main === i).length})`));
+    sw("var(--tie)", `Tie (${cells.filter(c => c.main < 0).length})`);
+  } else {
+    $("maptitle").textContent = isFn ? `${D.fn[sel]} per block` : "All places per block";
+    const n = cells.filter(c => val(c, sel)).length;
+    $("mapsub").textContent = isFn ? `${D.notes[sel]}. ${plural(totals[sel], "place")} in ${n} of ${cells.length} blocks.` : `${fmt(D.meta.places)} places of every function.`;
+    legend.append(el("span", { class: "cap" }, "Places per block"));
+    bs.forEach((b, i) => sw(rampFill(b[1], bs), b[0] === b[1] ? String(b[0]) : `${b[0]}–${b[1]}`));
+    if (isFn) sw("var(--chip)", "other functions only");
+  }
+  $("toptitle").textContent = isFn ? `Most ${D.fn[sel].toLowerCase()}` : "Busiest blocks";
+  const top = $("top"); top.replaceChildren();
+  [...cells].sort((a, b) => val(b, sel) - val(a, sel)).slice(0, 5).forEach(c => {
+    const li = el("li"), b = el("button", { type: "button" });
+    b.append(el("span", {}, c.n || "Unnamed block"), el("b", {}, val(c, sel)));
+    b.onclick = () => { picked = c; showBlock(c); };
+    li.append(b); top.append(li);
+  });
+  showBlock(picked);
+}
+render();
+</script>
