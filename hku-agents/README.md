@@ -99,6 +99,36 @@ runs out, the simulator walks them home so every day closes; those trips are mar
 - `out/<run>/web/web.json`: the website data. Copy it next to `same-route-simulator.html` and republish
   the page; its banner switches from "Test run" to the model's name by itself.
 
+## The other arms
+
+The agent run is one arm of the experiment. The others are compared with it by `arms.py`:
+
+```bash
+python arms.py --run day1
+```
+
+```bash
+python make_compare_figures.py --run day1
+```
+
+- **Random walk** (`random_walk.py`): one trip per real trip, from a random place to a random place by the
+  quickest path, with the real trip's departure time and pace. Five repeats. Costs nothing.
+- **Same trips, noisy turns**: the older baseline from `analyze.py`, kept for reference.
+- **Omni agents** (`omni.py`): agents who also get `look_around` and `follow`, and live among the recorded
+  people of a finished run. This needs a paid run:
+
+```bash
+python run_day.py --run omni --planner claude --agents out/day1/people.jsonl --omni-crowd day1 --limit 2000 --budget 8
+```
+
+```bash
+python arms.py --run day1 --omni omni
+```
+
+`arms.py` writes `out/<run>/analysis/compare.md` and its tables: shared turns per arm, the Markov chain of
+turns against what happened, the per-junction tests with the Diebold-Mariano test, and road use per arm
+with its regression on nearby places. It needs `numpy` and `scipy`; the figures need `matplotlib`.
+
 ## Cost and time
 
 Measured on 8 real people with the current setup: about **US$0.0026 per person** (13 calls on average),
