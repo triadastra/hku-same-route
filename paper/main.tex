@@ -1,0 +1,218 @@
+% IEEE Conference Template v1.0 (2026/10/15)
+% Requires ieeeconf.cls v1.0.
+
+\documentclass[9pt]{ieeeconf}
+
+%% Add packages here (several common packages are already included in the .sty file).
+% --------------------
+\usepackage{bm} % for bold math symbols (incl. Greek letters) with \bm{}
+\usepackage{siunitx}
+\robustify\bfseries
+\usepackage{booktabs}
+\usepackage[capitalize,nameinlink]{cleveref}
+\crefname{equation}{}{}
+\Crefname{equation}{Equation}{Equations}
+
+% Add definitions here.
+% --------------------
+\newcommand{\RR}{\mathbb{R}}
+
+
+\title{Likelihood of People Sharing the Same Route by Coincidence}
+
+\addauthor{Bryan H}{1}
+\addauthor{Celsia F}{1}
+\addauthor{Jerry}{1}
+\addauthor{Angie}{1}
+\addauthor{Michelle}{1}
+
+\addaffiliation{1}{The University of Hong Kong, 70 Pokfulam Road, Central Western District, Hong Kong Island, HK SAR}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+When a stranger makes the same one or two turns as you, it seems normal. When they are still with you after three or more turns, it is hard to tell whether they are following you or simply heading the same way. To measure how often this happens by pure coincidence, we simulate one weekday for 10,000 synthetic people on the real walking network around the University of Hong Kong. Each person is played by Claude Haiku 5.5 and plans their own day through map tools; no agent can see or react to any other. We then compare the result against a baseline in which the same trips are re-walked with randomized turns. Even with following ruled out by construction, a stranger makes the same three consecutive turns as you, within 90 seconds, on 85.4\% of trips, and the same five on 73.9\%. Shortest-path walking makes long shared runs far more common than random turning does: 47.7\% of trips have a stranger sharing ten turns in a row, against 35.9\% in the baseline. Sharing a route for several turns is therefore the expected outcome of the road network and of where people need to go, not evidence of being followed.
+
+Code and data: \url{https://github.com/triadastra/hku-same-route}.
+\end{abstract}
+
+
+\section{Introduction}
+\label{sec:intro}
+A major public safety concern at night is people following others. Imagine someone following you down the road, even making the same turn three times in a row. It does not matter whether they are in front of you or behind you; something feels wrong.
+
+Sharing the same path is a problem that transport researchers and data scientists want to either model computationally or study statistically. The way people move around a city or through a public space underlies city planning, the placement of amenities, public safety surveillance, and road maintenance: busier paths wear out faster, and more accidents happen where more people walk. It is therefore worth asking whether people who seem to follow others do so by a uniform random choice at each junction ($1/N$ for each of $N$ options), by a choice weighted toward nearby amenities and destinations, or for a reason that has nothing to do with the road at all.
+
+This paper answers one narrow version of that question. In a world where nobody follows anybody, how often does a stranger still make the same $k$ turns in a row as you? Our contributions are:
+\begin{itemize}
+    \item a simulator in which 10,000 language-model agents each live one weekday on the OpenStreetMap walking network from Kennedy Town to Sai Ying Pun, deciding one action at a time through map tools;
+    \item a definition of a \emph{shared turn} and a measurement of the probability that some stranger shares at least $k$ consecutive turns, for $k=1$ to $10$;
+    \item a comparison with a randomized-turn baseline, and a breakdown by hour of day and by group of people.
+\end{itemize}
+
+\section{Related Work}
+\label{sec:related}
+\textbf{Activity scheduling.} In transport research, day planning and scheduling have been a major focus: the order of a person's activities, the choice of which shop or road to take, and whether activities complement or substitute for one another. Time is treated as a budget that constrains where a person can be~\cite{hagerstrand1970}. Activity-based models such as ALBATROSS~\cite{arentze2004albatross} % TODO: add the DACO-EV citation
+build a person's daily schedule from rules, and rely on two kinds of flexibility. \textbf{Spatial flexibility} means choosing a similar or substitute destination for the same task, such as a closer shop or restaurant. \textbf{Temporal flexibility} means moving an activity to another free slot to make way for a more important one, for example moving dinner to collect children from school.
+
+\textbf{Route choice.} At the other end of the spectrum is shortest-path search: Dijkstra's algorithm~\cite{dijkstra1959} and A*~\cite{hart1968astar}, which underlie modern navigation systems. Workers, students, and anyone with a fixed destination usually take the quickest path, which is why these algorithms are the natural baseline for studying shared routes. They also concentrate walkers: if everyone minimizes the same cost, everyone picks the same main road.
+
+\textbf{What both leave out.} Shortest-path models ignore people who turn for leisure, sightseeing, or no particular reason, while schedule models do not say which junction a person turns at. Nearby amenities connect the two: a campus draws students through the same gates and toward the same buildings, which is predictable and expected, yet produces heavy overlap.
+
+\textbf{Language-model agents.} Generative agents~\cite{park2023generative} showed that language models given a persona and a memory produce believable daily routines. We use the same idea for a different purpose: the model supplies the schedule (where to go and when), while the route between two places is computed on the map, so that every turn can be counted.
+
+\section{Methodology}
+\label{sec:method}
+\subsection{Preprocessing}
+\label{sec:prep}
+\textbf{Map.} We download the walking network and all places inside the bounding box from Kennedy Town (west) to Sai Ying Pun (east) and from the Pok Fu Lam Road halls (south) to the waterfront (north) from OpenStreetMap~\cite{osm}. Only junctions, places, and lifts are kept as nodes, and each chain of path between them becomes one segment. The resulting graph has 3,543 nodes and 4,835 segments covering about 156~km of walkable path, including 383 stair segments and 48 lift links, and 1,538 named places (university buildings, halls, MTR exits, bus stops, food, shops, parks, and residential buildings). Walking time on a segment is its length divided by \SI{1.35}{\metre\per\second}; a metre of stairs counts as 2.2 flat metres, and a lift link costs \SI{40}{\second}.
+
+\textbf{People.} Each of the 10,000 agents is drawn at random: a role (62\% undergraduate, 12\% postgraduate, 10\% staff, 16\% local resident), a home (a hall, the MTR exit or bus stop they commute through, or a residential building), fixed commitments (classes in the university's timetable slots, office hours, a work shift, or an errand), a personality, habits, interests, a mood, and a walking pace between 0.85 and 1.2 times the average. These proportions are our own assumptions rather than census figures.
+% TODO: the draft said the population follows the 2021 Hong Kong census. The code does not use census data
+% (see MIX in make_agents.py). Either replace the mix with cited census/HKU numbers and re-run, or keep this sentence.
+
+\subsection{Agentic World Modeling}
+\label{sec:agents}
+Each agent is played by Claude Haiku 5.5 and may make up to 40 tool calls in its day. Agents organize their schedules independently of one another: they cannot foresee other agents' actions and never see other agents on the road. This eliminates, by construction, the possibility that one agent is following another. Overlaps and identical turns remain possible when agents take the same path by coincidence, or because quickest-path navigation tends to pick the main road.
+
+People do not walk with a complete plan for the day fixed in advance. We therefore make the agents decide one step at a time: every tool call returns the current time and place, and the agent chooses its next action from there. An agent is also free not to take the quickest path, for example by taking a detour or a walk along the waterfront. The agent acts only through the following map functions:
+
+\begin{enumerate}
+    \item \texttt{where\_am\_i()}: returns the agent's current neighbourhood and the closest places around it, each with a compass direction and walking time.
+    \item \texttt{search\_places(query, category)}: searches the map by keywords (name, type of place, or what one can do there) and returns up to eight matches with their place code, description, direction, and walking time from the agent.
+    \item \texttt{nearby(category, max\_minutes)}: lists the places of a given category within 1--30 minutes' walk of the agent, closest first.
+    \item \texttt{route\_info(to)}: previews the walk to a place without moving: minutes, metres, stairs, lifts, arrival time, and turn-by-turn directions.
+    \item \texttt{go\_to(to, reason)}: walks to a place immediately by the quickest path; the agent's clock advances to the arrival time.
+    \item \texttt{stroll(toward, minutes, reason)}: walks without a fixed route for 10--180 minutes, heading roughly toward a place; the agent ends at whichever place it has reached when the time is up. This is the detour option.
+    \item \texttt{stay(until, activity)}: remains at the current place doing an activity until a given time of day.
+    \item \texttt{end\_day(summary)}: ends the simulated day once the agent is home for the night or, for commuters, has left through its MTR exit or bus stop.
+\end{enumerate}
+The first four functions only observe the map, while the last four advance the agent's own clock. Each agent calls one function per turn, so a day is a sequence of consecutive decisions rather than a route planned in advance. No function reveals the position of any other agent. Every walk records each segment entered, with its time, and each turn made at a junction (left, right, straight, or back).
+
+\subsection{Shared Turns}
+\label{sec:shared}
+A \emph{decision junction} is a node where a walker has at least two ways onward. A stranger \emph{shares a turn} with you when both of you pass the same decision junction, entering and leaving by the same segments, each within \SI{90}{\second} of the other. For a trip, let $K$ be the longest run of consecutive shared turns with any single stranger. We report
+\begin{equation}
+    P_k = \Pr(K \ge k), \qquad k = 1,\dots,10,
+    \label{eq:pk}
+\end{equation}
+estimated over 5,000 trips sampled uniformly from the run, together with the average number of distinct strangers who share at least $k$ consecutive turns.
+
+\subsection{Random-Turn Baseline}
+\label{sec:baseline}
+To separate the effect of route choice from the effect of the schedule, we keep every trip's origin, destination, departure time, and pace, and re-walk it with randomized turns. At a node $u$, the walker chooses the next node $v$ with probability
+\begin{equation}
+    \Pr(v \mid u) \propto \exp\bigl(-\beta \max(0,\, c_{uv} + T_v - T_u)\bigr),
+    \label{eq:softmax}
+\end{equation}
+where $c_{uv}$ is the walking time of the segment, $T_x$ is the quickest time from $x$ to the destination, and $\beta = \SI{0.01}{\per\second}$. The exponent is the detour, in seconds, that the choice adds; $\beta \to \infty$ recovers the quickest path, and $\beta = 0$ is a uniform random walk. This is a first-order Markov chain over junctions that still reaches the destination.
+
+Our original plan had a third condition, an ``omniscient'' agent that can see nearby agents and choose to follow them. It is not implemented in this study and is left as future work.
+
+\section{Results}
+\label{sec:results}
+The run produced 117,318 model calls and 57,530 trips at a cost of US\$20.49; 9,989 of the 10,000 agents ended their day normally. The analysis uses 57,223 trips by 9,995 agents. Of all turns recorded, 47\% were straight on, 26\% left, 27\% right, and 1\% back.
+
+\subsection{How Often a Stranger Shares Your Turns}
+\Cref{tab:shared} gives $P_k$ for both conditions. Sharing three turns in a row with some stranger happens on 85.4\% of trips, and five in a row on 73.9\%, although no agent can follow another.
+
+\begin{table}[t]
+\centering
+\caption{Probability that some stranger shares at least $k$ consecutive turns with you within \SI{90}{\second}, and the average number of strangers who do.}
+\label{tab:shared}
+\begin{tabular}{rrrrr}
+\toprule
+ & \multicolumn{2}{c}{$P_k$ (\%)} & \multicolumn{2}{c}{Strangers} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+$k$ & Quickest & Random & Quickest & Random \\
+\midrule
+1  & 95.6 & 98.8 & 70.3 & 180.8 \\
+2  & 91.1 & 97.7 & 50.9 & 95.6 \\
+3  & 85.4 & 95.9 & 40.5 & 48.5 \\
+4  & 79.7 & 93.1 & 33.5 & 24.4 \\
+5  & 73.9 & 88.9 & 26.2 & 12.4 \\
+6  & 68.5 & 82.6 & 21.2 & 6.6 \\
+7  & 62.3 & 73.6 & 18.1 & 3.6 \\
+8  & 57.6 & 61.2 & 15.7 & 2.1 \\
+9  & 52.4 & 47.2 & 13.3 & 1.3 \\
+10 & 47.7 & 35.9 & 11.1 & 0.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two conditions cross. For short runs ($k \le 8$) the random baseline has the higher $P_k$; for long runs ($k \ge 9$) the quickest path does. The number of strangers shows the same pattern earlier and more sharply: from $k=4$ onward more strangers share your turns on the quickest path, and at $k=10$ it is 11.1 strangers against 0.9. Random walkers wander for longer and so pass more people, which makes one or two shared turns almost certain, but they soon diverge. Quickest-path walkers heading to the same place stay together for the whole way.
+
+\subsection{By Hour}
+$P_3$ stays between 76\% and 94\% from 07:00 to 21:00. It is highest at 18:00 (93.8\%, with $P_5 = 85.3\%$), when people leave campus toward the same few MTR exits, and lowest at 12:00 (76.5\%), when lunch destinations are spread out. Late at night there are too few trips to estimate it (16 sampled trips from 22:00 onward).
+
+\subsection{By Group}
+\Cref{tab:groups} breaks the result down by group. Staff, who walk the fewest and most direct trips, are the most likely to have a stranger share five turns (81\%). Local residents are the least likely (49\%), because their homes and errands are spread across the neighbourhood rather than concentrated on campus.
+
+\begin{table}[t]
+\centering
+\caption{Results by group. $P_5$ is the probability that a stranger shares at least five consecutive turns; ``Own'' is the share of trips on which the stranger who shared the most turns belonged to the same group.}
+\label{tab:groups}
+\begin{tabular}{lrrrr}
+\toprule
+Group & People & Trips each & $P_5$ (\%) & Own (\%) \\
+\midrule
+Undergraduates in halls   & 2,201 & 7.28 & 76 & 54 \\
+Commuting undergraduates  & 3,983 & 6.01 & 77 & 59 \\
+Postgraduates in halls    &   177 & 7.60 & 73 &  7 \\
+Commuting postgraduates   & 1,013 & 5.94 & 77 & 15 \\
+Staff                     & 1,008 & 4.03 & 81 & 59 \\
+Local residents           & 1,618 & 3.61 & 49 & 49 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The stranger who shares your route tends to be someone like you. Staff are about 10\% of the population, yet for 59\% of staff trips the closest route-sharer was also staff; for residents (16\% of the population) the figure is 49\%. The two postgraduate groups are the exception: their sharers are mostly undergraduates, who use the same buildings and far outnumber them.
+
+\subsection{Where the Overlap Happens}
+Walking concentrates on a few segments. The busiest, a short unnamed link at the centre of the main campus, carried 10,761 walkers in the day, with its peak at 17:00, and three sections of University Street carried between 5,594 and 7,862 each, peaking at 12:00. Seven of the ten busiest segments peak at 17:00.
+
+\section{Discussion}
+\label{sec:discussion}
+The introduction asked whether people share routes through uniform random choice, amenity-weighted choice, or neither. Our results support the weighted explanation. Turns are far from uniform (47\% straight), walkers concentrate on a handful of segments around the campus core, and the people who share your route are mostly those with the same kind of destination as you. Shared routes are produced by the network funnelling people with common destinations onto the same quickest path.
+
+For the safety question, the practical reading is that three shared turns carry almost no information in an area like this one: it happens on six trips in seven with no follower present. Even ten shared turns occur by coincidence on nearly half of trips. The number of turns alone is a poor signal; what the shared turns have in common with an obvious destination (an MTR exit at 18:00, a lecture hall before class) matters more.
+
+\textbf{Limitations.} The population mix, habits, and timetables are synthetic assumptions, not measured data. Lighting is recorded for few segments in OpenStreetMap, indoor routes through buildings are mostly missing, and opening hours are not enforced. The baseline is not a clean control: random walkers are on the road for longer, which raises their chance of meeting anyone at all, so its higher $P_k$ for small $k$ partly reflects exposure. The study covers one simulated weekday in one district, where a single campus dominates the destinations; a residential grid would likely give lower values. Finally, because agents never react to each other, the simulation can say how often coincidence looks like following, but not how often real following occurs.
+
+\section{Conclusion}
+\label{sec:conclusion}
+We simulated 10,000 independent language-model agents living one weekday around the University of Hong Kong and counted how often a stranger makes the same consecutive turns as another walker. With following excluded by design, a stranger still shares three turns in a row on 85.4\% of trips and ten in a row on 47.7\%. Compared with randomized turning, quickest-path walking gives fewer brief encounters but many more long shared runs. Future work should replace the assumed population with census and enrolment figures, add the planned condition in which agents can see and follow one another so that coincidence and real following can be told apart, and repeat the study in districts without a dominant destination.
+
+
+% Acknowledgments section
+\begin{acknowledgments}
+To show the contributions of individual members:
+\begin{enumerate}
+    \item Bryan H: choosing the topic and scope of the project, analysing the reasons for doing it, and suggesting possible directions.
+    \item Celsia F: brainstorming the methodology and coding the final product, carrying out the research and simulation pipeline, and leading and aligning members in writing the paper.
+    \item Jerry: analysing the results, graphing them, and testing whether they support the hypotheses and what they mean for students.
+    \item Angie: explaining why the results are important, and the related work connecting our results to previous studies.
+    \item Michelle: concluding the findings of the research and the future directions.
+\end{enumerate}
+Map data \copyright\ OpenStreetMap contributors, available under the Open Database License.
+\end{acknowledgments}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+
+\appendix
+
+\section{Use of AI}
+\label{sec:appendix_ai}
+The agents in the simulation are played by Claude Haiku 5.5 (\texttt{claude-haiku-5-5}) through the Anthropic API. The model receives a system prompt describing how the world works, a persona card for one person, that person's rough mental map of the area, and the eight tools of \cref{sec:agents}. The exact prompts and tool descriptions are in \texttt{agent\_tools.py} in the repository.
+% TODO: paste the system prompt and one example persona card here if the course requires them in the report.
+
+\section{Reproducing the Run}
+\label{sec:appendix_repro}
+Running \texttt{python pipeline.py --run day1 --n 10000 --planner claude} in the \texttt{hku-agents} folder rebuilds the people, the day, the analysis tables, and the website data. All tables in this paper come from \texttt{out/day1/analysis/}.
+
+\end{document}
