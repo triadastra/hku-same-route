@@ -16,6 +16,7 @@ in a row, within 90 seconds, purely by coincidence.
 | `hku-agents/out/day1/analysis/` | Result tables from the 10,000-person run (one weekday, US$20.49, 57,530 trips). |
 | `results.xlsx` | All the results in one workbook: a summary sheet with the key findings, then every table from the analysis. |
 | `same-route-simulator.html` | The results website. It reads `web.json` from the same folder. |
+| `amenity-heat-map.html` | Heat map of what each block is for: the 1,538 places on the map, counted per one-hectare block in eight functions. Rebuilt by `python hku-agents/export_amenity_map.py`. |
 | `web.json` | Website data exported from the run (2,000 of the 10,000 people, for the map replay). |
 
 The full per-person output (about 440 MB) and the downloaded OpenStreetMap caches are not in the
