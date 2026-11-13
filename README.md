@@ -19,8 +19,26 @@ in a row, within 90 seconds, purely by coincidence.
 | `amenity-heat-map.html` | Heat map of what each block is for: the 1,538 places on the map, counted per one-hectare block in eight functions. Rebuilt by `python hku-agents/export_amenity_map.py`. |
 | `web.json` | Website data exported from the run (2,000 of the 10,000 people, for the map replay). |
 
-The full per-person output (about 440 MB) and the downloaded OpenStreetMap caches are not in the
-repository; running `python pipeline.py` inside `hku-agents/` rebuilds them. Put your own Anthropic API key in
-`hku-agents/.env` (never commit it).
+## Repeat it
+
+```bash
+pip install -r hku-agents/requirements.txt
+```
+
+```bash
+python hku-agents/pipeline.py check
+```
+
+```bash
+python hku-agents/pipeline.py default
+```
+
+`check` is free and needs no key: it confirms that your copy rebuilds the published people and walks.
+`default` is our setup, 10,000 people played by Claude Haiku 5.5 (about US$20, two hours); it needs your
+own Anthropic API key in `hku-agents/.env` (copy `hku-agents/.env.example`; never commit it). Other modes,
+including free ones and other ways of routing walks, are in `hku-agents/README.md`.
+
+The full per-person output of the published run (about 440 MB) and the downloaded OpenStreetMap caches
+are not in the repository.
 
 Map data © OpenStreetMap contributors, ODbL.

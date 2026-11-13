@@ -1,7 +1,7 @@
 """The map as the agents experience it: find places, check routes, and walk.
 
-Walking always follows the quickest path (or a noisy variant used for the random-turn baseline) and
-records every segment entered, with its direction and time, plus the turn made at every junction.
+Walking follows the quickest path by default; the other route modes are a step-free path and a noisy
+variant (also used for the random-turn baseline). Every walk records every segment entered, with its direction and time, plus the turn made at every junction.
 """
 import csv
 import heapq
@@ -85,9 +85,9 @@ class World:
         ang = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0]))
         return ["east", "north-east", "north", "north-west", "west", "south-west", "south", "south-east"][round(ang / 45) % 8]
 
-    def directions(self, src, dst, t0, night=False, pace=1.0):
-        """Turn-by-turn steps for the quickest walk, like a phone map."""
-        w = self.walk(src, dst, t0, night, pace=pace)
+    def directions(self, src, dst, t0, night=False, pace=1.0, policy="quickest"):
+        """Turn-by-turn steps for the walk, like a phone map."""
+        w = self.walk(src, dst, t0, night, policy, pace=pace)
         turn_at = {x["node"]: x["turn"] for x in w["turns"]}
         verbs = {"L": "Turn left onto", "R": "Turn right onto", "S": "Continue onto", "B": "Turn back onto"}
         groups = []
@@ -107,13 +107,15 @@ class World:
         return out
 
     # ---------- routing ----------
-    def seg_cost(self, i, night):
+    def seg_cost(self, i, night, easy=False):
+        """Felt seconds for one segment. 'easy' (step-free routes) makes every metre of stairs feel longer."""
         e = self.edges[i]
-        return e["secs"] + (C.UNLIT_PENALTY if night and e["lit"] is False else 0)
+        return (e["secs"] + (C.UNLIT_PENALTY if night and e["lit"] is False else 0)
+                + (C.STAIRS_AVOID * e["steps"] if easy else 0))
 
     @lru_cache(maxsize=4096)
-    def times_from(self, src, night=False):
-        """Quickest walking time in seconds from src to every junction."""
+    def times_from(self, src, night=False, easy=False):
+        """Quickest walking time in seconds from src to every junction ('easy': by felt step-free time)."""
         dist = [math.inf] * len(self.nodes)
         dist[src] = 0.0
         pq = [(0.0, src)]
@@ -122,21 +124,23 @@ class World:
             if d > dist[u]:
                 continue
             for v, i in self.adj[u]:
-                nd = d + self.seg_cost(i, night)
+                nd = d + self.seg_cost(i, night, easy)
                 if nd < dist[v]:
                     dist[v] = nd
                     heapq.heappush(pq, (nd, v))
         return tuple(dist)
 
     def path(self, src, dst, night=False, policy="quickest", beta=0.05, rng=None):
-        """List of (from_node, to_node, edge) steps. 'noisy' picks each turn with softmax over extra time."""
-        to_dst = self.times_from(dst, night)  # undirected costs, so time-to-dst == time-from-dst
+        """List of (from_node, to_node, edge) steps. policy is 'quickest', 'step-free' (the quickest path
+        when stairs feel longer) or 'noisy' (each turn picked with softmax over extra time)."""
+        easy = policy == "step-free"
+        to_dst = self.times_from(dst, night, easy)  # undirected costs, so time-to-dst == time-from-dst
         steps, u, prev = [], src, None
         limit = 4 * max(1, len(self._quickest(src, dst, night))) + 20
         while u != dst:
             opts = [(v, i) for v, i in self.adj[u] if v != prev] or self.adj[u]
-            if policy == "quickest" or len(steps) >= limit:
-                v, i = min(opts, key=lambda o: self.seg_cost(o[1], night) + to_dst[o[0]])
+            if policy != "noisy" or len(steps) >= limit:
+                v, i = min(opts, key=lambda o: self.seg_cost(o[1], night, easy) + to_dst[o[0]])
             else:
                 extra = [self.seg_cost(i, night) + to_dst[v] - to_dst[u] for v, i in opts]
                 w = [math.exp(-beta * max(0.0, x)) for x in extra]
@@ -187,8 +191,8 @@ class World:
         metres = sum(self.edges[i]["len"] for _, _, i in steps)
         return {"segments": segs, "turns": turns, "arrive": round(t), "metres": round(metres)}
 
-    def route_summary(self, src, dst, t0, night=False):
-        w = self.walk(src, dst, t0, night)
+    def route_summary(self, src, dst, t0, night=False, policy="quickest"):
+        w = self.walk(src, dst, t0, night, policy)
         names, last = [], None
         for s in w["segments"]:
             n = _english(self.edges[s["edge"]]["name"])

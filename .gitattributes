@@ -1,0 +1,4 @@
+# The data files are checked byte for byte (hku-agents/verify.py): never convert their line endings.
+hku-agents/data/** -text
+*.jsonl -text
+*.gz binary

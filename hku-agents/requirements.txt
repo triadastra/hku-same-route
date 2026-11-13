@@ -1,0 +1,4 @@
+# The simulator needs one package (only for the Claude planner; the free modes run without it,
+# but `python pipeline.py check` tests the Claude loop offline and needs it too).
+# Tested with Python 3.13 and anthropic 2.8.0; Python 3.10 or newer should work.
+anthropic>=2.8,<3

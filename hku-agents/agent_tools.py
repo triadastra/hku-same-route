@@ -19,6 +19,30 @@ LANDMARK_CATS = ("mtr", "hku", "hall", "library", "sight")
 DAY_END = 24 * 3600 - 60
 NIGHT_FROM = 20 * 3600  # residents' days can end from here on
 
+# How go_to walks are routed (--routes). Strolls always meander, in every mode.
+ROUTE_MODES = {
+    "quickest": "everyone takes the quickest path (the published setup)",
+    "step-free": "everyone takes the quickest path that avoids stairs where a detour or a lift exists",
+    "noisy": "everyone picks each turn at random, weighted toward the quicker ways",
+    "personal": "each person routes by their own habits: step-free, quickest or noisy",
+}
+STEP_FREE_SIGNS = ("avoids stairs", "knees ache")
+QUICKEST_SIGNS = ("always takes the quickest way", "running late")
+NOISY_SIGNS = ("walks slowly", "explores new")
+
+
+def route_policy(agent, routes):
+    """The walking policy for one person: 'quickest', 'step-free' or 'noisy'."""
+    if routes not in ROUTE_MODES:
+        raise ValueError(f"unknown route mode {routes!r}; choose from {', '.join(ROUTE_MODES)}")
+    if routes != "personal":
+        return routes
+    text = " ".join(agent.get("habits", []) + agent.get("today", {}).get("notes", [])).lower()
+    for policy, signs in (("step-free", STEP_FREE_SIGNS), ("quickest", QUICKEST_SIGNS), ("noisy", NOISY_SIGNS)):
+        if any(s in text for s in signs):
+            return policy
+    return "quickest"
+
 
 def _tool(name, description, props, required):
     return {"name": name, "description": description, "strict": True,
@@ -188,8 +212,9 @@ class AgentDay:
     def _route_info(self, to):
         to = self._code(to)
         dst = self.w.places[to]["node"]
-        return {"to": f"{to} {self.w.places[to]['name']}", **self.w.route_summary(self.node, dst, self.t, self.night),
-                "directions": self.w.directions(self.node, dst, self.t, self.night, self.pace)}
+        shown = "step-free" if self.policy == "step-free" else "quickest"  # a noisy walker is shown the quickest way
+        return {"to": f"{to} {self.w.places[to]['name']}", **self.w.route_summary(self.node, dst, self.t, self.night, shown),
+                "directions": self.w.directions(self.node, dst, self.t, self.night, self.pace, shown)}
 
     def _walk(self, to, reason, policy, beta, kind, auto=False, until=None):
         dst = self.w.places[to]["node"]
@@ -271,7 +296,7 @@ class AgentDay:
         self.done = True
 
     def record(self, cost=0.0, stop=""):
-        return {"agent": self.a, "calls": self.calls, "cost_usd": round(cost, 5), "stop": stop or ("ended" if self.summary else "cut"),
+        return {"agent": self.a, "route_policy": self.policy, "calls": self.calls, "cost_usd": round(cost, 5), "stop": stop or ("ended" if self.summary else "cut"),
                 "summary": self.summary, "end": hhmm(self.t), "log": self.log, "trips": self.trips}
 
 
