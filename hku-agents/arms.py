@@ -10,7 +10,7 @@ What it computes
   1. P_k and S_k for every arm (the paper's shared-turn metrics).
   2. The Markov chain of turns: how often two walkers who meet on a road would go on to make the same
      next k turns if each turn depended only on the road they are on, against what really happens.
-  3. Per-junction tests of the agents' turn shares against random walking, with effect sizes, and a
+  3. Per-junction chi-square tests (and G-tests) of the agents' turn shares against random walking, with effect sizes, and a
      Diebold-Mariano test of which model predicts the agents' turns better: equal chance or random walking.
   4. Road use in both arms, and how the difference relates to nearby places.
 
@@ -182,7 +182,8 @@ def turn_counts(trips, decision):
 
 
 def compare_counts(A, B):
-    """Chi-square (G) test that two arms turn the same way at each unit, and the size of the difference."""
+    """Pearson chi-square test, and G-test, that two arms turn the same way at each unit, and the size of the
+    difference. small_expected marks units where an expected count is under 5, where chi-square is less reliable."""
     out = []
     for u in A.keys() & B.keys():
         a, b = [A[u][t] for t in TURNS], [B[u][t] for t in TURNS]
@@ -191,15 +192,22 @@ def compare_counts(A, B):
             continue
         cols = [i for i in range(4) if a[i] + b[i] > 0]
         if len(cols) < 2:
-            p, g = 1.0, 0.0
+            p, g, chi2, p_chi2, dof, small = 1.0, 0.0, 0.0, 1.0, 0, False
         else:
-            g, p, _, _ = stats.chi2_contingency([[a[i] for i in cols], [b[i] for i in cols]], lambda_="log-likelihood")
+            tab = [[a[i] for i in cols], [b[i] for i in cols]]
+            g, p, _, _ = stats.chi2_contingency(tab, lambda_="log-likelihood")
+            chi2, p_chi2, dof, expected = stats.chi2_contingency(tab)
+            small = bool(expected.min() < 5)
         sa, sb = [x / na for x in a], [x / nb for x in b]
         out.append({"unit": u, "n_a": na, "n_b": nb, "share_a": sa, "share_b": sb, "g": g, "p": p,
+                    "chi2": chi2, "p_chi2": p_chi2, "dof": dof, "small_expected": small,
+                    "cramers_v": math.sqrt(chi2 / (na + nb)),
                     "tvd": 0.5 * sum(abs(x - y) for x, y in zip(sa, sb))})
     if out:
         for r, padj in zip(out, stats.false_discovery_control([r["p"] for r in out], method="bh")):
             r["p_bh"] = padj
+        for r, padj in zip(out, stats.false_discovery_control([r["p_chi2"] for r in out], method="bh")):
+            r["p_chi2_bh"] = padj
     return sorted(out, key=lambda r: -(r["n_a"] + r["n_b"]))
 
 
@@ -214,7 +222,11 @@ def test_summary(rows):
         x = d[:, i]
         paired[t] = {"mean": float(x.mean()), "mean_abs": float(np.abs(x).mean()),
                      "wilcoxon_p": float(stats.wilcoxon(x).pvalue) if np.any(x != 0) else 1.0}
+    ok = [r for r in rows if not r["small_expected"]]
     return {"units": len(rows), "significant": sum(r["p_bh"] < 0.05 for r in rows) / len(rows),
+            "chi2_significant": sum(r["p_chi2_bh"] < 0.05 for r in rows) / len(rows),
+            "chi2_ok_units": len(ok), "chi2_ok_significant": sum(r["p_chi2_bh"] < 0.05 for r in ok) / max(1, len(ok)),
+            "cramers_v_median": float(np.median([r["cramers_v"] for r in rows])),
             "tvd_median": float(np.median(tvd)), "tvd_weighted": float((tvd * w).sum() / w.sum()), "paired": paired}
 
 
@@ -396,19 +408,21 @@ def main():
     with open(out / "junction_tests.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["junction", "lat", "lon", "passes_agents", "passes_random"] + [f"agents_{t}_%" for t in TURNS]
-                   + [f"random_{t}_%" for t in TURNS] + ["g_statistic", "p", "p_bh", "tvd"])
+                   + [f"random_{t}_%" for t in TURNS] + ["chi2", "dof", "p_chi2", "p_chi2_bh", "small_expected", "cramers_v", "g_statistic", "p_g", "p_g_bh", "tvd"])
         for r in t_node:
             n = world.nodes[r["unit"]]
             w.writerow([r["unit"], n["lat"], n["lon"], r["n_a"], r["n_b"]] + [round(100 * x, 1) for x in r["share_a"] + r["share_b"]]
-                       + [round(r["g"], 2), f"{r['p']:.3g}", f"{r['p_bh']:.3g}", round(r["tvd"], 4)])
+                       + [round(r["chi2"], 2), r["dof"], f"{r['p_chi2']:.3g}", f"{r['p_chi2_bh']:.3g}", int(r["small_expected"]),
+                          round(r["cramers_v"], 4), round(r["g"], 2), f"{r['p']:.3g}", f"{r['p_bh']:.3g}", round(r["tvd"], 4)])
     with open(out / "junction_tests_directed.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["segment", "name", "from_junction", "passes_agents", "passes_random"] + [f"agents_{t}_%" for t in TURNS]
-                   + [f"random_{t}_%" for t in TURNS] + ["g_statistic", "p", "p_bh", "tvd"])
+                   + [f"random_{t}_%" for t in TURNS] + ["chi2", "dof", "p_chi2", "p_chi2_bh", "small_expected", "cramers_v", "g_statistic", "p_g", "p_g_bh", "tvd"])
         for r in t_seg:
             e, frm = r["unit"]
             w.writerow([e, world.edges[e]["name"], frm, r["n_a"], r["n_b"]] + [round(100 * x, 1) for x in r["share_a"] + r["share_b"]]
-                       + [round(r["g"], 2), f"{r['p']:.3g}", f"{r['p_bh']:.3g}", round(r["tvd"], 4)])
+                       + [round(r["chi2"], 2), r["dof"], f"{r['p_chi2']:.3g}", f"{r['p_chi2_bh']:.3g}", int(r["small_expected"]),
+                          round(r["cramers_v"], 4), round(r["g"], 2), f"{r['p']:.3g}", f"{r['p_bh']:.3g}", round(r["tvd"], 4)])
     dm = diebold_mariano(world, trips, rw_seg, decision)
     print("junction tests done")
 
@@ -462,16 +476,26 @@ def main():
         L.append(f"Omni agents, observed, 3 more turns: {mk['omni'][1][2]:.1%} ({mk['omni'][0]:,} pairs).")
 
     L += ["", "## Do agents turn differently from random walkers?", "",
-          f"G-test of the left/right/straight/back counts, agents against random walk, where both arms have at least "
-          f"{MIN_PASSES} passes. p-values corrected over all units (Benjamini-Hochberg). 'Noise check' is one random-walk "
-          "repeat against another: what the same test gives when there is no real difference.", "",
-          "| Unit | Tested | Significant at 5% | Median difference (TVD) | Pass-weighted TVD | Noise check: significant | Noise check: median TVD |",
-          "|---|---|---|---|---|---|---|"]
+          f"Pearson chi-square test of the left/right/straight/back counts, agents against random walk, where both arms "
+          f"have at least {MIN_PASSES} passes. p-values corrected over all units (Benjamini-Hochberg). The G-test "
+          "(likelihood ratio) is the same comparison with a statistic that copes better with small counts. 'Noise check' "
+          "is one random-walk repeat against another: what the chi-square test gives when there is no real difference.", "",
+          "| Unit | Tested | Chi-square: significant at 5% | Same, only units with all expected counts 5+ | G-test: significant at 5% | "
+          "Median Cramér's V | Median TVD | Pass-weighted TVD | Noise check: significant | Noise check: median TVD |",
+          "|---|---|---|---|---|---|---|---|---|---|"]
     for name, t, nul in (("Junction", t_node, null_node), ("Road and direction", t_seg, null_seg)):
         a, b = test_summary(t), test_summary(nul)
-        L.append(f"| {name} | {a['units']} | {a['significant']:.1%} | {a['tvd_median']:.3f} | {a['tvd_weighted']:.3f} | "
-                 f"{b.get('significant', float('nan')):.1%} | {b.get('tvd_median', float('nan')):.3f} |")
-    L += ["", "TVD (total variation distance) is the share of turns that would have to change for the two arms to agree: "
+        L.append(f"| {name} | {a['units']} | {a['chi2_significant']:.1%} | {a['chi2_ok_significant']:.1%} of {a['chi2_ok_units']} | "
+                 f"{a['significant']:.1%} | {a['cramers_v_median']:.3f} | {a['tvd_median']:.3f} | {a['tvd_weighted']:.3f} | "
+                 f"{b.get('chi2_significant', float('nan')):.1%} | {b.get('tvd_median', float('nan')):.3f} |")
+    all_a = [sum(c[t] for c in ag_seg.values()) for t in TURNS]
+    all_r = [sum(c[t] for c in rw_seg.values()) for t in TURNS]
+    chi_all = stats.chi2_contingency([all_a, all_r])
+    L += ["", f"All turns pooled (one 2 × 4 table, {sum(all_a):,} agent turns and {sum(all_r):,} random-walk turns): "
+          f"chi-square = {chi_all.statistic:,.0f}, {chi_all.dof} degrees of freedom, p {('= %.3g' % chi_all.pvalue) if chi_all.pvalue > 0 else '< 1e-300'}, "
+          f"Cramér's V = {math.sqrt(chi_all.statistic / (sum(all_a) + sum(all_r))):.3f}. Shares, agents against random walk: "
+          + ", ".join(f"{nm} {x / sum(all_a):.1%} / {y / sum(all_r):.1%}" for nm, x, y in zip(("left", "right", "straight", "back"), all_a, all_r)) + "."]
+    L += ["", "Cramér's V runs from 0 (no difference) to 1. TVD (total variation distance) is the share of turns that would have to change for the two arms to agree: "
           "0 = identical, 1 = completely different.", "",
           "Paired differences, agents minus random walk, per road and direction:", "",
           "| Turn | Mean difference | Mean absolute difference | Wilcoxon p |", "|---|---|---|---|"]

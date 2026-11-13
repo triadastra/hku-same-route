@@ -92,9 +92,10 @@ document is yours.
 
 ## 9. Tests (paper section 3.3; implemented in `arms.py`)
 
-- Per junction, and per road and direction: G-test of the left/right/straight/back counts, agents against
-  random walk, at least 30 passes in each arm, Benjamini-Hochberg correction. Effect size: total variation
-  distance. A noise check compares two random-walk repeats with each other.
+- Per junction, and per road and direction: Pearson chi-square test of the left/right/straight/back counts,
+  agents against random walk, at least 30 passes in each arm, Benjamini-Hochberg correction. The G-test is
+  reported next to it, and the result restricted to units where every expected count is 5 or more. One
+  pooled chi-square over all turns. Effect sizes: Cramér's V and total variation distance. A noise check compares two random-walk repeats with each other.
 - Paired by direction (left with left, and so on): mean difference and Wilcoxon test across roads.
 - Diebold-Mariano: the agents' turns are the observed series; the two forecasts are equal chance per exit
   and the random-walk shares; loss is the Brier score; one value per hour of the day.

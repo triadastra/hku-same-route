@@ -37,14 +37,16 @@ Pairs that met: random walk 165,678, agents 526,687.
 
 ## Do agents turn differently from random walkers?
 
-G-test of the left/right/straight/back counts, agents against random walk, where both arms have at least 30 passes. p-values corrected over all units (Benjamini-Hochberg). 'Noise check' is one random-walk repeat against another: what the same test gives when there is no real difference.
+Pearson chi-square test of the left/right/straight/back counts, agents against random walk, where both arms have at least 30 passes. p-values corrected over all units (Benjamini-Hochberg). The G-test (likelihood ratio) is the same comparison with a statistic that copes better with small counts. 'Noise check' is one random-walk repeat against another: what the chi-square test gives when there is no real difference.
 
-| Unit | Tested | Significant at 5% | Median difference (TVD) | Pass-weighted TVD | Noise check: significant | Noise check: median TVD |
-|---|---|---|---|---|---|---|
-| Junction | 1819 | 83.6% | 0.182 | 0.170 | 0.0% | 0.017 |
-| Road and direction | 3774 | 80.3% | 0.194 | 0.165 | 0.0% | 0.008 |
+| Unit | Tested | Chi-square: significant at 5% | Same, only units with all expected counts 5+ | G-test: significant at 5% | Median Cramér's V | Median TVD | Pass-weighted TVD | Noise check: significant | Noise check: median TVD |
+|---|---|---|---|---|---|---|---|---|---|
+| Junction | 1819 | 83.1% | 82.3% of 1347 | 83.6% | 0.225 | 0.182 | 0.170 | 0.0% | 0.017 |
+| Road and direction | 3774 | 79.6% | 78.2% of 2394 | 80.3% | 0.264 | 0.194 | 0.165 | 0.0% | 0.008 |
 
-TVD (total variation distance) is the share of turns that would have to change for the two arms to agree: 0 = identical, 1 = completely different.
+All turns pooled (one 2 × 4 table, 1,283,334 agent turns and 1,864,075 random-walk turns): chi-square = 108,284, 3 degrees of freedom, p < 1e-300, Cramér's V = 0.185. Shares, agents against random walk: left 26.1% / 17.3%, right 26.6% / 17.3%, straight 46.8% / 65.2%, back 0.6% / 0.1%.
+
+Cramér's V runs from 0 (no difference) to 1. TVD (total variation distance) is the share of turns that would have to change for the two arms to agree: 0 = identical, 1 = completely different.
 
 Paired differences, agents minus random walk, per road and direction:
 
