@@ -17,9 +17,8 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 4. Destinations: all 1,538 places in the 17 categories (kept).
 5. Junctions: every junction drawn on the map is a junction, and nothing is merged.
 6. Population: 10,000 people in the proportions of the 2021 census and HKU's figures, not 70% HKU students.
-7. Following: the follower is at most 30 m behind, measured along the road, not in a straight line. When a
-   traffic light separates two people at a junction, the one behind gets time to catch up. (How, to be
-   discussed.)
+7. Following: the follower is at most 30 m behind, measured along the road, not in a straight line.
+8. No traffic lights in the simulation: nobody waits at a crossing, so no catch-up allowance is needed.
 
 ## 1. Question and hypotheses
 
@@ -179,8 +178,8 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
   probabilities.
 - Following distance (authors' decision 7): 30 m, measured along the road: the distance the stranger still has to
   walk to reach the junction you are at. 15 m and 60 m are in `following_sweeps.csv`.
-- DECIDE: how the one behind gets time to catch up when a traffic light separates two people at a junction
-  (authors' decision 7; to be discussed). Today nobody waits at lights in the simulation.
+- No traffic lights are simulated (authors' decision 8), so two people walking together are never split by a
+  red light. On real streets lights would separate some of them; state this as a limit.
 - DECIDE: the "same place" radius for who follows whom. default: 150 m.
 
 ## 9. Tests
@@ -215,5 +214,6 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 - 10,000 people are fewer than the real number of pedestrians. With the same behaviour, more people can only
   add strangers, so the chances reported are lower than they would be on real streets.
 - Lighting is tagged on 2% of segments and indoor routes are mostly missing; opening hours are not enforced.
+- No traffic lights: on real streets a red light can separate two people who would otherwise walk together.
 - The preprocessing thresholds (section 2) are our choices.
 - DECIDE: anything else you want stated.
