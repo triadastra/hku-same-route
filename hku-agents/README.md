@@ -101,11 +101,11 @@ runs out, the simulator walks them home so every day closes; those trips are mar
 
 ## Real intersections and following (the main analysis)
 
-OpenStreetMap junctions are about 13 m apart on a typical trip, because sidewalks and crossings are separate
-ways. `decisions.py` merges them into 573 real intersections, each with its real number of roads (3 to 6),
-and turns any trip into a list of decisions: (intersection, road in, road out, time). `following.py` then
-measures how often a stranger, close behind you, makes your decisions at k intersections in a row, in the
-Agent World and under four Markov chains (equal chance, momentum, counted shares, imitation):
+`decisions.py` turns any trip into a list of decisions: (junction, path in, path out, time). By the authors'
+decision every junction drawn on the map counts (2,371 of them, with 3 to 5 paths), and nothing is merged;
+merging is available with `Decisions(world, merge=True)`. `following.py` then measures how often a stranger,
+at most 30 m behind you along the road, makes your decisions at k junctions in a row, in the Agent World and
+under four Markov chains (equal chance, momentum, counted shares, imitation):
 
 ```bash
 python following.py --run day1 --control mock_day1
@@ -116,13 +116,14 @@ python make_following_figures.py --run day1
 ```
 
 ```bash
-python make_network_figure.py
+python make_junction_figure.py --run day1
 ```
 
 `--control` is optional: a run of the same people with the free rule-based planner
 (`python run_day.py --run mock_day1 --planner mock --agents out/day1/people.jsonl`). The results are in
-`out/day1/analysis/following.md` with its tables, including `decision_table.csv` (the share of each road out
-at every intersection). It takes about 4 minutes and needs `scipy`; the figures need `matplotlib`.
+`out/day1/analysis/following.md` with its tables, including `decision_table.csv` (the share of people leaving
+by each path, at every junction and path in). It takes about 25 minutes and needs `scipy`; the figures need
+`matplotlib`. Walking speeds come from published studies (`config.py`, sources in `data/walking_speeds.csv`).
 
 ## The other arms
 

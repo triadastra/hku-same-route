@@ -61,8 +61,10 @@ TOOLS = [
     _tool("walk", "Walk along one of the roads leading off from where you are, to the next intersection. You arrive "
           "by yourself when you reach the place you are heading for.",
           {"road": {"type": "integer", "description": "the road's number"},
-           "toward": {"type": "string", "description": "code of the place you are heading for, or an empty string to keep the one you have"}},
-          ["road", "toward"]),
+           "toward": {"type": "string", "description": "code of the place you are heading for, or an empty string to keep the one you have"},
+           "pace": {"type": "string", "enum": ["slow", "normal", "fast"],
+                    "description": "how fast you walk: normal is your usual speed, slow about a quarter slower, fast about a third faster"}},
+          ["road", "toward", "pace"]),
     _tool("enter", "Go into a place at the junction where you are, and end your walk there.",
           {"place": {"type": "string", "description": "place code"}}, ["place"]),
     _tool("stay", "Stay at the place where you are, doing something, until a time today.",
@@ -339,7 +341,10 @@ class Live:
     def _nearby(self, p, category, max_metres):
         return {"results": self.nearby(p.node, category, max(50, min(2000, int(max_metres)))), "now": hhmm(p.t)}, False
 
-    def _walk(self, p, road, toward=""):
+    def _walk(self, p, road, toward="", pace="normal"):
+        if pace not in C.PACES:
+            raise ValueError("pace must be slow, normal or fast")
+        speed = p.pace * C.PACES[pace]
         options = self.D.roads_from(p.node)
         k = int(road)
         if not 1 <= k <= len(options):
@@ -367,7 +372,7 @@ class Live:
             p.visits = Counter()
         p.track = []
         for a, b, e in steps:
-            secs = self.w.edges[e]["secs"] / p.pace
+            secs = self.w.edges[e]["secs"] / speed
             p.trip["segments"].append({"edge": e, "from": a, "to": b, "t": round(t)})
             p.track.append((t, a, b, e, t + secs))
             t += secs

@@ -12,8 +12,8 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 1. Study area: Kennedy Town to Sai Ying Pun, from the Pok Fu Lam Road halls to the waterfront (kept).
 2. Walkable paths: every path a pedestrian may use, including roads, because sidewalks are often not drawn
    separately (kept).
-3. Walking speed: values from a published study, cited; each person chooses their own pace within a range
-   that makes sense. (Sources being collected; not yet in the code.)
+3. Walking speed: values from published studies, cited; each person chooses their own pace, within a range
+   that makes sense, for every walk.
 4. Destinations: all 1,538 places in the 17 categories (kept).
 5. Junctions: every junction drawn on the map is a junction, and nothing is merged.
 6. Population: 10,000 people in the proportions of the 2021 census and HKU's figures, not 70% HKU students.
@@ -52,8 +52,25 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
   in the code (`Decisions(world, merge=True)`) but not used; `graphs/intersections.pdf` shows what it would do.
 - A decision is (junction, path in, path out, time), the record the project plan's thermal sensors would
   produce. For tables a decision is also labelled front (within 40° of straight on), left, right or back.
-- Walking speed (authors' decision 3): from a published study, with each person choosing their pace. Until
-  the source is in, the code still uses 1.35 m/s, stairs 2.2 times slower and 40 s per lift (uncited).
+- Walking speed (authors' decision 3; values in `config.py`, sources in `hku-agents/data/walking_speeds.csv`):
+  - each person's comfortable speed on the flat comes from their age: the mean of men's and women's speeds for
+    their decade (Bohannon & Andrews 2011: 1.35 m/s in the 20s, 1.41 in the 40s, 1.29 in the 60s, 0.96 at
+    80+), plus a spread of 0.15 m/s between people (Bohannon 1997). Teenagers walk like adults (McKay et al.
+    2017). The 10,000 people have a median of 1.34 m/s, the middle half 1.22 to 1.45 m/s;
+  - for every walk the person chooses slow, normal or fast: about a quarter slower or a third faster than
+    their own speed (Lythgo, Wilson & Galea 2011; Oberg et al. 1993 give the same ratios);
+  - stairs: 0.67 m/s along the stair, the mean of up (0.57) and down (0.77) from Fruin (1971), because the
+    map does not say which way a stair goes up; Hong Kong stairs measured 0.61 to 0.66 m/s (Lam et al. 1995);
+  - map walking times use 1.34 m/s, the mean free walking speed (Weidmann 1993), scaled by each person's speed.
+  - All values were taken from abstracts or from later papers quoting them: check the originals before citing.
+  - day1 was run before this, with 1.35 m/s for everyone, stairs 2.2 times slower and a random 0.85 to 1.2
+    multiplier; the next run uses these values.
+- DECIDE: the international speeds by age, or the same curve scaled to Hong Kong measurements? Hong Kong
+  walkways measured about 1.3 m/s (Lam & Cheung 2000) and older Hong Kong men 1.05 m/s at 65 to 70 (Mr OS
+  study), slower than the international 1.29 m/s for their decade. default: international.
+- DECIDE: children aged 6 to 9 walk at 1.2 m/s, an assumption within the 0.82 to 1.34 m/s found for ages 1 to
+  10 (Dusing & Thorpe 2007, no values per age). default: as stated.
+- DECIDE: lifts take 40 s (waiting and riding); no published value was found. default: 40 s.
 
 ## 3. The population (paper section 3.1)
 
@@ -173,9 +190,11 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 - Same next road, by the number of roads at the intersection (3, 4, 5, 6+).
 - By hour of departure.
 - Who follows whom: shared start and destination (within 150 m), same group.
-- The plan's table (`decision_table.csv`): for each intersection and road in, the share of each road out,
-  labelled front, left, right or back, and the share that stop there, next to the equal-chance and momentum
-  probabilities.
+- The plan's table (`decision_table.csv`): for each junction and path in, the share of people leaving by
+  each of its paths, and the share that stop there, next to the equal-chance and momentum probabilities. The
+  paths are named by street and direction; there are no left/right/front/back labels, so a Y junction is
+  simply 3 paths and a crossroads 4. `graphs/junction-shares.pdf` draws this as a connected diagram for two
+  busy junctions near HKU station (`make_junction_figure.py`).
 - Following distance (authors' decision 7): 30 m, measured along the road: the distance the stranger still has to
   walk to reach the junction you are at. 15 m and 60 m are in `following_sweeps.csv`.
 - No traffic lights are simulated (authors' decision 8), so two people walking together are never split by a
@@ -198,10 +217,11 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 
 ## 10. What we report
 
-- Figures: `graphs/intersections.pdf` (preprocessing), `graphs/following-models.pdf`,
+- Figures: `graphs/junction-shares.pdf` (how people split at a junction), `graphs/following-models.pdf`,
   `graphs/following-pairs.pdf`, `graphs/following-roads.pdf`, `graphs/following-hours.pdf`, and the two
   amenity maps. `graphs/road-use-ratio.pdf` (road use, from `arms.py`) is still valid.
-- Superseded (raw junctions, 90 s window): `graphs/shared-turns-three-arms.pdf`, `graphs/markov-turns.pdf`.
+- `graphs/intersections.pdf` shows what merging junctions would do; not used, by the authors' decision 5.
+- Superseded (90 s window, four fixed directions): `graphs/shared-turns-three-arms.pdf`, `graphs/markov-turns.pdf`.
 - Tables: `hku-agents/out/day1/analysis/following.md` and its CSV files.
 - DECIDE: which of these go in the paper, given the page limit.
 

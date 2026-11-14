@@ -25,6 +25,8 @@ def _tool(name, description, props, required):
             "input_schema": {"type": "object", "properties": props, "required": required, "additionalProperties": False}}
 
 
+PACE_TEXT = "how fast you walk: normal is your usual speed, slow about a quarter slower, fast about a third faster"
+
 TOOLS = [
     _tool("where_am_i", "Where you are now: the neighbourhood and the closest places around you, with direction "
           "and walking time.", {}, []),
@@ -39,12 +41,14 @@ TOOLS = [
           {"to": {"type": "string", "description": "place code"}}, ["to"]),
     _tool("go_to", "Walk to a place now by the quickest path. The clock moves to your arrival time.",
           {"to": {"type": "string", "description": "place code"},
-           "reason": {"type": "string", "description": "a few words"}}, ["to", "reason"]),
+           "pace": {"type": "string", "enum": ["slow", "normal", "fast"], "description": PACE_TEXT},
+           "reason": {"type": "string", "description": "a few words"}}, ["to", "pace", "reason"]),
     _tool("stroll", "Walk without a set route for about the given number of minutes, heading roughly toward a "
           "place. You end at whichever place you reach when the time is up.",
           {"toward": {"type": "string", "description": "place code"},
            "minutes": {"type": "integer", "description": "10 to 180"},
-           "reason": {"type": "string", "description": "a few words"}}, ["toward", "minutes", "reason"]),
+           "pace": {"type": "string", "enum": ["slow", "normal", "fast"], "description": PACE_TEXT},
+           "reason": {"type": "string", "description": "a few words"}}, ["toward", "minutes", "pace", "reason"]),
     _tool("stay", "Stay where you are doing something until a time today.",
           {"until": {"type": "string", "description": "HH:MM, 24-hour, later than now"},
            "activity": {"type": "string", "description": "a few words"}}, ["until", "activity"]),
@@ -191,10 +195,12 @@ class AgentDay:
         return {"to": f"{to} {self.w.places[to]['name']}", **self.w.route_summary(self.node, dst, self.t, self.night),
                 "directions": self.w.directions(self.node, dst, self.t, self.night, self.pace)}
 
-    def _walk(self, to, reason, policy, beta, kind, auto=False, until=None):
+    def _walk(self, to, reason, policy, beta, kind, auto=False, until=None, pace="normal"):
+        """pace: the person's choice for this walk, relative to their own comfortable speed (config.PACES)."""
+        speed = self.pace * C.PACES.get(pace, 1.0)
         dst = self.w.places[to]["node"]
         start = self.t + self.jitter.randint(0, 75)
-        walk = self.w.walk(self.node, dst, start, self.night, policy, beta, self.jitter if policy != "quickest" else self.rng, self.pace)
+        walk = self.w.walk(self.node, dst, start, self.night, policy, beta, self.jitter if policy != "quickest" else self.rng, speed)
         if until is not None and walk["arrive"] > until + 120:
             # Time is up mid-walk: stop at the junction reached by then and finish at the closest place
             keep = [s for s in walk["segments"] if s["t"] < until] or walk["segments"][:1]
@@ -202,8 +208,8 @@ class AgentDay:
             times = self.w.times_from(stop_node)
             to = min(self.w.places, key=lambda c: (times[self.w.places[c]["node"]], c))
             dst = self.w.places[to]["node"]
-            t_stop = keep[-1]["t"] + self.w.edges[keep[-1]["edge"]]["secs"] / self.pace
-            tail = self.w.walk(stop_node, dst, t_stop, self.night, pace=self.pace) if stop_node != dst else \
+            t_stop = keep[-1]["t"] + self.w.edges[keep[-1]["edge"]]["secs"] / speed
+            tail = self.w.walk(stop_node, dst, t_stop, self.night, pace=speed) if stop_node != dst else \
                 {"segments": [], "turns": [], "arrive": round(t_stop), "metres": 0}
             last_turn = [x for x in walk["turns"] if x["t"] <= keep[-1]["t"]]
             if tail["segments"] and len(self.w.adj[stop_node]) >= 3:  # the turn where the stroll bends toward the stop
@@ -211,24 +217,29 @@ class AgentDay:
                                   "t": round(t_stop)})
             walk = {"segments": keep + tail["segments"], "turns": last_turn + tail["turns"], "arrive": tail["arrive"],
                     "metres": round(sum(self.w.edges[s["edge"]]["len"] for s in keep)) + tail["metres"]}
-        trip = {"agent": self.a["id"], "trip": len(self.trips) + 1, "from": self.at, "to": to, "pace": self.pace,
+        trip = {"agent": self.a["id"], "trip": len(self.trips) + 1, "from": self.at, "to": to, "pace": round(speed, 3),
+                "pace_choice": pace,
                 "depart": round(start), "arrive": walk["arrive"], "metres": walk["metres"], "reason": reason,
                 "kind": kind, "auto": auto, "segments": walk["segments"], "turns": walk["turns"]}
         self.trips.append(trip)
         self.t, self.at, self.node = walk["arrive"], to, dst
         return trip
 
-    def _go_to(self, to, reason="", auto=False):
+    def _go_to(self, to, reason="", auto=False, pace="normal"):
         to = self._code(to)
         if to == self.at:
             raise ValueError("you are already there")
-        trip = self._walk(to, reason, self.policy, self.beta, "go", auto)
+        if pace not in C.PACES:
+            raise ValueError("pace must be slow, normal or fast")
+        trip = self._walk(to, reason, self.policy, self.beta, "go", auto, pace=pace)
         return {"arrived": f"{to} {self.w.places[to]['name']}", "walked_min": round((trip["arrive"] - trip["depart"]) / 60),
                 "metres": trip["metres"], "turns": "".join(x["turn"] for x in trip["turns"])}
 
-    def _stroll(self, toward, minutes, reason=""):
+    def _stroll(self, toward, minutes, reason="", pace="normal"):
         """Meander toward a place, then on to other nearby places, until the time is up."""
         toward = self._code(toward)
+        if pace not in C.PACES:
+            raise ValueError("pace must be slow, normal or fast")
         minutes = max(10, min(180, int(minutes)))
         end = min(self.t + minutes * 60, DAY_END)
         legs, target = [], toward
@@ -240,7 +251,7 @@ class AgentDay:
                 if not options:
                     break
                 target = self.jitter.choice(options)
-            trip = self._walk(target, reason, "noisy", 0.02, "stroll", until=end)
+            trip = self._walk(target, reason, "noisy", 0.02, "stroll", until=end, pace=pace)
             legs.append(self.w.places[trip["to"]]["name"])
             if trip["to"] != target:
                 break  # cut short because the time was up

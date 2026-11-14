@@ -1,15 +1,15 @@
 what,value,p3,p5,q3_formula_on_agent_pairs
-"momentum, kappa",0.5,0.1961,0.0196,0.077
-"momentum, kappa",1.0,0.2412,0.0353,0.113
-"momentum, kappa",2.0,0.3341,0.0904,0.2272
-"momentum, kappa",4.0,0.4538,0.191,0.4345
-"imitation, rho",0.0,0.3908,0.1352,
-"imitation, rho",0.1,0.3992,0.1405,
-"imitation, rho",0.3,0.428,0.1574,
-"imitation, rho",0.5,0.4603,0.1824,
-"following distance, Agent World",15,0.3045,0.1164,
-"following distance, Markov: counted",15,0.2481,0.0643,
-"following distance, Agent World",30,0.4366,0.2173,
-"following distance, Markov: counted",30,0.3875,0.1338,
-"following distance, Agent World",60,0.5302,0.3165,
-"following distance, Markov: counted",60,0.4954,0.2229,
+"momentum, kappa",0.5,0.366,0.0967,0.1138
+"momentum, kappa",1.0,0.4155,0.149,0.1644
+"momentum, kappa",2.0,0.5242,0.2888,0.3178
+"momentum, kappa",4.0,0.6374,0.4589,0.5729
+"imitation, rho",0.0,0.6098,0.4104,
+"imitation, rho",0.1,0.6224,0.4274,
+"imitation, rho",0.3,0.6456,0.4572,
+"imitation, rho",0.5,0.6781,0.5,
+"following distance, Agent World",15,0.5823,0.4056,
+"following distance, Markov: counted",15,0.499,0.2901,
+"following distance, Agent World",30,0.6806,0.5256,
+"following distance, Markov: counted",30,0.6109,0.413,
+"following distance, Agent World",60,0.7438,0.6063,
+"following distance, Markov: counted",60,0.6951,0.5167,

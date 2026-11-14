@@ -127,6 +127,17 @@ def timetable(rng, world, faculty, n_classes):
     return out
 
 
+def comfortable_speed(rng, age):
+    """A person's own comfortable walking speed in m/s, from published values by age (config.py, with sources in
+    data/walking_speeds.csv), plus the spread between people of the same age."""
+    if age < 10:
+        base = C.CHILD_SPEED
+    else:
+        decade = min(80, max(20, age // 10 * 10))
+        base = C.SPEED_BY_AGE[decade]
+    return min(2.0, max(0.5, rng.gauss(base, C.SPEED_SD)))
+
+
 CENSUS_BANDS = [(0, 14, 14539), (15, 24, 10619), (25, 44, 45481), (45, 64, 43062), (65, 95, 30080)]
 
 
@@ -170,7 +181,7 @@ def make(n, seed):
         kind = rng.choices(kinds, weights=weights)[0]
         name = f"{rng.choice(GIVEN)} {rng.choice(SURNAMES)}"
         a = {"id": f"A{k + 1:05d}", "name": name, "kind": kind, "personality": rng.choice(PERSONALITY),
-             "habits": rng.sample(HABITS, 2), "pace": round(rng.uniform(0.85, 1.2), 2)}
+             "habits": rng.sample(HABITS, 2)}
         if kind in ("HKU undergrad", "HKU taught postgrad", "HKU research postgrad"):
             role = "undergrad" if kind == "HKU undergrad" else "postgrad"
             fac = rng.choices(list(FACULTY_WEIGHT), weights=list(FACULTY_WEIGHT.values()))[0]
@@ -258,6 +269,8 @@ def make(n, seed):
             if c:
                 first = int(a["commitments"][0]["start"][:2]) * 3600 + int(a["commitments"][0]["start"][3:]) * 60
                 a["start"] = hhmm(max(6 * 3600, min(parse_hhmm(a["start"]), first - 30 * 60)))
+        a["speed"] = round(comfortable_speed(rng, a["age"]), 2)          # m/s on the flat
+        a["pace"] = round(a["speed"] / C.WALK_SPEED, 3)                 # the same, relative to the map's walking times
         a.update(traits(rng, a["role"], a["age"]))
         agents.append(a)
     return agents
@@ -276,6 +289,8 @@ def check(agents):
     res = [a for a in agents if a["role"] == "resident"]
     bands = {"under 15": (0, 14), "15-24": (15, 24), "25-44": (25, 44), "45-64": (45, 64), "65+": (65, 200)}
     tot = sum(CENSUS_AGES.values())
+    sp = sorted(a["speed"] for a in agents)
+    lines.append(f"\nwalking speed: median {sp[n // 2]:.2f} m/s, middle half {sp[n // 4]:.2f}-{sp[3 * n // 4]:.2f} m/s")
     lines.append(f"\nresidents' ages (census includes children under 6, who are not simulated on their own):")
     for b, (lo, hi) in bands.items():
         m = sum(lo <= a["age"] <= hi for a in res)

@@ -48,6 +48,9 @@ class World:
         g = json.loads((C.DATA / "graph.json").read_text(encoding="utf-8"))
         self.nodes = g["nodes"]
         self.edges = g["edges"]
+        for e in self.edges:   # walking time from the speeds in config.py (graph.json was built with older values)
+            e["secs"] = round((e["len"] - e["steps"]) / C.WALK_SPEED + e["steps"] / C.STAIRS_SPEED
+                              + (C.LIFT_SECONDS / 2 if e["lift"] else 0), 1)
         self.adj = [[] for _ in self.nodes]
         for i, e in enumerate(self.edges):
             self.adj[e["u"]].append((e["v"], i))

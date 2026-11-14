@@ -438,6 +438,8 @@ def main():
         w = csv.writer(f)
         w.writerow(["roads", "pairs_agents", "agents", "equal", "momentum", "counted", "imitate", "random_od"])
         for n_roads in (3, 4, 5, 6):
+            if not qmeas["agents"][3].get(n_roads, [0, 0])[0]:
+                continue   # no junction with this many paths
             cells = []
             for n in ("agents", "equal", "momentum", "counted", "imitate", "random_od"):
                 p, s = qmeas[n][3].get(n_roads, [0, 0])
@@ -506,7 +508,7 @@ def main():
     # the project plan's table: shares of each road out, per intersection and road in
     with open(out / "decision_table.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["intersection", "lat", "lon", "roads", "road_in", "road_out", "turn", "passes", "share_%",
+        w.writerow(["junction", "lat", "lon", "paths", "path_in", "path_out", "passes", "share_%",
                     "equal_%", "momentum_%"])
         stops = Counter(t["end"] for t in agents if t["end"])
         for (c, ai), cnt in sorted(counts.items(), key=lambda kv: -sum(kv[1].values())):
@@ -520,9 +522,9 @@ def main():
             mo = dict(models["momentum"].probs(c, ai))
             for ao in range(len(D.arms[c])):
                 w.writerow([c, round(lat, 6), round(lon, 6), len(D.arms[c]), road_name(D, c, ai), road_name(D, c, ao),
-                            D.label(c, ai, ao), tot, round(100 * cnt[ao] / tot, 1), round(100 * eq.get(ao, 0), 1),
+                            tot, round(100 * cnt[ao] / tot, 1), round(100 * eq.get(ao, 0), 1),
                             round(100 * mo.get(ao, 0), 1)])
-            w.writerow([c, round(lat, 6), round(lon, 6), len(D.arms[c]), road_name(D, c, ai), "stops here", "S", tot,
+            w.writerow([c, round(lat, 6), round(lon, 6), len(D.arms[c]), road_name(D, c, ai), "stops here", tot,
                         round(100 * stops[(c, ai)] / tot, 1), "", ""])
 
     # ---------------- summary ----------------
