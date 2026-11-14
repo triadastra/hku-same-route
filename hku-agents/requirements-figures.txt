@@ -1,0 +1,4 @@
+# Only for make_figures.py (the paper figures in graphs/).
+matplotlib
+numpy
+scipy

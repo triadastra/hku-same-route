@@ -136,7 +136,8 @@ def main():
 
     an = run / "analysis"
     data = {
-        "meta": {"run": args.run, "planner": summary["planner"], "model": C.MODEL if summary["planner"] == "claude" else None,
+        "meta": {"run": args.run, "planner": summary["planner"], "model": summary.get("model") or (C.MODEL if summary["planner"] == "claude" else None),
+                 "routes": summary.get("routes", "quickest"),
                  "agents_total": summary["agents"], "trips_total": summary["trips"], "agents_shown": len(people),
                  "usd": summary["usd"], "exported": time.strftime("%Y-%m-%d"), "window_s": C.SHARED_WINDOW,
                  "map_note": "Map data (c) OpenStreetMap contributors, ODbL",

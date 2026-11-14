@@ -33,6 +33,7 @@ WALK_SPEED = 1.35          # m/s on the flat
 STEPS_FACTOR = 2.2         # a metre of stairs takes this many times as long as a flat metre
 LIFT_SECONDS = 40          # wait + ride for one lift link
 UNLIT_PENALTY = 60         # extra "felt" seconds per unlit segment after dark (route choice only)
+STAIRS_AVOID = 6           # extra "felt" seconds per metre of stairs on step-free routes (route choice only)
 SHARED_WINDOW = 90         # seconds: a stranger must enter the same segment within this of you
 
 # The simulated day (the same for everyone)

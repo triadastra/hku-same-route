@@ -3,6 +3,11 @@
     python run_day.py --run pilot --planner mock                 # free, rule-based, for testing
     python run_day.py --run pilot-claude --planner claude --limit 20
     python run_day.py --run day1 --planner claude --budget 30    # stops starting calls at US$30
+    python run_day.py --run stepfree --planner replay --replay-from day1 --routes step-free
+
+Planners: 'claude' (each person is played by the model), 'mock' (a free rule-based timetable-follower)
+and 'replay' (repeats the tool calls of a finished run, free). --routes sets how walks are routed; see
+ROUTE_MODES in agent_tools.py. Most people should use pipeline.py, which calls this.
 
 Each agent's day is saved to out/<run>/agents/<id>.json as soon as it finishes, so a stopped run can be
 restarted with the same command and only the unfinished agents run again.
@@ -14,7 +19,8 @@ import random
 import time
 
 import config as C
-from agent_tools import TOOLS, AgentDay, persona_card, system_prompt, tool_result_text
+import plans
+from agent_tools import ROUTE_MODES, TOOLS, AgentDay, persona_card, route_policy, system_prompt, tool_result_text
 from world import World, hhmm, parse_hhmm
 
 
@@ -40,8 +46,8 @@ class Spend:
 
 
 # ---------------- Claude planner ----------------
-async def claude_day(client, system, agent, world, spend):
-    day = AgentDay(agent, world)
+async def claude_day(client, system, agent, world, spend, policy="quickest"):
+    day = AgentDay(agent, world, policy=policy)
     messages = [{"role": "user", "content": persona_card(agent, world)}]
     cost, nudges, stop = 0.0, 0, ""
     while not day.done:
@@ -82,9 +88,9 @@ async def claude_day(client, system, agent, world, spend):
 
 
 # ---------------- free rule-based planner ----------------
-def mock_day(agent, world, rng):
+def mock_day(agent, world, rng, policy="quickest"):
     """A simple timetable-follower that uses the same tools, for testing the pipeline at no cost."""
-    day = AgentDay(agent, world)
+    day = AgentDay(agent, world, policy=policy)
     habits = " ".join(agent["habits"])
     ate_lunch = False
 
@@ -155,6 +161,24 @@ def mock_day(agent, world, rng):
     return day.record(0.0, "ended")
 
 
+# ---------------- replay planner ----------------
+def replay_day(agent, plan, world, policy="quickest"):
+    """Repeat the tool calls of an earlier day, in order. With the same route mode this rebuilds the
+    earlier trips exactly; with another, the same decisions are walked by different routes (a call
+    that no longer fits, such as staying until a time already past, fails as it would have then)."""
+    if plan["who"] != plans.fingerprint(agent):
+        raise SystemExit(f"{agent['id']} is not the person these plans were made for. Use the people file of the "
+                         f"replayed run (same --n and --seed, same make_agents.py).")
+    day = AgentDay(agent, world, policy=policy)
+    for tool, args in plan["log"]:
+        if day.done:
+            break
+        day.run(tool, dict(args))
+    day.calls = plan["calls"]
+    day.finish()
+    return day.record(0.0, plan["stop"] if day.summary or plan["stop"] != "ended" else "cut")
+
+
 # ---------------- runner ----------------
 async def run_all(args, agents, world, out_dir):
     spend = Spend(args.budget)
@@ -164,10 +188,20 @@ async def run_all(args, agents, world, out_dir):
     print(f"{len(agents) - len(todo)} agents already done, {len(todo)} to run with the {args.planner} planner")
     t0 = time.time()
     if args.planner == "mock":
-        rng = random.Random(args.seed)
         for a in todo:
-            rec = mock_day(a, world, rng)
+            # One random stream per person, so a resumed or shortened run gives the same days.
+            rec = mock_day(a, world, random.Random(f"{args.seed}:{a['id']}"), route_policy(a, args.routes))
             (out_dir / f"{a['id']}.json").write_text(json.dumps(rec, ensure_ascii=False), encoding="utf-8")
+        return spend, time.time() - t0
+    if args.planner == "replay":
+        source = args.source[1]
+        missing = [a["id"] for a in todo if a["id"] not in source]
+        if missing:
+            print(f"  {len(missing)} people have no plan in '{args.replay_from}' (unfinished there) and are left out")
+        for a in todo:
+            if a["id"] in source:
+                rec = replay_day(a, source[a["id"]], world, route_policy(a, args.routes))
+                (out_dir / f"{a['id']}.json").write_text(json.dumps(rec, ensure_ascii=False), encoding="utf-8")
         return spend, time.time() - t0
 
     try:
@@ -185,7 +219,7 @@ async def run_all(args, agents, world, out_dir):
             if spend.exhausted or fatal:
                 return
             try:
-                rec = await claude_day(client, system, a, world, spend)
+                rec = await claude_day(client, system, a, world, spend, route_policy(a, args.routes))
             except TypeError as e:  # raised by the SDK when no API key is set at all
                 if not fatal:
                     print(f"  stopping: no API key found ({e}). Set ANTHROPIC_API_KEY first.")
@@ -220,13 +254,23 @@ async def run_all(args, agents, world, out_dir):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="pilot")
-    ap.add_argument("--planner", choices=["mock", "claude"], default="mock")
+    ap.add_argument("--planner", choices=["mock", "claude", "replay"], default="mock")
+    ap.add_argument("--routes", choices=list(ROUTE_MODES), default="quickest", help="how walks are routed")
+    ap.add_argument("--replay-from", default="", help="for --planner replay: a finished run (name, folder or plans file)")
     ap.add_argument("--agents", default=str(C.DATA / "agents.jsonl"))
     ap.add_argument("--limit", type=int, default=0, help="only the first N agents")
     ap.add_argument("--budget", type=float, default=C.BUDGET_USD)
     ap.add_argument("--concurrency", type=int, default=C.CONCURRENCY)
-    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--seed", type=int, default=1, help="only the mock planner draws random numbers")
     args = ap.parse_args()
+    if args.planner == "replay" and not args.replay_from:
+        ap.error("--planner replay needs --replay-from <run>")
+    model = None
+    if args.planner == "claude":
+        model = C.MODEL
+    elif args.planner == "replay":
+        args.source = plans.load_plans(args.replay_from)
+        model = args.source[0].get("model")
 
     world = World()
     agents = [json.loads(l) for l in open(args.agents, encoding="utf-8")]
@@ -248,10 +292,16 @@ def main():
     stops = {}
     for r in recs:
         stops[r["stop"]] = stops.get(r["stop"], 0) + 1
-    summary = {"planner": args.planner, "agents": n, "calls": calls, "trips": trips, "usd": round(usd, 4),
+    policies = {}
+    for r in recs:
+        policies[r.get("route_policy", "quickest")] = policies.get(r.get("route_policy", "quickest"), 0) + 1
+    summary = {"planner": args.planner, "model": model, "routes": args.routes, "route_policies": policies,
+               "replayed_from": args.replay_from or None, "seed": args.seed, "agents": n, "calls": calls, "trips": trips, "usd": round(usd, 4),
                "usd_per_agent": round(usd / n, 5) if n else 0, "projected_usd_10k_agents": round(usd / n * 10000, 2) if n else 0,
                "tokens_this_session": spend.tok, "seconds_this_session": round(secs, 1), "how_days_ended": stops}
     (C.OUT / args.run / "run_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    if recs:
+        plans.write_plans(C.OUT / args.run, recs, summary)
     print(json.dumps(summary, indent=2))
 
 
