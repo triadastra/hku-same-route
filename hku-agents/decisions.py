@@ -1,22 +1,17 @@
-"""Real intersections, and the choices each one offers.
+"""Junctions, and the choices each one offers.
 
-OpenStreetMap draws sidewalks, crossings and short paths as separate ways, so on a typical trip the walking
-network has a junction every 13 m. People do not decide at every one of them. Here:
-
-- short dead-end stubs (building entrances, kerb stubs) are not roads;
-- junctions joined by a short path are merged into one intersection (the four corners of a crossroads,
-  the two sides of a crossing);
-- each intersection gets its real roads ("arms"): a Y junction has 3, a crossroads 4. A street and its
-  sidewalks leaving the same way are one arm, even when they reach different junctions next.
-
-A decision is the arm someone leaves an intersection by, given the arm they came in on. Any trip can be
-turned into its list of decisions:
+The authors' decision (method.md, section 2): every junction drawn on the map is a junction, and every path
+out of it is its own choice. Nothing is merged: a junction where three paths meet offers three, a crossroads
+four, and a sidewalk meeting a crossing is a junction too. A decision is the path someone leaves a junction
+by, given the path they came in by. Any trip can be turned into its list of decisions:
 
     D = Decisions(World())
-    D.trip_decisions(trip)  ->  [(intersection, arm_in, arm_out, t), ...]
+    D.trip_decisions(trip)  ->  [(junction, path in, path out, t), ...]
 
-Intersections with fewer than 3 arms are not decisions (a bend, two sidewalks merging); walking passes
-through them. The thresholds are below and in method.md, section 2.
+A junction is a place where 3 or more paths meet; a point where only 2 meet is a bend, which walking passes
+through. Optional and off by default: Decisions(world, merge=True) merges junctions joined by short paths
+into one intersection, drops short dead-end stubs, and treats a street and its sidewalks as one road
+(thresholds below). It is kept only to show what merging would change.
 """
 import heapq
 import math
@@ -25,13 +20,15 @@ from functools import lru_cache
 
 from world import xy
 
+# Used only with merge=True:
 MERGE_M = 20        # junctions joined by a path this short or shorter belong to the same intersection...
 SPAN_M = 40         # ...as long as the intersection stays within this size (metres between its farthest junctions)
 STUB_M = 15         # a dead-end branch shorter than this is not a road
 SAME_ARM_DEG = 60   # branches toward the same next intersection within this angle are one arm
 PARALLEL_DEG = 35   # branches leaving in about the same direction...
 PARALLEL_M = 20     # ...that are still this close HEADING_M along (a street and its sidewalks) are one arm
-HEADING_M = 40      # an arm's direction is measured where it is this far from the intersection's centre
+# Always used:
+HEADING_M = 40      # a path's direction is measured where it is this far from the junction (or at its end)
 LABEL_FRONT_DEG = 40  # for tables only: within this angle of straight ahead is "front"
 
 
@@ -41,8 +38,11 @@ def angle_diff(a, b):
 
 
 class Decisions:
-    def __init__(self, world, merge_m=MERGE_M, span_m=SPAN_M, stub_m=STUB_M):
+    def __init__(self, world, merge=False, merge_m=MERGE_M, span_m=SPAN_M, stub_m=STUB_M):
         self.w = world
+        self.merge = merge
+        if not merge:
+            merge_m, stub_m, span_m = -1, -1, -1   # nothing is merged, no branch is a stub, no loop is "inside"
         adj = world.adj
         self.n_nodes = len(adj)
 
@@ -123,6 +123,8 @@ class Decisions:
                             (d < PARALLEL_DEG and math.dist(A["point"], point) < PARALLEL_M):
                         arm = k
                         break
+                if not merge:
+                    arm = None   # every path out is its own choice
                 if arm is None:
                     arm = len(self.arms[c])
                     self.arms[c].append({"dest": dest, "heading": head, "point": point, "branches": []})

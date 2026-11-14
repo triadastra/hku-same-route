@@ -5,6 +5,22 @@ yours to make. A line starting with `DECIDE:` is waiting for you; the value afte
 code uses now. Replace the line with your choice and a one-line reason, and delete this notice when the
 document is yours.
 
+## Decisions made by the authors
+
+Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in. The sections below follow them.
+
+1. Study area: Kennedy Town to Sai Ying Pun, from the Pok Fu Lam Road halls to the waterfront (kept).
+2. Walkable paths: every path a pedestrian may use, including roads, because sidewalks are often not drawn
+   separately (kept).
+3. Walking speed: values from a published study, cited; each person chooses their own pace within a range
+   that makes sense. (Sources being collected; not yet in the code.)
+4. Destinations: all 1,538 places in the 17 categories (kept).
+5. Junctions: every junction drawn on the map is a junction, and nothing is merged.
+6. Population: 10,000 people in the proportions of the 2021 census and HKU's figures, not 70% HKU students.
+7. Following: the follower is at most 30 m behind, measured along the road, not in a straight line. When a
+   traffic light separates two people at a junction, the one behind gets time to catch up. (How, to be
+   discussed.)
+
 ## 1. Question and hypotheses
 
 - Question (project plan, 2.2): how the number of intersections, the possible directions and popular routes
@@ -30,50 +46,49 @@ document is yours.
 - Walking time: 1.35 m/s, stairs 2.2 times slower, 40 s per lift (`config.py`).
 - Places: 1,538 named buildings and amenities in 17 categories, each snapped to the nearest network node
   within 150 m; unnamed amenities are named after the nearest landmark (`build_map.py`, `captions.py`).
-- Decision points (`decisions.py`). The raw network has 2,372 junctions, one every 13 m on a typical trip,
-  because sidewalks and crossings are separate ways. Three steps turn it into real intersections:
-  1. a dead-end branch shorter than 15 m is not a road (188 stubs);
-  2. junctions joined by a path of at most 20 m are one intersection, shortest links first, while the
-     intersection stays within 40 m from end to end;
-  3. paths out of an intersection toward the same next intersection within 60°, or leaving within 35° of
-     each other and still within 20 m of each other 40 m from the centre (a street and its sidewalks),
-     are one road ("arm").
-  An intersection with 3 or more roads is a decision point: 573 of them (405 with 3 roads, 107 with 4, 51
-  with 5, 10 with 6). 133 intersections with 2 roads are passed through. Figure: `graphs/intersections.pdf`.
-- A decision is (intersection, road in, road out, time), the record the project plan's thermal sensors
-  would produce. The 57,223 day1 trips give 475,883 decisions: median 6 per trip, 61 m apart (quartiles
-  42–91 m). For tables a decision is also labelled front (within 40° of straight on), left, right or back;
-  93.5% of "back" decisions are crossing to the other side of the same street and walking back.
-- DECIDE: the thresholds 15 m, 20 m, 40 m, 35°, 60°. default: as above, chosen by looking at the result
-  (`graphs/intersections.pdf`, panel b). Check a few intersections you know on the ground.
-- DECIDE: are the walking constants sourced, or assumptions? default: assumptions, uncited.
+- Decision points (`decisions.py`), by the authors' decision 5: every junction drawn on the map is a junction,
+  and every path out of it is its own choice. Nothing is merged. That gives 2,371 junctions (1,710 where 3
+  paths meet, 652 with 4, 9 with 5). A trip passes a median of 15 junctions, about 13 m apart, because
+  sidewalks and crossings are drawn as separate paths. Merging nearby junctions into intersections is kept
+  in the code (`Decisions(world, merge=True)`) but not used; `graphs/intersections.pdf` shows what it would do.
+- A decision is (junction, path in, path out, time), the record the project plan's thermal sensors would
+  produce. For tables a decision is also labelled front (within 40° of straight on), left, right or back.
+- Walking speed (authors' decision 3): from a published study, with each person choosing their pace. Until
+  the source is in, the code still uses 1.35 m/s, stairs 2.2 times slower and 40 s per lift (uncited).
 
 ## 3. The population (paper section 3.1)
 
-- Today: 10,000 people drawn from mixes written by hand in `make_agents.py`: 74% HKU students, 10% staff,
-  16% residents. It does not represent the area.
-- Official figures, with sources, are in `hku-agents/data/population_figures.csv`:
-  - residents of the nine census areas from Kennedy Town to Sai Ying Pun (2021 census): 143,781.
-    Ages: under 15 10.1%, 15-24 7.4%, 25-44 31.6%, 45-64 29.9%, 65+ 20.9%. Activity: working 54.9%,
-    students 12.8% (including school children), retired 18.0%, home-makers 4.1%, unpaid carers 1.7%,
-    others 8.5%. Of the working residents, 33.5% work in Central & Western, 14.3% at home (12.3% of
-    working residents are domestic helpers), 9.9% have no fixed place, and the rest work elsewhere;
-  - HKU (2025/26): 45,303 students (20,103 undergraduate, 20,366 taught postgraduate, 4,834 research),
-    10,076 staff, 7,800 hall places.
-- In those proportions (residents plus HKU students and staff, before removing HKU people who already live
-  in the area): residents about 73%, HKU students about 22%, staff about 5%.
-- Gaps: the census counts residents at night (30 June 2021, during COVID), so it includes HKU people who
-  live locally and leaves out everyone who comes in by day; workers coming in can only be counted for the
-  whole district, which includes Central; no station or pedestrian counts were found.
-- Not in the current generator at all: school children (10.1% of residents) and domestic helpers
-  (6.7% of residents), two groups that walk a lot locally.
-- DECIDE: how to use the figures. default: nothing done. Options:
-  - same size, new mix: 10,000 people in the proportions above, about US$20; same crowd density as day1,
-    so the effect of the mix can be seen on its own;
-  - bigger: for example 50,000 people, about US$100, closer to the real number of people in the area;
-  - reweight day1 to these proportions: free, but only 1,618 residents carry the residents' weight.
+- Authors' decision 6: 10,000 people in the proportions of who is in the area on a weekday, from the 2021
+  census and HKU's figures (sources in `hku-agents/data/population_figures.csv`):
+  - residents of the nine census areas from Kennedy Town to Sai Ying Pun: 143,781 (2021);
+  - HKU students: 44,097 (20,103 undergraduate, 19,160 taught postgraduate after removing 1,206 who study in
+    Beijing and Shanghai, 4,834 research), and 10,076 staff (2025/26).
+  - That is 72.6% residents, 22.3% HKU students and 5.1% HKU staff.
+- Residents are split by the census: working in Central & Western 26,413; working outside it 33,383; no
+  fixed place of work 7,809; domestic helpers 9,665; working at home 1,607; students 18,414; retired 25,818;
+  home-makers 5,952; unpaid carers 2,486; not working 12,234. Ages follow the census age bands within each
+  kind's age range.
+- Implemented in `make_agents.py`; it prints the generated mix against these targets. With 10,000 people
+  every kind is within 0.5 points of its target, and the residents' ages within 2 points in every band
+  except under 15 (6.5% against 10.1%, because children under 6 are not simulated on their own).
+- Not yet run with the model (about US$20).
+- DECIDE: the assumptions the figures do not settle (marked ASSUMPTION in `make_agents.py`). defaults:
+  - half of the residents working in Central & Western work inside the study area, half in Central or
+    Sheung Wan;
+  - 70% of resident students are school pupils (6 to 17) at a school in the area; the rest go to college
+    elsewhere;
+  - 75% of commuters use the MTR, 25% a bus;
+  - the age range of each kind of resident (for example retired 65 to 95, domestic helpers 25 to 55);
+  - children under 6 are not simulated on their own; the census "others" are simulated as adults 18 to 80;
+  - every HKU student and staff member comes to campus that day, and 17.7% of students live in a hall
+    (7,800 places over 44,097 students);
+  - HKU people who live in the area are counted twice (as residents and as HKU); not removed.
+- DECIDE: the fixed plans given to each kind of resident (work hours, school 08:00 to 15:30, a morning
+  market trip for retired people, home-makers and helpers, a school pick-up for half the helpers, a clinic
+  visit for carers). default: as in `make_agents.py`.
 - DECIDE: include A13 Tung Wah (12,320 people), which reaches Aberdeen Street? default: no.
-- DECIDE: how to estimate people who come into the area to work, shop or visit. default: left out.
+- DECIDE: how to count people who come into the area to work, shop or visit. default: left out (no data
+  below district level).
 
 ## 4. Arm A: Agent World (done)
 
@@ -162,7 +177,10 @@ document is yours.
 - The plan's table (`decision_table.csv`): for each intersection and road in, the share of each road out,
   labelled front, left, right or back, and the share that stop there, next to the equal-chance and momentum
   probabilities.
-- DECIDE: the following distance. default: 30 m (15 m and 60 m in `following_sweeps.csv`).
+- Following distance (authors' decision 7): 30 m, measured along the road: the distance the stranger still has to
+  walk to reach the junction you are at. 15 m and 60 m are in `following_sweeps.csv`.
+- DECIDE: how the one behind gets time to catch up when a traffic light separates two people at a junction
+  (authors' decision 7; to be discussed). Today nobody waits at lights in the simulation.
 - DECIDE: the "same place" radius for who follows whom. default: 150 m.
 
 ## 9. Tests

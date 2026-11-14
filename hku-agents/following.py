@@ -1,11 +1,11 @@
-"""How likely is it that a stranger makes your route decisions, intersection after intersection?
+"""How likely is it that a stranger makes your route decisions, junction after junction?
 
-The project plan's question (sections 2.2 and 5): how the number of intersections, the possible directions and
+The project plan's question (sections 2.2 and 5): how the number of junctions, the possible directions and
 popular routes change the chance that two people appear to follow each other, at different times of day, and
 how that chance changes when route preference or imitation is added.
 
-Everything works on real intersections (decisions.py): a trip is a list of decisions
-(intersection, road in, road out, time).
+Everything works on junctions (decisions.py; by the authors' decision every junction on the map counts and
+nothing is merged): a trip is a list of decisions (junction, path in, path out, time).
 
 Who walks
   agents     the Agent World run: people with their own plans, walking by the quickest path (out/<run>/trips.jsonl)
@@ -15,19 +15,20 @@ Who walks
   and pace, and makes as many decisions as that trip, choosing each road out from a table:
   equal      every road out has the same chance, 1/n (turning back only at a dead end)
   momentum   roads closer to straight ahead are likelier: weight exp(kappa * cos(change of direction))
-  counted    the shares counted in the agent run at each intersection, per road in and hour of day: what the
+  counted    the shares counted in the agent run at each junction, per path in and hour of day: what the
              project plan's thermal sensors would record, with no way to follow anyone
   imitate    counted, but with chance rho a walker takes the road the person just in front of them took
 
 Measures
-  following  the same stranger, behind you by at most FOLLOW_M metres when you reach each intersection,
-             arriving and leaving by your roads at k of your intersections in a row.
+  following  the same stranger, at most FOLLOW_M metres behind you along the road when you reach each junction
+             (the distance they still have to walk to it), arriving and leaving by your paths at k of your
+             junctions in a row.
              P_k = share of trips with such a stranger (also among trips with at least k decisions);
              S_k = average number of such strangers per trip.
-  q_k        two people arrive at an intersection by the same road, one at most FOLLOW_M metres behind the other:
+  q_k        two people arrive at a junction by the same path, one at most FOLLOW_M metres behind the other:
              the chance they make the same next k decisions. For a Markov chain there is a formula,
              q_k(s) = sum over roads a of p(a | s)^2 * q_(k-1)(next(s, a)), with q_0 = 1.
-  chi-square at each intersection and road in (at least 30 passes): do the Agent World's counts of each road out
+  chi-square at each junction and path in (at least 30 passes): do the Agent World's counts of each path out
              fit equal chance, or momentum? Turning back is left out (equal chance never turns back). Calibrated on
              the equal-chance walkers, where after the correction the test should reject almost none.
 
@@ -52,8 +53,9 @@ from groups import GROUPS, LABELS, group_of
 from random_walk import random_trips
 from world import World, _english
 
-KMAX = 8
-FOLLOW_M = 30          # metres behind you that still counts as following
+KMAX = 10
+FOLLOW_M = 30          # metres behind you, along the road, that still counts as following
+MAX_GAP_S = 150        # look this many seconds behind you for followers (30 m on steep stairs takes up to ~2 min)
 KAPPA = 2.0            # momentum: straight on is e^2 = 7.4 times likelier than a right-angle turn
 RHO = 0.3              # imitation: chance of taking the road the person in front took
 SEEDS = 3
@@ -67,14 +69,38 @@ def secs_for(metres):
 
 # ---------------- walkers ----------------
 def as_decisions(D, trips):
-    """Keep what the measures need, and replace each trip's segments by its decisions."""
+    """Keep what the measures need, and replace each trip's segments by its decisions. tt and dd are the times
+    and the metres walked so far at each segment boundary, to tell how far along the road someone is."""
     out = []
     for t in trips:
-        if t["segments"]:
+        segs = t["segments"]
+        if segs:
+            tt = [s["t"] for s in segs] + [t["arrive"]]
+            dd = [0.0]
+            for s in segs:
+                dd.append(dd[-1] + D.w.edges[s["edge"]]["len"])
             out.append({"agent": t["agent"], "from": t["from"], "to": t["to"], "depart": t["depart"],
                         "pace": t.get("pace", 1.0), "kind": t.get("kind", ""), "seq": D.trip_decisions(t),
-                        "end": D.trip_end(t)})
+                        "end": D.trip_end(t), "tt": tt, "dd": dd})
     return out
+
+
+def walked_by(trip, t):
+    """Metres a trip has walked by time t, or None if it has not started yet."""
+    tt, dd = trip["tt"], trip["dd"]
+    if t < tt[0]:
+        return None
+    k = bisect.bisect_right(tt, t) - 1
+    if k >= len(tt) - 1:
+        return dd[-1]
+    span = tt[k + 1] - tt[k]
+    return dd[k] + (dd[k + 1] - dd[k]) * ((t - tt[k]) / span if span > 0 else 1.0)
+
+
+def road_gap(trip, t_now, t_there):
+    """How far behind, along the road, a person is at time t_now from the junction they reach at t_there."""
+    a, b = walked_by(trip, t_now), walked_by(trip, t_there)
+    return None if a is None or b is None else b - a
 
 
 def load_trips(path, D):
@@ -130,12 +156,15 @@ def chain_walk(D, trips, model, seed, rho=0.0):
     decisions. Walkers move on one clock, so with rho > 0 one can copy the person just in front of them."""
     rng = random.Random(seed)
     follow_s = secs_for(FOLLOW_M)
-    heap = [(t["seq"][0][3], g, t["seq"][0][0], t["seq"][0][1], 0) for g, t in enumerate(trips) if t["seq"]]
+    heap = [(t["seq"][0][3], g, t["seq"][0][0], t["seq"][0][1], 0, 0.0) for g, t in enumerate(trips) if t["seq"]]
     heapq.heapify(heap)
     seqs = [[] for _ in trips]
+    tts, dds = [[] for _ in trips], [[] for _ in trips]
     recent = defaultdict(deque)   # (intersection, road in) -> arrivals (time, road out), oldest first
     while heap:
-        t, g, c, ai, k = heapq.heappop(heap)
+        t, g, c, ai, k, metres = heapq.heappop(heap)
+        tts[g].append(t)
+        dds[g].append(metres)
         ao = None
         if rho > 0:
             q = recent[(c, ai)]
@@ -151,16 +180,18 @@ def chain_walk(D, trips, model, seed, rho=0.0):
         if k + 1 < len(trips[g]["seq"]):
             nxt = D.step(c, ao)
             if nxt is not None:
-                c2, a2, secs, _ = nxt
-                heapq.heappush(heap, (t + (D.through_secs(c, ai, ao) + secs) / trips[g]["pace"], g, c2, a2, k + 1))
-    return [{**t, "seq": s} for t, s in zip(trips, seqs)]
+                c2, a2, secs, m = nxt
+                cross = D.through_secs(c, ai, ao)
+                heapq.heappush(heap, (t + (cross + secs) / trips[g]["pace"], g, c2, a2, k + 1,
+                                      metres + m + cross * C.WALK_SPEED))
+    return [{**t, "seq": s, "tt": tt or [float("inf")], "dd": dd or [0.0]}
+            for t, s, tt, dd in zip(trips, seqs, tts, dds)]
 
 
 # ---------------- measures ----------------
 def follow_scan(trips, follow_m=FOLLOW_M):
     """For each trip: (decisions, longest following run by one stranger, strangers with a run >= k, that
     stranger's trip)."""
-    follow_s = secs_for(follow_m)
     idx = defaultdict(list)
     for g, t in enumerate(trips):
         for m, (c, ai, ao, tt) in enumerate(t["seq"]):
@@ -176,9 +207,12 @@ def follow_scan(trips, follow_m=FOLLOW_M):
             key = (c, ai, ao)
             lst, ts = idx[key], times[key]
             cur = {}
-            for _, g, mm in lst[bisect.bisect_right(ts, tt): bisect.bisect_right(ts, tt + follow_s)]:
+            for t_j, g, mm in lst[bisect.bisect_right(ts, tt): bisect.bisect_right(ts, tt + MAX_GAP_S)]:
                 a = trips[g]["agent"]
                 if a == me:
+                    continue
+                gap = road_gap(trips[g], tt, t_j)
+                if gap is None or gap > follow_m:
                     continue
                 s = prev.get((g, mm - 1), 0) + 1
                 cur[(g, mm)] = s
@@ -204,7 +238,6 @@ def s_k(rows, k):
 def q_scan(trips, kmax=6, follow_m=FOLLOW_M):
     """Pairs arriving at an intersection by the same road, one close behind the other: how many then make the
     same next k decisions (route only). Also, for each k, the starting state and hour of the pairs counted."""
-    follow_s = secs_for(follow_m)
     idx = defaultdict(list)
     for g, t in enumerate(trips):
         for m, (c, ai, ao, tt) in enumerate(t["seq"]):
@@ -219,8 +252,11 @@ def q_scan(trips, kmax=6, follow_m=FOLLOW_M):
         seq = t["seq"]
         for m, (c, ai, ao, tt) in enumerate(seq):
             lst, ts = idx[(c, ai)], times[(c, ai)]
-            for _, g, mm in lst[bisect.bisect_right(ts, tt): bisect.bisect_right(ts, tt + follow_s)]:
+            for t_j, g, mm in lst[bisect.bisect_right(ts, tt): bisect.bisect_right(ts, tt + MAX_GAP_S)]:
                 if trips[g]["agent"] == t["agent"]:
+                    continue
+                gap = road_gap(trips[g], tt, t_j)
+                if gap is None or gap > follow_m:
                     continue
                 other = trips[g]["seq"]
                 rem = min(len(seq) - m, len(other) - mm, kmax)
@@ -493,14 +529,14 @@ def main():
     def pct(x):
         return f"{100 * x:.1f}%"
 
-    L = [f"# Following at real intersections: {args.run}", "",
-         f"{len(agents):,} trips, {sum(len(t['seq']) for t in agents):,} decisions at {sum(D.is_decision)} decision points. "
-         f"A stranger is following you for k decisions if the same person, at most {FOLLOW_M} m behind you each time "
-         f"(about {secs_for(FOLLOW_M):.0f} s), arrives at and leaves k of your intersections in a row by your roads. "
+    L = [f"# Following at junctions: {args.run}", "",
+         f"{len(agents):,} trips, {sum(len(t['seq']) for t in agents):,} decisions at {sum(D.is_decision):,} junctions. "
+         f"A stranger is following you for k decisions if the same person, at most {FOLLOW_M} m behind you along the road "
+         f"each time, arrives at and leaves k of your junctions in a row by your paths. "
          f"Chain walkers and random trips: {args.seeds} repeats, mean (± standard deviation).", "",
-         "## Chance that a stranger follows you through k intersections", "",
+         "## Chance that a stranger follows you through k junctions", "",
          "| k | " + " | ".join(label[n] for n in names) + " |", "|---|" + "---|" * len(names)]
-    for k in range(1, 7):
+    for k in (1, 2, 3, 4, 5, 6, 8, 10):
         cells = []
         for n in names:
             m, sd = mean_sd(n, lambda r: p_k(r, k))
@@ -508,10 +544,10 @@ def main():
         L.append(f"| {k} | " + " | ".join(cells) + " |")
     L += ["", "Among trips that make at least k decisions:", "",
           "| k | " + " | ".join(label[n] for n in names) + " |", "|---|" + "---|" * len(names)]
-    for k in (3, 5):
+    for k in (3, 5, 10):
         L.append(f"| {k} | " + " | ".join(pct(mean_sd(n, lambda r: p_k(r, k, True))[0]) for n in names) + " |")
     L += ["", "## Two people arriving together: same next k decisions", "",
-          f"Pairs who arrive at an intersection by the same road, one at most {FOLLOW_M} m behind the other. "
+          f"Pairs who arrive at a junction by the same path, one at most {FOLLOW_M} m behind the other along the road. "
           "The formula is the Markov chain's prediction for the same pairs (the counted chain uses the table of the hour "
           "they arrive in); for the chain walkers it checks the code.", "",
           "| k | Agent World | Counted chain, formula | Momentum, formula | Equal chance, formula | Equal: walkers / formula | Momentum: walkers / formula | Counted: walkers / formula | Imitation: walkers |",
@@ -524,18 +560,18 @@ def main():
                  f"{pct(o('momentum'))} / {pct(predicted(qmeas['momentum'], 'momentum', k))} | "
                  f"{pct(o('counted'))} / {pct(predicted(qmeas['counted'], 'counted', k))} | {pct(o('imitate'))} |")
     L += ["", f"Agent pairs counted at k = 1: {qmeas['agents'][0][1]:,}.", "",
-          "## Same next road, by how many roads the intersection has", "",
-          "| Roads | Agent pairs | Agent World | Equal chance | Momentum | Counted | Imitation | Random place to place |",
+          "## Same next path, by how many paths the junction has", "",
+          "| Paths | Agent pairs | Agent World | Equal chance | Momentum | Counted | Imitation | Random place to place |",
           "|---|---|---|---|---|---|---|---|"]
     with open(out / "following_by_roads.csv") as f:
         for r in csv.DictReader(f):
             L.append(f"| {r['roads']} | {int(r['pairs_agents']):,} | " + " | ".join(
                 pct(float(r[n])) if r[n] else "" for n in ("agents", "equal", "momentum", "counted", "imitate", "random_od")) + " |")
-    L += ["", "## Is the choice at each intersection equal chance? (chi-square)", "",
-          "Goodness of fit of the Agent World's counts of each road out, at each intersection and road in with at least 30 "
+    L += ["", "## Is the choice at each junction equal chance? (chi-square)", "",
+          "Goodness of fit of the Agent World's counts of each path out, at each junction and path in with at least 30 "
           "passes (turning back left out), to equal chance and to momentum. p-values corrected over all of them "
           "(Benjamini-Hochberg). Calibration: the same test on the equal-chance walkers' counts, which do follow equal chance, so after the correction it should reject almost none.", "",
-          "| Counts tested against | Intersection and road-in pairs | Rejected at 5% | Median effect size w | Calibration: rejected |",
+          "| Counts tested against | Junction and path-in pairs | Rejected at 5% | Median effect size w | Calibration: rejected |",
           "|---|---|---|---|---|"]
     for name, lab in (("equal", "Equal chance"), ("momentum", f"Momentum (kappa {KAPPA:g})")):
         n_t, rej, med = chi[name]
@@ -546,12 +582,12 @@ def main():
     for row in sweep:
         L.append(f"| {row[0]} | {row[1]:g} | {pct(row[2])} | {pct(row[3])} | {'' if row[4] is None else pct(row[4])} |")
     L += ["", "## Who follows whom in the Agent World", "",
-          f"Of {len(hits):,} trips with a stranger following for 3+ intersections, the stranger started within "
+          f"Of {len(hits):,} trips with a stranger following for 3+ junctions, the stranger started within "
           f"{SAME_PLACE_M} m of where you started on {pct(same_o / len(hits))}, was going to within {SAME_PLACE_M} m of "
           f"your destination on {pct(same_d / len(hits))}, both on {pct(same_od / len(hits))}"
           + (f", and was in your group on {pct(same_group / len(hits))}" if people else "") + ".", "",
           "Tables: following_pk.csv, following_qk.csv, following_by_roads.csv, following_by_hour.csv, following_sweeps.csv, following_chi2.csv, "
-          "decision_table.csv (shares of each road out per intersection and road in, with equal-chance and momentum "
+          "decision_table.csv (shares of each path out per junction and path in, with equal-chance and momentum "
           "probabilities, and the share that stop there)."]
     (out / "following.md").write_text("\n".join(L), encoding="utf-8")
     print("\n".join(L))

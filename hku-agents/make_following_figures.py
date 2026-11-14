@@ -1,9 +1,9 @@
 """Paper figures for following at real intersections, from the tables following.py writes. PDF and PNG in graphs/.
 
-  graphs/following-models.pdf   chance that a stranger follows you through k intersections, Agent World and Markov chains
+  graphs/following-models.pdf   chance that a stranger follows you through k junctions, Agent World and Markov chains
   graphs/following-pairs.pdf    two people arriving together: same next k decisions, Agent World and the chains' formula
-  graphs/following-roads.pdf    same next road, by how many roads the intersection has
-  graphs/following-hours.pdf    chance of being followed through 3 intersections, by hour of day
+  graphs/following-roads.pdf    same next path, by how many paths the junction has
+  graphs/following-hours.pdf    chance of being followed through 3 junctions, by hour of day
 
 Run:  python hku-agents/make_following_figures.py --run day1      (needs matplotlib)
 """
@@ -55,15 +55,15 @@ def draw(ax, x, series, ticks=None, end_labels=True, ymax=100):
 
 
 def models(an):
-    rows = table(an / "following_pk.csv")[:6]
+    rows = table(an / "following_pk.csv")[:10]
     k = [int(r["k"]) for r in rows]
     fig, ax = plt.subplots(figsize=(3.5, 2.6))
     draw(ax, k, [(lab, col, mk, [100 * float(r[f"p_{key}"]) for r in rows], "-") for key, (lab, col, mk) in SERIES.items()],
          end_labels=False)
     ax.legend(frameon=False, fontsize=6.5, loc="upper right")
-    ax.set_xlabel("Intersections in a row, $k$")
+    ax.set_xlabel("Junctions in a row, $k$")
     ax.set_ylabel("Trips with a stranger following (%)")
-    ax.set_xlim(0.7, 6.3)
+    ax.set_xlim(0.7, 10.3)
     save(fig, "following-models")
 
 
@@ -90,8 +90,8 @@ def roads(an):
               for key in ("agents", "counted", "momentum", "equal")]
     draw(ax, x, series)
     ax.set_xticklabels([r["roads"] for r in rows])
-    ax.set_xlabel("Roads at the intersection")
-    ax.set_ylabel("Same next road, pairs arriving together (%)")
+    ax.set_xlabel("Paths at the junction")
+    ax.set_ylabel("Same next path, pairs arriving together (%)")
     ax.set_xlim(-0.3, len(rows) - 0.7)
     save(fig, "following-roads")
 
@@ -104,7 +104,7 @@ def hours(an):
                  for key in ("agents", "counted", "momentum", "equal")], ticks=[h0 for h0 in h if h0 % 3 == 0])
     ax.set_xticklabels([f"{h0:02d}:00" for h0 in h if h0 % 3 == 0])
     ax.set_xlabel("Hour of departure (hours with at least 200 trips)")
-    ax.set_ylabel("Followed through 3 intersections (%)")
+    ax.set_ylabel("Followed through 3 junctions (%)")
     save(fig, "following-hours")
 
 
