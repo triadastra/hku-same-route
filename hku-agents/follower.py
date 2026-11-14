@@ -1,5 +1,9 @@
 """The deliberate follower: what the following measure reads when someone follows on purpose.
 
+SUPERSEDED for results by follower_rl.py (method.md, section 6b). This walker takes a new target when it loses
+one and keeps its own trip's destination, both of which the authors ruled out. It is kept because follower_rl.py
+uses the measure defined here (Leaders, trail_scan, t_k, interval).
+
 Every other walker in the study follows nobody on purpose. This one does, by a fixed rule with no personality,
 so it marks the top of the scale: the Agent World shows how much following happens by coincidence, and the
 deliberate follower shows how much happens when it is intended, on the same streets, among the same people.

@@ -208,6 +208,45 @@ a destination, a target and a memory of its closest point.
 - DECIDE: the view time (default 30 s); whether a follower may speed up to keep its target (default: no);
   whether followers should also see each other (default: no).
 
+### 6b. The Q-learning follower (implemented in `hku-agents/follower_rl.py`; run on `census_run`)
+
+Added on 2026-11-14 at the authors' request. It replaces 6a for results: the follower of 6a changes
+targets and keeps its own trip's destination, which the authors ruled out. `follower.py` is kept for the
+measure it defines (T_k) and as a record.
+
+- The world is the census Agent World run, replayed unchanged. A follower starts 5 s behind one Agent
+  World person (its target) at the first junction of one of that person's trips. Nobody sees followers.
+- One target for the whole chase (authors' rule): if the follower loses its target or lets go, the chase
+  is over and it walks the quickest path to its own destination. It never takes another target.
+- Its destination and pace are those of a trip of a different, randomly chosen person (authors' rule),
+  so following and its own destination pull in different directions.
+- Decision at each junction while the target is in view and took a road other than the follower's
+  quickest road: follow, or leave. A follower may turn back the way it came.
+- Reward and penalty as in 6a (authors' rules): R = 1 for taking the target's road while the target is at
+  most 30 s in front on the same road; 0.5 x^2 for a road that leaves it x beyond the closest it has been
+  to its destination, x in units of 100 m.
+- Learning: one-step tabular Q-learning, no discount (gamma = 1), epsilon-greedy from 1 to 0.02, learning
+  rate 0.2 falling to 0.02, 100 epochs, 3 trainings with different random numbers. The state is what the
+  follower can know at the junction, in bins: how far beyond its closest point its quickest road and its
+  target's road would leave it, seconds behind the target, and distance left to its destination (2,304
+  states, 2 actions). So it learns a rule about distances, not a route on this map.
+- People are split in two at random: training behind the trips of one half, testing behind the trips of
+  the other. Every number reported is from the test half.
+- All followers of an epoch are stepped together as PyTorch tensors, on CUDA when there is a GPU. It was
+  written and tested on a CPU (about 8 minutes for the whole script); it has not been run on a GPU.
+- Compared in the same test episodes: a follower that never follows, the one-junction rule of 6a, a
+  follower that always follows, and the Agent World people's own trips (coincidence).
+- Result on `census_run` (`out/census_run/analysis/follower_rl.md`): trailing the same stranger through 3
+  junctions: Agent World 50.1%, never follows 67.3%, rule 95.0%, Q-learning 95.1%, always follows 96.2%;
+  through 10: 11.7%, 17.3%, 46.9%, 46.1%, 54.7%. Score per follower: never 2.68, rule 10.40, Q-learning
+  10.67, always -72.2. Q-learning learned to follow somewhat farther off course than the rule's 141 m
+  (it still follows in 62% of choices at 150 to 200 m, and stops beyond 200 m).
+- Checks (`python follower_rl.py --check`, no run needed): a follower given its target's own destination
+  repeats the target's route; one that never follows is never penalised and arrives; the same seed gives
+  the same table; Q-learning scores at least as well as the fixed walkers on people it did not train on.
+- DECIDE: the start gap (default 5 s); the unit of x (default 100 m); the view time (default 30 s);
+  whether a follower may speed up to keep its target (default: no); a discount (default: none).
+
 ## 7. Arm C: the live world (implemented in `hku-agents/live.py`, not run)
 
 - No navigation app: no `go_to`, `stroll` or `route_info`. At every real intersection (section 2) the
