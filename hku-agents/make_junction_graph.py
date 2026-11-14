@@ -112,9 +112,10 @@ def main():
     handles = [Line2D([], [], marker="o", ls="", ms=7, mfc=colour[k], mec="white", label=f"{KIND[k]} ({counts[k]})")
                for k in KIND if counts[k]]
     handles.append(Line2D([], [], marker=r"$\rightarrow$", ls="", ms=11, color=INK,
-                          label="% of walkers leaving the node who take this road"))
-    ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.0), frameon=False, fontsize=6.8,
-              ncol=len(handles), handletextpad=0.1, columnspacing=1.0)
+                          label="% of walkers leaving the\nnode who take this road"))
+    ax.legend(handles=handles, loc="center left", bbox_to_anchor=(1.01, 0.5), frameon=False, fontsize=7.5,
+              ncol=1, handletextpad=0.4, labelspacing=1.1, title="Roads meeting at the node", title_fontsize=7.5,
+              alignment="left")
     ax.set_xlim(x0, x1); ax.set_ylim(y0, y1); ax.set_aspect("equal")
     ax.set_xticks([]); ax.set_yticks([])
     for s in ax.spines.values():
