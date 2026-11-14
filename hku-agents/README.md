@@ -175,10 +175,48 @@ runs out, the simulator walks them home so every day closes; those trips are mar
 - `out/<run>/web/web.json`: the website data. Copy it next to `same-route-simulator.html` and republish
   the page; its banner switches from "Test run" to the model's name by itself.
 
-The published run is `out/day1/`. Only its analysis tables and `run_summary.json` are in the
-repository. Whoever holds its full output (`out/day1/agents/`) can add its plans with
+The published run is `out/day1/`. Its analysis tables, `run_summary.json` and its raw output
+(compressed) are in the repository. After unpacking `out/day1/agents.tar.gz`, its plans can be added with
 `python plans.py --run day1` and commit `out/day1/plans.jsonl.gz` (a few MB; `.gitignore` already lets
 it through). After that, anyone can rebuild the published trips for free with `python pipeline.py replay`.
+
+## The other arms
+
+The agent run is one arm of the experiment. The others are compared with it by `arms.py`:
+
+```bash
+python arms.py --run day1
+```
+
+```bash
+python make_compare_figures.py --run day1
+```
+
+- **Random walk** (`random_walk.py`): one trip per real trip, from a random place to a random place by the
+  quickest path, with the real trip's departure time and pace. Five repeats. Costs nothing.
+- **Same trips, noisy turns**: the older baseline from `analyze.py`, kept for reference.
+- **Live world** (`live.py`): no navigation app. Everyone lives the day on one shared clock; at every junction
+  each person sees the roads leading off and the people around them, and picks a road. The people are the
+  first N of the day1 people. Try it free with the rule-based walker first:
+
+```bash
+python live.py --run live_test --planner mock --limit 1000
+```
+
+Then the real run, which costs money (see `method.md`, section 7, for the estimate). A stopped run resumes
+from its checkpoint when the same command is run again:
+
+```bash
+python live.py --run live --planner claude --limit 1000 --budget 60 --concurrency 24
+```
+
+```bash
+python arms.py --run day1 --live live
+```
+
+`arms.py` writes `out/<run>/analysis/compare.md` and its tables: shared turns per arm, the Markov chain of
+turns against what happened, the per-junction tests with the Diebold-Mariano test, and road use per arm
+with its regression on nearby places. It needs `numpy` and `scipy`; the figures need `matplotlib`.
 
 ## Cost and time
 

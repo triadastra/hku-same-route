@@ -177,7 +177,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="pilot")
     ap.add_argument("--beta", type=float, default=0.01, help="baseline randomness; smaller is more random")
-    ap.add_argument("--sample", type=int, default=5000, help="max trips used as 'you' (speed)")
+    ap.add_argument("--sample", type=int, default=0, help="score only this many random trips as 'you' (faster); 0 = every trip")
     ap.add_argument("--seed", type=int, default=1)
     args = ap.parse_args()
 

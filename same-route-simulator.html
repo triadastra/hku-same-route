@@ -275,7 +275,7 @@ svg.chart text.ax { fill: var(--ink-3); }
   <header class="hero">
     <span class="tag">COMP1110 group project · Modeling coincidences: accidentally having the same route · HKU, November 2026</span>
     <h1>Is that stranger following you, or just taking the quickest way?</h1>
-    <p class="lede">We simulated one weekday for 10,000 people on the real footpaths from Kennedy Town to Sai Ying Pun and recorded every turn they made. Nobody in the simulation follows anyone. Even so, on <b>74%</b> of trips a stranger made the same five turns in a row as the walker, each within 90 seconds of them. Long matching streaks like this come mostly from everyone choosing the same quickest routes.</p>
+    <p class="lede">We simulated one weekday for 10,000 people on the real footpaths from Kennedy Town to Sai Ying Pun and recorded every turn they made. Nobody in the simulation follows anyone. Even so, on <b>75%</b> of trips a stranger made the same five turns in a row as the walker, each within 90 seconds of them. Long matching streaks like this come mostly from everyone choosing the same quickest routes.</p>
     <p class="byline">Celsia, Jerry, Angie, Bryan and Michelle</p>
     <nav class="toc" aria-label="On this page">
       <a href="#findings">Key findings</a><a href="#figures">Results</a><a href="#method">Method</a><a href="#limits">Limits</a><a href="#explore">Explore the data</a>
@@ -286,30 +286,30 @@ svg.chart text.ax { fill: var(--ink-3); }
   <section class="block" id="findings" aria-labelledby="h-findings">
     <h2 class="sec" id="h-findings">Key findings</h2>
     <div class="kpis">
-      <div class="kpi"><b>74%</b><span>of trips had a stranger make the same <strong>5 turns in a row</strong> as the walker, each within 90 seconds.</span></div>
-      <div class="kpi"><b>48%</b><span>of trips still had one for <strong>10 turns in a row</strong>.</span></div>
-      <div class="kpi"><b>13×</b><span>more strangers share 10 turns with you when everyone takes the quickest path than when turns are random: <strong>11.1 against 0.9</strong> per trip.</span></div>
-      <div class="kpi"><b>49%</b><span>of local residents' trips had a 5-turn match, against <strong>73–81%</strong> for students and staff, who share the class-change crowds.</span></div>
+      <div class="kpi"><b>75%</b><span>of trips had a stranger make the same <strong>5 turns in a row</strong> as the walker, each within 90 seconds.</span></div>
+      <div class="kpi"><b>49%</b><span>of trips still had one for <strong>10 turns in a row</strong>.</span></div>
+      <div class="kpi"><b>14×</b><span>more strangers share 10 turns with you when everyone takes the quickest path than when turns are random: <strong>11.4 against 0.8</strong> per trip.</span></div>
+      <div class="kpi"><b>49%</b><span>of local residents' trips had a 5-turn match, against <strong>76–80%</strong> for students and staff, who share the class-change crowds.</span></div>
     </div>
   </section>
 
   <!-- ===================== RESULTS (FIGURES) ===================== -->
   <section class="block" id="figures" aria-labelledby="h-figures">
     <h2 class="sec" id="h-figures">Results</h2>
-    <p class="secintro">A stranger <b>shares a turn</b> with you when you both pass the same junction, coming in the same way and leaving the same way, each within 90 seconds of the other. For each trip we find the stranger with the longest unbroken run of shared turns. The baseline re-walks the very same 57,000 trips (same start, end and departure time) with near-random turns.</p>
+    <p class="secintro">A stranger <b>shares a turn</b> with you when you both pass the same junction, coming in the same way and leaving the same way, each within 90 seconds of the other. For each trip we find the stranger with the longest unbroken run of shared turns. Every one of the 57,223 trips is scored against all the others. The baseline re-walks the very same trips (same start, end and departure time) with near-random turns.</p>
     <div class="figs">
       <figure class="fig">
         <div><span class="fnum">Figure 1</span><h3>Chance that a stranger makes your same k turns in a row</h3></div>
         <div class="legend"><span><i class="ln" style="background:var(--you)"></i>Quickest path (how people walk)</span><span><i class="ln" style="background:var(--base-series)"></i>Same trips, random turns</span></div>
         <svg class="chart" id="f1" viewBox="0 0 520 270" role="img" aria-label="Share of trips where at least one stranger made the same k turns in a row, for k from 1 to 10, quickest path against random turns"></svg>
-        <figcaption>Random walkers wander longer and pass more people, so they collect short matches more often. Their matches break off quickly. Quickest-path matches last: once a stranger has matched 9 of your turns, there is a <b>91%</b> chance they match the 10th too, against 76% with random turns.</figcaption>
+        <figcaption>Random walkers wander longer and pass more people, so they collect short matches more often. Their matches break off quickly. Quickest-path matches last: once a stranger has matched 9 of your turns, there is a <b>91%</b> chance they match the 10th too, against 74% with random turns.</figcaption>
         <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f1t"></table></div></details>
       </figure>
       <figure class="fig">
         <div><span class="fnum">Figure 2</span><h3>How many strangers make your same k turns, on average</h3></div>
         <div class="legend"><span><i class="ln" style="background:var(--you)"></i>Quickest path</span><span><i class="ln" style="background:var(--base-series)"></i>Random turns</span></div>
         <svg class="chart" id="f2" viewBox="0 0 520 270" role="img" aria-label="Average number of strangers per trip who made the same k turns in a row, on a log scale, quickest path against random turns"></svg>
-        <figcaption>Log scale. Up to 3 turns, random walking produces as many matches. From 4 turns on, quickest paths produce more, and the gap keeps growing: <b>11.1 strangers against 0.9</b> at 10 turns. Long "following" streaks are a product of shared efficient routes.</figcaption>
+        <figcaption>Log scale. Up to 3 turns, random walking produces as many matches. From 4 turns on, quickest paths produce more, and the gap keeps growing: <b>11.4 strangers against 0.8</b> at 10 turns. Long "following" streaks are a product of shared efficient routes.</figcaption>
         <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f2t"></table></div></details>
       </figure>
       <figure class="fig wide">
@@ -320,8 +320,8 @@ svg.chart text.ax { fill: var(--ink-3); }
       </figure>
       <figure class="fig">
         <div><span class="fnum">Figure 4</span><h3>Chance of a 5-turn match, by the hour the trip started</h3></div>
-        <svg class="chart" id="f4" viewBox="0 0 520 250" role="img" aria-label="Share of trips with a stranger matching 5 turns in a row, by departure hour from 07:00 to 20:00"></svg>
-        <figcaption>Highest after classes end (17:00 to 19:00, <b>84–85%</b>), when many people head for the same MTR exits at once. Lowest in the late morning and at lunch (11:00 to 12:00, <b>66–67%</b>), when people spread out to many places. Hours with fewer than 50 trips are left out.</figcaption>
+        <svg class="chart" id="f4" viewBox="0 0 520 250" role="img" aria-label="Share of trips with a stranger matching 5 turns in a row, by departure hour from 06:00 to 22:00"></svg>
+        <figcaption>Highest in the evening, after classes end (17:00 to 20:00, <b>83–89%</b>), when many people head for the same MTR exits at once. Lower in the late morning and at lunch (11:00 to 12:00, <b>67–68%</b>), when people spread out to many places, and lowest at the edges of the day (06:00 and 22:00), when few people are out. Hours with fewer than 50 trips are left out.</figcaption>
         <details><summary>Show the numbers</summary><div class="tablewrap"><table id="f4t"></table></div></details>
       </figure>
       <figure class="fig">
@@ -1201,22 +1201,23 @@ onShow.roads = () => { requestAnimationFrame(() => { fitRoads(); rKey = ""; if (
 // Results paper: figures drawn from the day1 analysis (out/day1/analysis/*.csv)
 // ===================================================================
 const RES = {
+  // every trip scored (57,223), seed 7
   // k, P(stranger shares k) quickest, random; mean strangers sharing k, quickest, random
-  shared: [[1, .9558, .9882, 70.268, 180.839], [2, .911, .9774, 50.857, 95.552], [3, .8544, .9588, 40.476, 48.462],
-           [4, .797, .9312, 33.516, 24.4], [5, .7394, .8892, 26.191, 12.382], [6, .685, .8258, 21.223, 6.598],
-           [7, .623, .7358, 18.136, 3.586], [8, .5758, .612, 15.672, 2.074], [9, .524, .472, 13.267, 1.302], [10, .4766, .3594, 11.063, .867]],
+  shared: [[1, .9534, .987, 71.639, 180.957], [2, .9103, .9769, 52.058, 95.558], [3, .8559, .9593, 41.812, 48.344],
+           [4, .802, .9328, 34.606, 24.293], [5, .7477, .8923, 26.895, 12.311], [6, .6937, .8325, 21.694, 6.493],
+           [7, .6367, .7409, 18.643, 3.573], [8, .586, .618, 16.088, 2.071], [9, .5342, .4774, 13.713, 1.288], [10, .4856, .3553, 11.404, .841]],
   // departure hour, trips, P(share 3), P(share 5)
-  hours: [[6, 17, .4706, .2941], [7, 361, .8726, .7313], [8, 518, .8764, .7568], [9, 397, .8514, .7254], [10, 363, .8623, .7548],
-          [11, 413, .8039, .6586], [12, 536, .7649, .6679], [13, 474, .8312, .7278], [14, 329, .8328, .6809], [15, 317, .877, .7539],
-          [16, 319, .8997, .768], [17, 376, .9149, .8404], [18, 259, .9382, .8533], [19, 185, .9189, .8486], [20, 103, .8447, .7573],
-          [21, 17, .8824, .8235], [22, 14, .7143, .3571], [23, 2, 0, 0]],
+  hours: [[6, 222, .4144, .2297], [7, 4125, .8528, .7241], [8, 5699, .8817, .7754], [9, 4527, .848, .7221], [10, 4181, .8522, .7235],
+          [11, 4539, .8002, .67], [12, 6117, .7785, .6768], [13, 4985, .8285, .7149], [14, 3882, .8617, .7269], [15, 3769, .8862, .7644],
+          [16, 3638, .8955, .7996], [17, 4690, .9085, .8309], [18, 3094, .9108, .831], [19, 2299, .9369, .893], [20, 1097, .8979, .8441],
+          [21, 215, .8419, .8093], [22, 113, .5929, .469], [23, 31, .2903, .0968]],
   // label, people, trips each, P(share 5)
-  groups: [["Undergrads in halls", 2201, 7.28, .7633], ["Commuting undergrads", 3983, 6.01, .7719], ["Postgrads in halls", 177, 7.6, .7308],
-           ["Commuting postgrads", 1013, 5.94, .7709], ["Staff", 1008, 4.03, .8098], ["Local residents", 1618, 3.61, .4856]],
+  groups: [["Undergrads in halls", 2201, 7.28, .7743], ["Commuting undergrads", 3983, 6.01, .7796], ["Postgrads in halls", 177, 7.6, .7643],
+           ["Commuting postgrads", 1013, 5.94, .7608], ["Staff", 1008, 4.03, .8044], ["Local residents", 1618, 3.61, .4873]],
   // rows: you; columns: the matching stranger's group; last value: trips
-  matrix: [[.5388, .2817, .0388, .0737, .0321, .035, 1058], [.1772, .5949, .0171, .1551, .0342, .0215, 1580],
-           [.4316, .3053, .0737, .0842, .0632, .0421, 95], [.1965, .6071, .0101, .1511, .0151, .0202, 397],
-           [.1174, .2181, .0101, .0369, .5872, .0302, 298], [.1822, .2305, .0112, .0446, .0446, .487, 269]],
+  matrix: [[.5404, .2786, .0435, .0677, .034, .0359, 12399], [.1902, .5956, .0141, .1386, .0382, .0233, 18660],
+           [.5321, .286, .0486, .0564, .037, .0399, 1028], [.1885, .5917, .0153, .1501, .0334, .021, 4578],
+           [.1171, .1924, .0128, .0446, .6009, .0321, 3270], [.1744, .1989, .0147, .0498, .0618, .5004, 2850]],
 };
 const GLONG = RES.groups.map(g => g[0]);
 
