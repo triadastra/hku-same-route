@@ -1,29 +1,90 @@
 """Create synthetic people with a personal profile and the fixed things they must do today.
 
-Everything here is made up and drawn at random from the mix below. Change MIX and the lists to match
-real HKU numbers before a final run, and cite where those numbers came from.
+Who they are follows the people in the area on a weekday, in their real proportions (the authors' decision,
+method.md section 3): residents of the nine census areas from Kennedy Town to Sai Ying Pun (2021 Population
+Census), plus HKU's students and staff (HKU, 2025/26). Every count below comes from
+data/population_figures.csv. Where the figures do not settle something, the choice is marked ASSUMPTION and
+listed in method.md, section 3, for the authors to decide.
 
-    python make_agents.py --n 200 --seed 1          # -> data/agents.jsonl
+    python make_agents.py --n 10000 --seed 7 --out out/<run>/people.jsonl
 """
 import argparse
 import json
 import random
 
 import config as C
-from world import World, hhmm
+from world import World, hhmm, parse_hhmm
 
-MIX = {"undergrad": 0.62, "postgrad": 0.12, "staff": 0.10, "resident": 0.16}
-HALL_SHARE = {"undergrad": 0.35, "postgrad": 0.15}   # the rest commute by MTR or bus
-
-FACULTIES = {
-    "Arts": ["Run Run Shaw Tower"],
-    "Social Sciences": ["Jockey Club Tower"],
-    "Law": ["Cheng Yu Tung Tower"],
-    "Engineering": ["Haking Wong Building", "Chow Yei Ching Building"],
-    "Business and Economics": ["K.K. Leung Building"],
-    "Science": ["Chong Yuet Ming Physics", "Chong Yuet Ming Chemistry", "James Hsioung Lee", "Kadoorie Biological"],
+# ---- Counts (data/population_figures.csv) ----
+# HKU students by faculty, 2025/26 headcount (HKU Quick Stats, Student Profiles):
+#   faculty: (undergraduate, taught postgraduate, research postgraduate)
+HKU_STUDENTS = {
+    "Architecture": (774, 1177, 236),
+    "Arts": (1835, 1845, 189),
+    "Business and Economics": (3511, 5753, 229),
+    "Dentistry": (517, 91, 206),
+    "Education": (865, 1855, 248),
+    "Engineering": (3579, 4122, 1388),
+    "Law": (471, 1249, 91),
+    "Medicine": (4111, 1272, 1142),
+    "Science": (2549, 792, 695),
+    "Social Sciences": (1891, 2210, 312),
+    "Non-faculty-based": (0, 0, 98),
+}                                        # totals 20,103 + 20,366 + 4,834 = 45,303
+TPG_ABROAD = 1206                        # taught postgraduates on programmes in Beijing and Shanghai
+# HKU staff by type, 2025/26 headcount, regular + temporary, excluding honorary/visiting (Staff Profiles)
+HKU_STAFF = {
+    "professor": 1201 + 10,              # professoriate staff
+    "research staff": 397 + 2556,
+    "teaching staff": 722 + 251 + 67 + 3,   # non-professoriate teaching staff and other academic staff
+    "administrative staff": 3049 + 409,  # administrative and support staff
+    "technical staff": 1251 + 160,
+}                                        # total 10,076
+HALL_PLACES = 7800                       # HKU hall and residence places, university-wide
+RESIDENTS = {                            # 2021 census, sum of the nine areas = 143,781
+    "works in Central & Western": 26413,
+    "works outside Central & Western": 16442 + 10940 + 3542 + 1019 + 1440,   # other HK Island, Kowloon, NT, outside HK
+    "works with no fixed place": 7809,
+    "domestic helper": 9665,
+    "works at home": 11272 - 9665,       # working at home, minus the domestic helpers
+    "student": 18414,
+    "retired": 25818,
+    "home-maker": 5952,
+    "unpaid carer": 2486,
+    "not working": 12234,                # includes 3,445 unemployed
 }
-FACULTY_WEIGHT = {"Arts": 12, "Social Sciences": 14, "Law": 7, "Engineering": 20, "Business and Economics": 22, "Science": 18}
+CENSUS_AGES = {"under 15": 14539, "15-24": 10619, "25-44": 45481, "45-64": 43062, "65+": 30080}   # for the check
+
+# ---- ASSUMPTIONS the figures do not settle (method.md, section 3) ----
+OUTSIDE_AREA = {"Medicine"}  # faculties based off the map: Medicine is at the Sassoon Road campus, south of the area,
+                             # so its students and staff are left out (Dentistry is at the Prince Philip Dental
+                             # Hospital in Sai Ying Pun, on the map, and is kept)
+# The 1,206 taught postgraduates studying in Beijing and Shanghai are taken out of each faculty in proportion.
+# HKU publishes no staff numbers by faculty, so: professors and teaching staff are spread over faculties like all
+# students; research and technical staff like research postgraduates; half the administrative staff work in
+# central offices (Main Building, Knowles Building) and half in the faculties, like all students.
+WORK_IN_AREA = 0.5      # share of residents working in Central & Western whose workplace is inside the study area
+SCHOOL_PUPILS = 0.7     # share of resident students at school (age 6 to 17) rather than college elsewhere
+MTR_SHARE = 0.75        # share of commuters (HKU people and residents working away) who use the MTR, not a bus
+AGES = {                # age range of each kind of resident
+    "works in Central & Western": (20, 64), "works outside Central & Western": (20, 64),
+    "works with no fixed place": (20, 64), "domestic helper": (25, 55), "works at home": (25, 64),
+    "student": None, "retired": (65, 95), "home-maker": (25, 70), "unpaid carer": (30, 80), "not working": (18, 80),
+}
+
+FACULTIES = {   # where each faculty teaches and works (places on the map)
+    "Architecture": ["Knowles Building"],
+    "Arts": ["Run Run Shaw Tower"],
+    "Business and Economics": ["K.K. Leung Building"],
+    "Dentistry": ["Prince Philip Dental Hospital"],
+    "Education": ["Runme Shaw Building", "Meng Wah Complex"],
+    "Engineering": ["Haking Wong Building", "Chow Yei Ching Building"],
+    "Law": ["Cheng Yu Tung Tower"],
+    "Science": ["Chong Yuet Ming Physics", "Chong Yuet Ming Chemistry", "James Hsioung Lee", "Kadoorie Biological"],
+    "Social Sciences": ["Jockey Club Tower"],
+    "Non-faculty-based": ["Main Building"],
+}
+CENTRAL_OFFICES = ["Main Building", "Knowles Building"]
 SHARED_ROOMS = ["Central Podium", "Lee Shau Kee Lecture Centre", "Meng Wah Complex", "Knowles Building",
                 "Rayson Huang Theatre", "Main Building"]
 # HKU classes start at :30 and end at :20.
@@ -97,6 +158,72 @@ def timetable(rng, world, faculty, n_classes):
     return out
 
 
+def comfortable_speed(rng, age):
+    """A person's own comfortable walking speed in m/s, from published values by age (config.py, with sources in
+    data/walking_speeds.csv), plus the spread between people of the same age."""
+    if age < 10:
+        base = C.CHILD_SPEED
+    else:
+        decade = min(80, max(20, age // 10 * 10))
+        base = C.SPEED_BY_AGE[decade]
+    return min(2.0, max(0.5, rng.gauss(base, C.SPEED_SD)))
+
+
+CENSUS_BANDS = [(0, 14, 14539), (15, 24, 10619), (25, 44, 45481), (45, 64, 43062), (65, 95, 30080)]
+
+
+def census_age(rng, lo, hi):
+    """An age between lo and hi, each year weighted by how many residents of that age band the census counts
+    per year of age, so ages within a range follow the census shape."""
+    years = list(range(lo, hi + 1))
+    w = [next(n / (b - a + 1) for a, b, n in CENSUS_BANDS if a <= y <= b) for y in years]
+    return rng.choices(years, weights=w)[0]
+
+
+LEVELS = ("undergrad", "taught postgrad", "research postgrad")
+
+
+def hku_cells():
+    """{(kind, faculty): count} for the HKU people on the map: students by level and faculty, staff by type and
+    faculty, after the adjustments listed under ASSUMPTIONS."""
+    tpg_total = sum(v[1] for v in HKU_STUDENTS.values())
+    students = {}
+    for fac, (ug, tpg, rpg) in HKU_STUDENTS.items():
+        students[fac] = (ug, tpg * (1 - TPG_ABROAD / tpg_total), rpg)
+    all_s = {f: sum(v) for f, v in students.items()}
+    rpg_s = {f: v[2] for f, v in students.items()}
+    tot_all, tot_rpg = sum(all_s.values()), sum(rpg_s.values())
+    cells = {}
+    for fac, v in students.items():
+        for level, n in zip(LEVELS, v):
+            cells[(f"HKU {level}", fac)] = n
+    for kind, n in HKU_STAFF.items():
+        if kind in ("research staff", "technical staff"):
+            basis, tot = rpg_s, tot_rpg
+        else:
+            basis, tot = all_s, tot_all
+        share = 0.5 if kind == "administrative staff" else 1.0
+        for fac in students:
+            cells[(f"HKU {kind}", fac)] = n * share * basis[fac] / tot
+        if kind == "administrative staff":
+            cells[(f"HKU {kind}", "central offices")] = n * 0.5
+    return {k: v for k, v in cells.items() if k[1] not in OUTSIDE_AREA and v > 0}
+
+
+def mix():
+    """Shares of each kind of person (with HKU people also by faculty), from the counts above."""
+    cells = hku_cells()
+    cells.update({(f"resident: {k}", None): v for k, v in RESIDENTS.items()})
+    total = sum(cells.values())
+    return {k: v / total for k, v in cells.items()}
+
+
+def within(world, times, cats, max_min, rng, fallback=None):
+    """A random place of these categories within max_min minutes' walk."""
+    near = [c for c, p in world.places.items() if p["category"] in cats and times[p["node"]] <= max_min * 60]
+    return rng.choice(near) if near else fallback
+
+
 def make(n, seed):
     world = World()
     rng = random.Random(seed)
@@ -105,66 +232,167 @@ def make(n, seed):
     hku_mtr = [c for c in mtr if "HKU" in world.places[c]["name"]]
     bus = [c for c, p in world.places.items() if p["category"] == "bus"]
     homes = [c for c, p in world.places.items() if p["category"] == "building" and p["caption"].startswith("Residential")]
+    markets = [c for c, p in world.places.items() if p["category"] == "shop"
+               and any(w in p["caption"].lower() for w in ("market", "supermarket", "groceries", "vegetable"))]
+    shares = mix()
+    cells, weights = list(shares), list(shares.values())
+    hall_share = HALL_PLACES / sum(sum(v) for v in HKU_STUDENTS.values())   # 17.2% of students, university-wide
     agents = []
     for k in range(n):
-        role = rng.choices(list(MIX), weights=list(MIX.values()))[0]
+        kind, fac = rng.choices(cells, weights=weights)[0]
         name = f"{rng.choice(GIVEN)} {rng.choice(SURNAMES)}"
-        a = {"id": f"A{k + 1:05d}", "name": name, "role": role, "personality": rng.choice(PERSONALITY),
-             "habits": rng.sample(HABITS, 2), "pace": round(rng.uniform(0.85, 1.2), 2)}
-        if role in ("undergrad", "postgrad"):
-            fac = rng.choices(list(FACULTY_WEIGHT), weights=list(FACULTY_WEIGHT.values()))[0]
-            a.update(age=rng.randint(18, 23) if role == "undergrad" else rng.randint(22, 35), faculty=fac,
+        a = {"id": f"A{k + 1:05d}", "name": name, "kind": kind, "personality": rng.choice(PERSONALITY),
+             "habits": rng.sample(HABITS, 2)}
+        if kind in ("HKU undergrad", "HKU taught postgrad", "HKU research postgrad"):
+            role = "undergrad" if kind == "HKU undergrad" else "postgrad"
+            a.update(role=role, role_detail=kind[4:], faculty=fac,
+                     age=rng.randint(18, 23) if role == "undergrad" else rng.randint(22, 35),
                      year=rng.randint(1, 4) if role == "undergrad" else None)
-            if rng.random() < HALL_SHARE[role]:
+            if rng.random() < hall_share:
                 a["home"] = rng.choice(halls); a["home_kind"] = "lives in this hall"
             else:
-                a["home"] = rng.choice(hku_mtr if rng.random() < 0.75 else bus)
+                a["home"] = rng.choice(hku_mtr if rng.random() < MTR_SHARE else bus)
                 a["home_kind"] = "commutes; arrives and leaves here"
-            a["commitments"] = timetable(rng, world, fac, rng.randint(1, 4))
-            a["start"] = "07:30" if a["home_kind"].startswith("lives") else hhmm(
-                max(7 * 3600, (int(a["commitments"][0]["start"][:2]) * 60 + 30) * 60 - rng.randint(20, 50) * 60))
-        elif role == "staff":
-            fac = rng.choices(list(FACULTY_WEIGHT), weights=list(FACULTY_WEIGHT.values()))[0]
-            office = rng.choice(pick_codes(world, FACULTIES[fac]))
-            a.update(age=rng.randint(26, 64), faculty=fac, home=rng.choice(mtr if rng.random() < 0.8 else bus),
-                     home_kind="commutes; arrives and leaves here", start=f"0{rng.randint(7, 9)}:{rng.choice(['00', '15', '30', '45'])}")
-            a["commitments"] = [{"start": "09:30", "end": "17:30", "place": office, "what": "work in office"}]
-            if rng.random() < 0.5:
-                a["commitments"].append({"start": f"{rng.choice([10, 11, 14, 15])}:30", "end": f"{rng.choice([16, 17])}:20",
-                                         "place": rng.choice(pick_codes(world, SHARED_ROOMS)), "what": "teach a class"})
-                a["commitments"].sort(key=lambda c: c["start"])
+            if kind == "HKU research postgrad":
+                office = rng.choice(pick_codes(world, FACULTIES[fac]))
+                a["commitments"] = [{"start": "09:30", "end": f"{rng.randint(17, 19)}:30", "place": office, "what": "research work in the lab or office"}]
+            else:
+                a["commitments"] = timetable(rng, world, fac, rng.randint(1, 4))
+            first = int(a["commitments"][0]["start"][:2]) * 3600 + int(a["commitments"][0]["start"][3:]) * 60
+            a["start"] = "07:30" if a["home_kind"].startswith("lives") else hhmm(max(7 * 3600, first - rng.randint(20, 50) * 60))
+        elif kind.startswith("HKU "):
+            staff = kind[4:]
+            if fac == "central offices":
+                office = rng.choice(pick_codes(world, CENTRAL_OFFICES))
+                a["faculty"] = None
+            else:
+                office = rng.choice(pick_codes(world, FACULTIES[fac]))
+                a["faculty"] = fac
+            age = census_age(rng, 26, 64) if staff != "research staff" else census_age(rng, 25, 45)
+            a.update(role="staff", role_detail=f"HKU {staff}", age=age, home=rng.choice(mtr if rng.random() < MTR_SHARE else bus),
+                     home_kind="commutes; arrives and leaves here")
+            if staff == "administrative staff":
+                c = [{"start": "09:00", "end": "17:30", "place": office, "what": "work in the office"}]
+            elif staff == "technical staff":
+                c = [{"start": "09:00", "end": "17:30", "place": office, "what": "work in the labs"}]
+            elif staff == "research staff":
+                c = [{"start": "09:30", "end": f"{rng.randint(17, 19)}:30", "place": office, "what": "research work in the lab or office"}]
+            else:   # professors and teaching staff: office hours plus classes they teach
+                c = [{"start": "09:30", "end": "17:30", "place": office, "what": "work in the office"}]
+                if fac in FACULTIES and fac != "Non-faculty-based":
+                    n_classes = rng.randint(1, 3) if staff == "teaching staff" else (1 if rng.random() < 0.5 else 0)
+                    for cl in timetable(rng, world, fac, n_classes) if n_classes else []:
+                        c.append({**cl, "what": f"teach a {cl['what']}"})
+            a["commitments"] = sorted(c, key=lambda x: x["start"])
+            first = int(a["commitments"][0]["start"][:2]) * 3600 + int(a["commitments"][0]["start"][3:]) * 60
+            a["start"] = hhmm(max(7 * 3600, first - rng.randint(15, 45) * 60))
         else:
-            age = rng.randint(16, 82)
+            occ = kind.split(": ", 1)[1]
             home = rng.choice(homes)
             times = world.times_from(world.places[home]["node"])
             own_mtr = min(mtr, key=lambda c: times[world.places[c]["node"]])
-            a.update(age=age, faculty=None, home=home, home_kind="lives here, in a flat in this building",
-                     start=f"0{rng.randint(6, 9)}:{rng.choice(['00', '20', '40'])}")
-            if age >= 62:
-                a["occupation"] = "retired"
-                market = min((c for c, p in world.places.items() if p["category"] == "shop"
-                              and any(w in p["caption"].lower() for w in ("market", "supermarket", "groceries", "vegetable"))),
-                             key=lambda c: times[world.places[c]["node"]])
-                a["commitments"] = [{"start": f"{rng.randint(8, 11)}:00", "end": "", "place": market, "what": "buy groceries"}]
-            elif age >= 20 and rng.random() < 0.55:
-                a["occupation"] = "works outside the area"
-                a["commitments"] = [{"start": f"0{rng.randint(7, 9)}:{rng.choice(['00', '30'])}", "end": f"{rng.randint(17, 20)}:{rng.choice(['00', '30'])}",
-                                     "place": own_mtr, "what": "at work outside the area: take the MTR from this exit and come back here after work"}]
-            elif age >= 18 and rng.random() < 0.4:
-                a["occupation"] = "works a shift nearby"
-                job = rng.choice([c for c, p in world.places.items() if p["category"] in ("food", "shop")
-                                  and times[p["node"]] < 20 * 60])
-                s = rng.choice([7, 10, 14])
-                a["commitments"] = [{"start": f"{s:02d}:00", "end": f"{s + 8:02d}:00", "place": job, "what": "work a shift"}]
+            exit_ = own_mtr if rng.random() < MTR_SHARE else min(bus, key=lambda c: times[world.places[c]["node"]])
+            market = min(markets, key=lambda c: times[world.places[c]["node"]]) if markets else None
+            if occ == "student":
+                pupil = rng.random() < SCHOOL_PUPILS
+                age = census_age(rng, 6, 17) if pupil else census_age(rng, 18, 24)
+                occ = "school pupil" if pupil else "student at a college elsewhere"
             else:
-                a["occupation"] = "at home today" if age >= 18 else "secondary school student, a day off school"
-                errand = rng.choice([c for c, p in world.places.items() if p["category"] in ("food", "shop", "money", "health")
-                                     and times[p["node"]] < 15 * 60])
-                a["commitments"] = [{"start": f"{rng.randint(10, 17)}:00", "end": "", "place": errand, "what": "an errand"}]
-            a["role_detail"] = a["occupation"]
-        a.update(traits(rng, role, a["age"]))
+                age = census_age(rng, *AGES[occ])
+            a.update(role="resident", role_detail=occ, occupation=occ, age=age, faculty=None, home=home,
+                     home_kind="lives here, in a flat in this building", start=f"0{rng.randint(6, 8)}:{rng.choice(['00', '20', '40'])}")
+            c = []
+            if occ == "works in Central & Western":
+                if rng.random() < WORK_IN_AREA:
+                    job = within(world, times, ("food", "shop", "service", "money", "health", "school", "building"), 25, rng)
+                    s = rng.choice([7, 9, 10, 14])
+                    c.append({"start": f"{s:02d}:00", "end": f"{s + 8:02d}:00", "place": job, "what": "work"})
+                    a["occupation"] = "works in the area"
+                else:
+                    c.append({"start": f"0{rng.randint(7, 9)}:{rng.choice(['00', '30'])}", "end": f"{rng.randint(17, 19)}:{rng.choice(['00', '30'])}",
+                              "place": exit_, "what": "at work in Central or Sheung Wan: leave from here and come back here after work"})
+                    a["occupation"] = "works elsewhere in Central & Western"
+            elif occ in ("works outside Central & Western", "student at a college elsewhere"):
+                c.append({"start": f"0{rng.randint(7, 9)}:{rng.choice(['00', '30'])}", "end": f"{rng.randint(17, 20)}:{rng.choice(['00', '30'])}",
+                          "place": exit_, "what": ("at work" if occ.startswith("works") else "at college") + " outside the area: leave from here and come back here after"})
+            elif occ == "works with no fixed place":
+                for h in sorted(rng.sample(range(9, 17), 3)):
+                    c.append({"start": f"{h:02d}:00", "end": "", "place": within(world, times, ("building", "shop", "food", "service"), 30, rng, home),
+                              "what": "a job at this address"})
+            elif occ == "school pupil":
+                school = within(world, times, ("school",), 25, rng)
+                if school:
+                    c.append({"start": "08:00", "end": "15:30", "place": school, "what": "school"})
+            elif occ == "domestic helper":
+                if market:
+                    c.append({"start": f"0{rng.randint(8, 9)}:00", "end": "", "place": market, "what": "buy groceries for the family"})
+                school = within(world, times, ("school",), 20, rng)
+                if school and rng.random() < 0.5:
+                    c.append({"start": "15:30", "end": "", "place": school, "what": "pick up the family's child from school"})
+            elif occ == "retired" or occ == "home-maker":
+                if market:
+                    c.append({"start": f"{rng.randint(8, 11):02d}:00", "end": "", "place": market, "what": "buy groceries"})
+            elif occ == "unpaid carer":
+                clinic = within(world, times, ("health",), 30, rng)
+                if clinic:
+                    c.append({"start": f"{rng.randint(9, 15):02d}:00", "end": "", "place": clinic, "what": "accompany a family member to the clinic or pharmacy"})
+            if not c and occ not in ("works at home",):
+                errand = within(world, times, ("food", "shop", "money", "health"), 15, rng)
+                if errand:
+                    c.append({"start": f"{rng.randint(10, 17)}:00", "end": "", "place": errand, "what": "an errand"})
+            a["commitments"] = sorted(c, key=lambda x: x["start"])
+            if c:
+                first = int(a["commitments"][0]["start"][:2]) * 3600 + int(a["commitments"][0]["start"][3:]) * 60
+                a["start"] = hhmm(max(6 * 3600, min(parse_hhmm(a["start"]), first - 30 * 60)))
+        a["speed"] = round(comfortable_speed(rng, a["age"]), 2)          # m/s on the flat
+        a["pace"] = round(a["speed"] / C.WALK_SPEED, 3)                 # the same, relative to the map's walking times
+        a.update(traits(rng, a["role"], a["age"]))
         agents.append(a)
     return agents
+
+
+def check(agents):
+    """The generated mix against the census and HKU proportions."""
+    n = len(agents)
+    want, by_kind, by_fac = mix(), {}, {}
+    for (kind, fac), v in want.items():
+        by_kind[kind] = by_kind.get(kind, 0) + v
+        if kind.startswith("HKU "):
+            by_fac[fac] = by_fac.get(fac, 0) + v
+    got_kind, got_fac = {}, {}
+    for a in agents:
+        got_kind[a["kind"]] = got_kind.get(a["kind"], 0) + 1
+        if a["kind"].startswith("HKU "):
+            f = a["faculty"] or "central offices"
+            got_fac[f] = got_fac.get(f, 0) + 1
+    cells = hku_cells()
+    hku_students = sum(v for (k, f), v in cells.items() if k in ("HKU " + l for l in LEVELS))
+    hku_staff = sum(cells.values()) - hku_students
+    residents = sum(RESIDENTS.values())
+    lines = [f"Who is in the area: {residents:,} residents of Sai Ying Pun to Kennedy Town (2021 census) and "
+             f"{hku_students + hku_staff:,.0f} HKU people ({hku_students:,.0f} students, {hku_staff:,.0f} staff): "
+             f"1 HKU person for every {residents / (hku_students + hku_staff):.1f} residents.",
+             f"In {n:,} people: {sum(a['role'] == 'resident' for a in agents):,} residents, "
+             f"{sum(a['role'] in ('undergrad', 'postgrad') for a in agents):,} HKU students, "
+             f"{sum(a['role'] == 'staff' for a in agents):,} HKU staff.\n",
+             f"{'kind':48} {'target':>7} {'made':>7}"]
+    for k, v in by_kind.items():
+        lines.append(f"{k:48} {100 * v:6.1f}% {100 * got_kind.get(k, 0) / n:6.1f}%")
+    hku_n = sum(got_fac.values())
+    hku_w = sum(by_fac.values())
+    lines.append(f"\nHKU people by faculty ({', '.join(sorted(OUTSIDE_AREA))} left out, based off the map):")
+    for f, v in sorted(by_fac.items(), key=lambda kv: -kv[1]):
+        lines.append(f"{f:48} {100 * v / hku_w:6.1f}% {100 * got_fac.get(f, 0) / max(1, hku_n):6.1f}%")
+    sp = sorted(a["speed"] for a in agents)
+    lines.append(f"\nwalking speed: median {sp[n // 2]:.2f} m/s, middle half {sp[n // 4]:.2f}-{sp[3 * n // 4]:.2f} m/s")
+    res = [a for a in agents if a["role"] == "resident"]
+    bands = {"under 15": (0, 14), "15-24": (15, 24), "25-44": (25, 44), "45-64": (45, 64), "65+": (65, 200)}
+    tot = sum(CENSUS_AGES.values())
+    lines.append(f"\nresidents' ages (census includes children under 6, who are not simulated on their own):")
+    for b_, (lo, hi) in bands.items():
+        m = sum(lo <= a["age"] <= hi for a in res)
+        lines.append(f"{b_:48} {100 * CENSUS_AGES[b_] / tot:6.1f}% {100 * m / max(1, len(res)):6.1f}%")
+    return "\n".join(lines)
 
 
 def main():
@@ -177,8 +405,8 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         for a in agents:
             f.write(json.dumps(a, ensure_ascii=False) + "\n")
-    roles = {r: sum(a["role"] == r for a in agents) for r in MIX}
-    print(f"wrote {len(agents)} agents to {args.out}: {roles}")
+    print(f"wrote {len(agents)} agents to {args.out}")
+    print(check(agents))
 
 
 if __name__ == "__main__":

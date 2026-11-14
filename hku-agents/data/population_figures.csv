@@ -1,0 +1,48 @@
+figure,value,year,source,note
+"Study area: census constituency areas (DCCAs) used","A05 University, A06 Kwun Lung, A07 Kennedy Town & Mount Davis, A08 Sai Wan, A09 Belcher, A10 Shek Tong Tsui, A11 Sai Ying Pun, A14 Centre Street, A15 Water Street",2021 census (2019 boundaries),https://www.census2021.gov.hk/doc/DCCA_21C.xlsx; https://www.eac.hk/pdf/distco/2019dc/final/en/A_descriptions(Eng).pdf,"A13 Tung Wah (12,320 people, Eastern Street to Aberdeen Street) is optional; with it the total is 156,101."
+"Population A05 University",18548,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,"Exact. Contains HKU; reaches uphill to Lugard and Harlech Roads."
+"Population A06 Kwun Lung",15570,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Uphill Kennedy Town up to Pok Fu Lam Road.
+"Population A07 Kennedy Town & Mount Davis",16030,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Western Kennedy Town plus Mount Davis.
+"Population A08 Sai Wan",14650,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Kennedy Town centre and praya.
+"Population A09 Belcher",20187,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Queen's Road West up to Pok Fu Lam Road.
+"Population A10 Shek Tong Tsui",16125,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Waterfront north of Queen's Road West.
+"Population A11 Sai Ying Pun",13600,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Waterfront.
+"Population A14 Centre Street",14521,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Between Queen's Road West and Bonham Road.
+"Population A15 Water Street",14550,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Exact. Between Queen's Road West and Bonham Road.
+"Study-area population (9 DCCAs)",143781,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived: sum of the nine DCCAs.
+"Age under 15",14539,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived (sum of nine DCCAs). 10.1%.
+"Age 15-24",10619,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 7.4%.
+"Age 25-44",45481,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 31.6%.
+"Age 45-64",43062,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 29.9%.
+"Age 65+",30080,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 20.9%. The five age groups add up to 143781.
+"Working population",78877,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,"Derived. 54.9%. Aged 15+, worked in the 7 days before the census; students with jobs are counted here."
+"Students (not working)",18414,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,"Derived. 12.8%. Full-time students including school children."
+"Retired",25818,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 18.0%.
+"Home-makers",5952,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 4.1%.
+"Unpaid carers",2486,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 1.7%. New category in 2021.
+"Others (including 3445 unemployed)",12234,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 8.5%. The six activity groups add up to 143781.
+"Working residents: work in Central & Western District",26413,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 33.5% of working residents. Excludes working at home.
+"Working residents: work in another Hong Kong Island district",16442,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 20.8%.
+"Working residents: work in Kowloon",10940,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 13.9%.
+"Working residents: work in New Territories new towns",3542,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 4.5%.
+"Working residents: work in other New Territories areas",1019,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 1.3%.
+"Working residents: no fixed place of work or marine",7809,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 9.9%.
+"Working residents: work at home",11272,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 14.3%. Probably mostly live-in domestic helpers (inference).
+"Working residents: work outside Hong Kong",1440,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 1.8%. The eight place-of-work groups add up to 78877.
+"Foreign domestic helpers among working residents",9665,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,Derived. 12.3% of working residents.
+"Full-time students living in the area who study in Central & Western",11913,2021,https://www.census2021.gov.hk/doc/DCCA_21C.xlsx,"Derived. All levels, kindergarten to university."
+"Central & Western District population",235953,2021,https://www.census2021.gov.hk/data/static_file/en/tableA201a/Table%20A201a.xlsx,Exact. Land population. 2016: 243266.
+"Central & Western residents who walk to work",14667,2021,https://www.census2021.gov.hk/data/static_file/en/Table%20C204.xlsx,"Exact. Of 94009 with a fixed workplace; 14468 of them work in the district."
+"Central & Western full-time students who walk to school",8665,2021,https://www.census2021.gov.hk/data/static_file/en/Table%20B203.xlsx,"Exact. Of 31040; 8472 of them study in the district."
+"People working in Central & Western District, any residence",314609,2021,https://www.census2021.gov.hk/data/static_file/en/Table%20C140.xlsx,"Exact. District level only; includes the Central business district, so it cannot be used for this area without assumptions."
+"HKU undergraduates",20103,2025/26,https://www.cpao.hku.hk/qstats/student-profiles,Exact headcount.
+"HKU taught postgraduates",20366,2025/26,https://www.cpao.hku.hk/qstats/student-profiles,"Exact. No full-time/part-time split; includes 1206 on programmes in Beijing and Shanghai."
+"HKU research postgraduates",4834,2025/26,https://www.cpao.hku.hk/qstats/student-profiles,Exact.
+"HKU students, total",45303,2025/26,https://www.cpao.hku.hk/qstats/overview,Exact. Excludes exchange-in and visiting students.
+"HKU staff excluding honorary/visiting",10076,2025/26,https://www.cpao.hku.hk/qstats/overview,"Exact. Academic 5207 (derived: 2387 regular + 2820 temporary), non-academic 4869."
+"HKU hall and student residence places",7800,June 2026,https://www.cpao.hku.hk/qstats/space,"Exact. University-wide, not by location; 950 more planned."
+"Weekday passengers at MTR HKU, Kennedy Town and Sai Ying Pun stations",not found,,https://www.mtr.com.hk/en/corporate/investor/patronage.php,MTR publishes only line-level averages.
+"Official pedestrian counts in the area",not found,,,"Searched Transport Department, LegCo and Audit Commission sources."
+"HKU students by faculty: undergraduate / taught postgraduate / research postgraduate","Architecture 774/1177/236; Arts 1835/1845/189; Business and Economics 3511/5753/229; Dentistry 517/91/206; Education 865/1855/248; Engineering 3579/4122/1388; Law 471/1249/91; Medicine 4111/1272/1142; Science 2549/792/695; Social Sciences 1891/2210/312; Non-faculty-based 0/0/98",2025/26,https://www.cpao.hku.hk/qstats/student-profiles,"Exact headcounts (government-funded plus not). Interdisciplinary schools are counted under their administering faculty."
+"HKU staff by type (regular + temporary)","Professoriate 1211; research staff 2953; non-professoriate teaching 973; other academic 70; administrative and support 3458; technical 1411",2025/26,https://www.cpao.hku.hk/qstats/staff-profiles,"Exact. Honorary and visiting staff (5,609) excluded. No breakdown by faculty is published."
+"Faculty sites","Medicine: Sassoon Road campus, south of the study area; Dentistry: Prince Philip Dental Hospital, 34 Hospital Road, Sai Ying Pun (on the map); all other faculties on the main and Centennial campuses",,,"Used to decide which faculties are in the area."
