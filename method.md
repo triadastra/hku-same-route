@@ -77,9 +77,20 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 - Authors' decision 6: 10,000 people in the proportions of who is in the area on a weekday, from the 2021
   census and HKU's figures (sources in `hku-agents/data/population_figures.csv`):
   - residents of the nine census areas from Kennedy Town to Sai Ying Pun: 143,781 (2021);
-  - HKU students: 44,097 (20,103 undergraduate, 19,160 taught postgraduate after removing 1,206 who study in
-    Beijing and Shanghai, 4,834 research), and 10,076 staff (2025/26).
-  - That is 72.6% residents, 22.3% HKU students and 5.1% HKU staff.
+  - HKU people by faculty and job, from HKU's 2025/26 figures: students by faculty and level (undergraduate,
+    taught postgraduate, research postgraduate), and staff by type (professors, research staff, teaching
+    staff, administrative staff, technical staff). The 1,206 taught postgraduates studying in Beijing and
+    Shanghai are taken out of each faculty in proportion.
+  - Medicine (6,525 students) is based at the Sassoon Road campus, off the map, so its students and staff are
+    left out. Dentistry is at the Prince Philip Dental Hospital in Sai Ying Pun, on the map, and is kept.
+  - On the map that is 46,110 HKU people (37,647 students and 8,462 staff) against 143,781 residents: one HKU
+    person for every 3.1 residents. As shares: 75.7% residents, 19.8% HKU students (8.4% undergraduate, 9.5%
+    taught postgraduate, 1.9% research) and 4.5% HKU staff; in 10,000 people, about 7,570 residents, 1,980
+    HKU students and 450 HKU staff. HKU people by faculty: Engineering 23.6%, Business and Economics 22.1%,
+    Science 10.8%, Social Sciences 10.7%, Arts 9.3%, Education 7.2%, Architecture 5.5%, Law 4.3%, Dentistry
+    2.3%, central offices 3.7%.
+  - Each HKU person works or studies in their faculty's building; staff have office hours, professors and
+    teaching staff also teach classes, research staff work in labs until 17:30 to 19:30.
 - Residents are split by the census: working in Central & Western 26,413; working outside it 33,383; no
   fixed place of work 7,809; domestic helpers 9,665; working at home 1,607; students 18,414; retired 25,818;
   home-makers 5,952; unpaid carers 2,486; not working 12,234. Ages follow the census age bands within each
@@ -96,8 +107,12 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
   - 75% of commuters use the MTR, 25% a bus;
   - the age range of each kind of resident (for example retired 65 to 95, domestic helpers 25 to 55);
   - children under 6 are not simulated on their own; the census "others" are simulated as adults 18 to 80;
-  - every HKU student and staff member comes to campus that day, and 17.7% of students live in a hall
-    (7,800 places over 44,097 students);
+  - every HKU student and staff member comes to campus that day, and 17.2% of students live in a hall
+    (7,800 places over 45,303 students, university-wide);
+  - Medicine is left out because it is based off the map;
+  - HKU publishes no staff numbers by faculty: professors and teaching staff are spread over faculties like
+    all students, research and technical staff like research postgraduates, and half of the administrative
+    staff work in central offices (Main Building, Knowles Building), half in the faculties;
   - HKU people who live in the area are counted twice (as residents and as HKU); not removed.
 - DECIDE: the fixed plans given to each kind of resident (work hours, school 08:00 to 15:30, a morning
   market trip for retired people, home-makers and helpers, a school pick-up for half the helpers, a clinic

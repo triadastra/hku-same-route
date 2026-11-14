@@ -12,6 +12,8 @@ in a row, within 90 seconds, purely by coincidence.
 
 | Path | What it is |
 |---|---|
+| `RUNBOOK.md` | How to run the final experiments: what is ready, the commands, costs, checks and what to report. Start here. |
+| `hku-agents/run_experiments.sh` | One documented script for every step of the final experiments (`bash run_experiments.sh people`, `check`, `agent-world`, `control`, `live`, `analyse`, `pack`). |
 | `hku-agents/` | The simulator: map building, people, agent tools, the day runner and the analysis. Its README explains how to run everything. |
 | `hku-agents/out/day1/analysis/` | Result tables from the 10,000-person run (one weekday, US$20.49, 57,530 trips). |
 | `hku-agents/out/day1/trips.jsonl.gz` | Every trip of the run (57,530), with each road segment, time and turn. |

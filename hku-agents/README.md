@@ -6,6 +6,11 @@ someone with a phone map. Every walk records each segment and each turn (left, r
 back). The analysis then measures how often a stranger makes the same k turns as you, in a row, by
 coincidence, and how different groups use each road.
 
+## The final experiments
+
+See `RUNBOOK.md` in the repository root. Every step is one command of `run_experiments.sh`, documented at the
+top of that script.
+
 ## Quick start
 
 ```bash

@@ -32,7 +32,8 @@ Measures
              fit equal chance, or momentum? Turning back is left out (equal chance never turns back). Calibrated on
              the equal-chance walkers, where after the correction the test should reject almost none.
 
-    python following.py --run day1 --control mock_day1      # a few minutes; --control is optional
+    python following.py --run day1 --control mock_day1          # --control is optional
+    python following.py --run census_run --people-from live_census   # only the people of another run
 
 Writes out/<run>/analysis/following.md, following_*.csv and decision_table.csv, and graphs/following-*.pdf.
 """
@@ -345,26 +346,37 @@ def main():
     ap.add_argument("--run", default="day1")
     ap.add_argument("--control", default="", help="a run of the same people without the LLM (e.g. mock_day1)")
     ap.add_argument("--seeds", type=int, default=SEEDS)
+    ap.add_argument("--people-from", default="",
+                    help="only the people of this other run (e.g. the 1,000-person live run), to compare like with like; "
+                         "results go to analysis/same_people_as_<run>/")
     args = ap.parse_args()
 
     world = World()
     D = D_GLOBAL = Decisions(world)
     run_dir = C.OUT / args.run
     out = run_dir / "analysis"
-    out.mkdir(exist_ok=True)
+    keep = None
+    if args.people_from:
+        keep = {p.stem for p in (C.OUT / args.people_from / "agents").glob("A*.json")}
+        if not keep:
+            raise SystemExit(f"no people found in out/{args.people_from}/agents/")
+        out = out / f"same_people_as_{args.people_from}"
+    out.mkdir(parents=True, exist_ok=True)
     people = {}
     if (run_dir / "people.jsonl").exists():
         people = {a["id"]: a for a in (json.loads(l) for l in open(run_dir / "people.jsonl", encoding="utf-8"))}
 
     print("loading and converting trips", flush=True)
     raw = [json.loads(l) for l in open(run_dir / "trips.jsonl", encoding="utf-8")]
-    raw = [t for t in raw if t["segments"]]
+    raw = [t for t in raw if t["segments"] and (keep is None or t["agent"] in keep)]
     agents = as_decisions(D, raw)
     rod = []
     for s in range(args.seeds):
         rod.append(as_decisions(D, random_trips(world, raw, 1 + s)))
     del raw
     control = load_trips(C.OUT / args.control / "trips.jsonl", D) if args.control else None
+    if control and keep is not None:
+        control = [t for t in control if t["agent"] in keep]
 
     counts, hourly = defaultdict(Counter), defaultdict(Counter)
     for t in agents:
