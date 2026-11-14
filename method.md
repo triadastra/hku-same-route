@@ -167,6 +167,47 @@ Made on 2026-11-14, after reviewing the defaults that Claude Code had filled in.
 - DECIDE: kappa (default 2; 0.5 to 4 in `following_sweeps.csv`), rho (default 0.3; 0 to 0.5), and the
   minimum passes for an hour's own table (default 30).
 
+### 6a. The deliberate follower (implemented in `hku-agents/follower.py`)
+
+Added on 2026-11-14 at the authors' request: a walker that follows on purpose, by a fixed rule with no
+personality, to show what the measure reads when following is intended. It is not a Markov chain: it has
+a destination, a target and a memory of its closest point.
+
+- The world is the Agent World run, replayed unchanged. Followers see the Agent World people, who walk
+  exactly as they did. Followers do not see each other, so a follower only ever follows a real person
+  living their day (authors' decision).
+- One follower per Agent World trip: it starts at that trip's first junction, by the same road, at the
+  same time and pace, and keeps that trip's destination.
+- At each junction it takes the road with the highest score, reward minus penalty. Nothing is trained and
+  nothing is drawn by chance, so one run is the whole result.
+- Penalty (authors' rule): the follower remembers the closest it has ever been to its destination (the
+  minimum walking distance over every junction it has passed). A road that would leave it x beyond that
+  closest distance costs 0.5 x^2. A little farther costs almost nothing, so a road that must go round is
+  accepted; going the other way to follow someone is punished more and more.
+- Reward (authors' rule): R = 1 for taking the road its target took, and only while the target is in view
+  and at most 30 s of walking in front. "In view" is taken as: the target came to this junction by the
+  follower's own road at most 30 s before it. The map has no buildings to block a line of sight.
+- The target is the person nearest in front, kept from junction to junction until lost. With nobody to
+  follow, the follower takes the quickest road.
+- The follower never overtakes its target (it reaches the next junction at least 1 s after them). It does
+  not speed up to keep up.
+- It stops when it takes the road its destination is on, or after 3 times its trip's junctions plus 10.
+  The share that do not arrive is reported: a follower can keep circling near its closest point, taking
+  one target after another, because the penalty is measured from the closest point and not from the time
+  spent.
+- Measure: T_k, the share of walkers who trail the same stranger through k junctions in a row, at most
+  30 m behind along the road each time. This is the study's following rule seen from the person behind.
+  It is computed for the Agent World people (coincidence) and for the followers (intent), against the same
+  leaders, with 95% bootstrap intervals that resample people.
+- Checks (`python follower.py --check`, no run needed): with R = 0 a follower repeats its quickest-path
+  trip exactly and follows nobody; with a reward it follows; two runs agree.
+- Tested on the day1 trips only to see that it runs (5 minutes for 56,379 trips); those numbers are not
+  kept. Results come from `census_run`: `out/census_run/analysis/follower.md`.
+- DECIDE: the unit of x. default: 100 m, so with R = 1 a follower goes at most 141 m (100 m times the
+  square root of 2) beyond its closest point. R from 0 to 16 (0 to 566 m) is in `follower_sweep.csv`.
+- DECIDE: the view time (default 30 s); whether a follower may speed up to keep its target (default: no);
+  whether followers should also see each other (default: no).
+
 ## 7. Arm C: the live world (implemented in `hku-agents/live.py`, not run)
 
 - No navigation app: no `go_to`, `stroll` or `route_info`. At every real intersection (section 2) the

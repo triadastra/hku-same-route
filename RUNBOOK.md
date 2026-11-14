@@ -22,6 +22,7 @@ costs, what to check after each step, and what to report. Read it all before run
 | 3 | Live world: the first 1,000 of the same people on one shared clock, choosing every junction themselves with no navigation app, seeing people within 50 m | `live_census` | estimated US$20 to 60, capped at US$60 |
 | 4, 5 | Random place to place, and the same people with a rule-based planner (no LLM) | inside the analysis, and `census_control` | free |
 | 6 to 9 | Markov chains: equal chance, momentum, counted shares, counted plus imitation | inside the analysis | free |
+| 10 | Deliberate follower: one per Agent World trip, following the Agent World's people on purpose by a fixed rule (`hku-agents/follower.py`; `method.md`, section 6a) | inside the analysis | free |
 
 Experiment 1 is `day1`, already done.
 
@@ -86,6 +87,8 @@ LIVE_RUN=live_pilot LIVE_PEOPLE=20 LIVE_BUDGET=3 bash run_experiments.sh live
    - from `following.md`: the chance of being followed through 3, 5 and 10 junctions for the Agent World and
      each Markov chain; pairs arriving together against each chain's formula; same next path by number of
      paths; by hour; the chi-square result; who follows whom;
+   - from `follower.md`: the share of walkers trailing the same stranger through 3, 5 and 10 junctions, for the
+     Agent World's people and for the deliberate followers, and the share of followers who did not arrive;
    - live world against the Agent World on the same 1,000 people
      (`out/census_run/analysis/same_people_as_live_census/following.md` and `out/live_census/analysis/following.md`);
    - what changed from `day1` (old mix) to `census_run` (census mix).
