@@ -1,8 +1,9 @@
 """The live world: everyone lives the same day on one shared clock, and chooses every turn themselves.
 
-There is no navigation app here: no go_to, no stroll and no route_info. At each junction a person sees the
-roads leading off it (name, direction, length, stairs, what they pass) and the people around them, and picks
-one road. Where to go, and which way, is their own choice.
+There is no navigation app here: no go_to, no stroll and no route_info. At each real intersection (decisions.py)
+a person sees the roads leading off it (name, direction, length, stairs, what they pass) and the people around
+them, and picks one road; walking goes on by itself to the next intersection. Where to go, and which way, is
+their own choice.
 
 The simulator keeps one clock for everybody. It takes everyone whose next decision falls within the next
 WINDOW seconds, asks them all at once, applies their choices, and moves on. A person sees the others where
@@ -30,6 +31,7 @@ from functools import lru_cache
 
 import config as C
 from agent_tools import CATEGORIES, DAY_END, LANDMARK_CATS, NIGHT_FROM, _tool, persona_card
+from decisions import Decisions
 from world import World, _english, hhmm, parse_hhmm
 
 WINDOW = 10            # seconds of the shared clock handled in one round of decisions
@@ -41,7 +43,11 @@ MAX_CALLS_PER_STEP = 6 # calls without moving the clock before the simulator ste
 LOST_AFTER = 90 * 60   # a trip longer than this is finished by the simulator, by the quickest path
 KEEP_TURNS, PRUNE_AT = 8, 24   # conversation memory: when it reaches PRUNE_AT exchanges, keep the last KEEP_TURNS
 OUTDOOR = ("park", "sight", "bus", "mtr")  # people staying at these places can be seen from the street
-TURN_WORD = {"L": "left", "R": "right", "S": "straight on", "B": "back the way you came"}
+TURN_WORD = {"L": "left", "R": "right", "S": "straight on", "F": "straight on", "B": "back the way you came"}
+
+
+def compass(angle):
+    return ["east", "north-east", "north", "north-west", "west", "south-west", "south", "south-east"][round(math.degrees(angle) / 45) % 8]
 
 TOOLS = [
     _tool("look", "Look around where you are: the roads leading off, the people near you and the places here.", {}, []),
@@ -52,7 +58,7 @@ TOOLS = [
     _tool("nearby", "List places within a straight-line distance of you, closest first.",
           {"category": {"type": "string", "enum": CATEGORIES},
            "max_metres": {"type": "integer", "description": "50 to 2000"}}, ["category", "max_metres"]),
-    _tool("walk", "Walk along one of the roads leading off from where you are, to the next junction. You arrive "
+    _tool("walk", "Walk along one of the roads leading off from where you are, to the next intersection. You arrive "
           "by yourself when you reach the place you are heading for.",
           {"road": {"type": "integer", "description": "the road's number"},
            "toward": {"type": "string", "description": "code of the place you are heading for, or an empty string to keep the one you have"}},
@@ -76,9 +82,9 @@ Kennedy Town and Sai Ying Pun. Act as this person would, from the start time unt
 How the world works:
 - Everyone around you is living the same day, at the same time.
 - You act only through the tools. Each tool result tells you the time and where you are.
-- There is no navigation app. You find your own way: at every junction you choose which road to take. \
+- There is no navigation app. You find your own way: at every intersection you choose which road to take. \
 search_places and nearby give a place's direction and straight-line distance, not the way there.
-- Walking takes real time: walk takes you to the next junction. stay passes time at a place.
+- Walking takes real time: walk takes you to the next intersection. stay passes time at a place.
 - You know your own neighbourhood roughly, as described to you. Use only place codes that a tool or the list \
 below gave you.
 - People who commute arrive at, and leave from, their MTR exit or bus stop. Hall residents sleep in their hall.
@@ -97,7 +103,8 @@ class Person:
         self.t = parse_hhmm(a["start"])
         self.place = a["home"]
         self.node = world.places[self.place]["node"]
-        self.e_in = None          # the segment just walked, at a junction (None at a place)
+        self.e_in = None          # the segment just walked (None at a place)
+        self.arm_in = None        # at an intersection: the road they came in by
         self.dest = None          # place code they are heading for
         self.trip = None          # the trip in progress
         self.track = []           # (t_start, from, to, edge, t_end) for the walk in progress
@@ -120,6 +127,7 @@ class Person:
 class Live:
     def __init__(self, world, people):
         self.w = world
+        self.D = Decisions(world)
         self.people = {p.id: p for p in people}
         self.places_at = defaultdict(list)
         for code, p in world.places.items():
@@ -133,45 +141,55 @@ class Live:
     def night(self, t):
         return t >= 19 * 3600 or t < 6.5 * 3600
 
-    @lru_cache(maxsize=None)
-    def chain(self, u, i):
-        """Steps (from, to, edge) from junction u along segment i until the next junction or dead end."""
-        steps, a, e = [], u, i
-        while True:
-            E = self.w.edges[e]
-            b = E["v"] if E["u"] == a else E["u"]
-            steps.append((a, b, e))
-            if len(self.w.adj[b]) != 2 or b == u or len(steps) > 300:
-                return tuple(steps)
-            nxt = [j for _, j in self.w.adj[b] if j != e]
-            if not nxt:
-                return tuple(steps)
-            a, e = b, nxt[0]
+    def at_junction(self, node):
+        c = self.D.cluster_of.get(node)
+        return c if c is not None and self.D.is_decision[c] else None
 
-    def roads(self, u, e_in, t):
-        out = []
-        for k, (_, i) in enumerate(self.w.adj[u], 1):
-            ch = self.chain(u, i)
-            end = ch[-1][1]
-            E = self.w.edges[i]
-            label = "a lift" if E["lift"] else "steps" if E["steps"] > 0.5 * E["len"] else (_english(E["name"]) or "a footpath")
-            d = {"road": k, "is": label}
-            if e_in is not None:
-                d["turn"] = TURN_WORD[self.w.turn(u, e_in, None, i)]
-            d["heading"] = self.w.compass(self.w.xy[u], self.w.xy[end]) if end != u else "loops back here"
-            d["metres"] = round(sum(self.w.edges[e]["len"] for _, _, e in ch))
-            stairs = sum(self.w.edges[e]["steps"] for _, _, e in ch)
+    @lru_cache(maxsize=None)
+    def road_walk(self, node, k):
+        """Where road k (counting from 0) from node leads: the steps to the next intersection, and where they end
+        (see Decisions.advance)."""
+        start, edge = self.D.roads_from(node)[k]
+        c = self.at_junction(node)
+        cross = self.D.crossing_path(c, node, start) if c is not None and start != node else []
+        steps, where = self.D.advance(start, edge)
+        return tuple(cross + steps), where
+
+    def roads(self, p):
+        out, node = [], p.node
+        c = self.at_junction(node)
+        for k, (start, edge) in enumerate(self.D.roads_from(node)):
+            steps, where = self.road_walk(node, k)
+            E = self.w.edges[edge]
+            if c is not None:
+                A = self.D.arms[c][k]
+                label = "a lift" if E["lift"] else "steps" if E["steps"] > 0.5 * E["len"] else (_english(A["name"]) or "a footpath")
+                heading = compass(A["heading"])
+                turn = TURN_WORD[self.D.label(c, p.arm_in, k)] if p.arm_in is not None else None
+            else:
+                label = "a lift" if E["lift"] else "steps" if E["steps"] > 0.5 * E["len"] else (_english(E["name"]) or "a footpath")
+                heading = compass(self.w._bearing_out(node, edge))
+                turn = TURN_WORD[self.w.turn(node, p.e_in, None, edge)] if p.e_in is not None else None
+            d = {"road": k + 1, "is": label}
+            if turn:
+                d["turn"] = turn
+            d["heading"] = heading
+            edges = [e for _, _, e in steps]
+            d["metres"] = round(sum(self.w.edges[e]["len"] for e in edges))
+            stairs = sum(self.w.edges[e]["steps"] for e in edges)
             if stairs >= 5:
                 d["stairs_m"] = round(stairs)
-            if any(self.w.edges[e]["lift"] for _, _, e in ch):
+            if any(self.w.edges[e]["lift"] for e in edges):
                 d["lift"] = True
-            if self.night(t) and any(self.w.edges[e]["lit"] is False for _, _, e in ch):
+            if self.night(p.t) and any(self.w.edges[e]["lit"] is False for e in edges):
                 d["unlit"] = True
-            passes = [self.w.places[c]["name"] for _, b, _ in ch for c in self.places_at.get(b, ())][:3]
+            passes = list(dict.fromkeys(self.w.places[x]["name"] for _, b, _ in steps for x in self.places_at.get(b, ())))[:3]
             if passes:
                 d["passes"] = passes
-            if len(self.w.adj[end]) == 1:
-                d["ends"] = "dead end"
+            if where[0] == "junction" and where[1] == c and where[2] == k:
+                d["ends"] = "dead end, you would come back here"
+            elif where[0] == "junction":
+                d["leads_to"] = f"an intersection with {len(self.D.arms[where[1]])} roads"
             out.append(d)
         return out
 
@@ -243,17 +261,22 @@ class Live:
             if d <= SIGHT_M:
                 seen.append((d, pid, o, step, (x, y)))
         out = []
+        c = self.at_junction(me.node)
         for d, pid, o, step, xy in sorted(seen)[:MAX_SEEN]:
-            road = None
+            road, away = None, False
             if step:
                 a, b, e = step
-                for k, (_, i) in enumerate(self.w.adj[me.node], 1):
-                    if i == e:
-                        road = k
-                if road and a == me.node:
-                    doing = f"walking away from you along road {road}"
-                elif road and b == me.node:
-                    doing = f"coming toward you along road {road}"
+                if c is not None:
+                    k = self.D.arm_edges[c].get(e)
+                    if k is not None:
+                        road = k + 1
+                        away = math.dist(self.w.xy[b], self.D.centre[c]) > math.dist(self.w.xy[a], self.D.centre[c])
+                else:
+                    for k, (_, i) in enumerate(self.D.roads_from(me.node), 1):
+                        if i == e:
+                            road, away = k, a == me.node
+                if road:
+                    doing = f"walking away from you along road {road}" if away else f"coming toward you along road {road}"
                 else:
                     doing = f"walking {self.w.compass(self.w.xy[a], self.w.xy[b])}"
             else:
@@ -271,15 +294,21 @@ class Live:
         if p.place:
             v["at"] = f"{p.place} {self.w.places[p.place]['name']}"
         else:
-            names = sorted({_english(self.w.edges[i]["name"]) for _, i in self.w.adj[p.node]} - {""})
-            v["at"] = "a junction" + (f" of {', '.join(names)}" if names else "") + f", {self.w.area_of(here)}"
+            c = self.at_junction(p.node)
+            if c is not None:
+                names = sorted({_english(A["name"]) for A in self.D.arms[c]} - {""})
+                kind = "an intersection"
+            else:
+                names = sorted({_english(self.w.edges[i]["name"]) for _, i in self.w.adj[p.node]} - {""})
+                kind = "a path"
+            v["at"] = kind + (f" of {', '.join(names)}" if names else "") + f", {self.w.area_of(here)}"
         if p.dest and p.dest != p.place:
             s = self.straight(p.dest, p.node)
             v["heading_for"] = f"{p.dest} {s['name']}: {s['metres_straight_line']} m {s.get('direction', 'here')} in a straight line"
         here_places = [c for c in self.places_at.get(p.node, ()) if c != p.place]
         if here_places:
             v["places_here"] = [f"{c} {self.w.places[c]['name']}" for c in here_places[:6]]
-        v["roads"] = self.roads(p.node, p.e_in, p.t)
+        v["roads"] = self.roads(p)
         v["people_near_you"] = self.people_near(p, p.t)
         return v
 
@@ -311,30 +340,39 @@ class Live:
         return {"results": self.nearby(p.node, category, max(50, min(2000, int(max_metres)))), "now": hhmm(p.t)}, False
 
     def _walk(self, p, road, toward=""):
+        options = self.D.roads_from(p.node)
         k = int(road)
-        if not 1 <= k <= len(self.w.adj[p.node]):
-            raise ValueError(f"there is no road {k} here; the roads are numbered 1 to {len(self.w.adj[p.node])}")
+        if not 1 <= k <= len(options):
+            raise ValueError(f"there is no road {k} here; the roads are numbered 1 to {len(options)}")
         if toward:
             p.dest = self.code(toward)
-        i = self.w.adj[p.node][k - 1][1]
+        start, edge = options[k - 1]
+        dest_node = self.w.places[p.dest]["node"] if p.dest else None
+        c = self.at_junction(p.node)
+        steps, where = [], None
+        if c is not None and start != p.node:
+            for st in self.D.crossing_path(c, p.node, start):
+                steps.append(st)
+                if st[1] == dest_node:
+                    where = ("place", dest_node)
+                    break
+        if where is None:
+            more, where = self.D.advance(start, edge, dest_node)
+            steps += more
         t = p.t
         if p.trip is None:
             p.trip = {"agent": p.id, "trip": len(p.trips) + 1, "from": p.place, "to": None, "pace": p.pace,
                       "depart": round(t), "arrive": None, "metres": 0, "reason": "", "kind": "live", "auto": False,
                       "segments": [], "turns": []}
             p.visits = Counter()
-        elif len(self.w.adj[p.node]) >= 3 and p.e_in is not None:
-            p.trip["turns"].append({"node": p.node, "turn": self.w.turn(p.node, p.e_in, None, i), "t": round(t)})
-        dest_node = self.w.places[p.dest]["node"] if p.dest else None
         p.track = []
-        for a, b, e in self.chain(p.node, i):
+        for a, b, e in steps:
             secs = self.w.edges[e]["secs"] / p.pace
             p.trip["segments"].append({"edge": e, "from": a, "to": b, "t": round(t)})
             p.track.append((t, a, b, e, t + secs))
             t += secs
-            if b == dest_node:
-                break
-        p.place, p.node, p.e_in, p.t = None, p.track[-1][2], p.track[-1][3], t
+        p.place, p.node, p.e_in, p.t = None, steps[-1][1], steps[-1][2], t
+        p.arm_in = where[2] if where[0] == "junction" else None
         p.visits[p.node] += 1
         self.reindex(p)
         return {}, True
@@ -373,10 +411,13 @@ class Live:
     def arrive(self, p, place):
         tr = p.trip
         if tr:
+            segs = tr["segments"]
             tr["to"], tr["arrive"] = place, round(p.t)
-            tr["metres"] = round(sum(self.w.edges[s["edge"]]["len"] for s in tr["segments"]))
+            tr["metres"] = round(sum(self.w.edges[s["edge"]]["len"] for s in segs))
+            tr["turns"] = [{"node": segs[k]["from"], "turn": self.w.turn(segs[k]["from"], segs[k - 1]["edge"], None, segs[k]["edge"]),
+                            "t": segs[k]["t"]} for k in range(1, len(segs)) if len(self.w.adj[segs[k]["from"]]) >= 3]
             p.trips.append(tr)
-        p.trip, p.place, p.e_in = None, place, None
+        p.trip, p.place, p.e_in, p.arm_in = None, place, None, None
         if p.dest == place:
             p.dest = None
         p.node = self.w.places[place]["node"]
@@ -393,11 +434,7 @@ class Live:
         p.trip["auto"] = True
         if p.node != dst:
             w = self.w.walk(p.node, dst, p.t, self.night(p.t), pace=p.pace)
-            if p.trip["segments"] and p.e_in is not None and len(self.w.adj[p.node]) >= 3:
-                p.trip["turns"].append({"node": p.node, "turn": self.w.turn(p.node, p.e_in, None, w["segments"][0]["edge"]),
-                                        "t": round(p.t)})
             p.trip["segments"] += w["segments"]
-            p.trip["turns"] += w["turns"]
             p.track = [(s["t"], s["from"], s["to"], s["edge"], s["t"] + self.w.edges[s["edge"]]["secs"] / p.pace)
                        for s in w["segments"]]
             p.t = w["arrive"]
@@ -441,13 +478,15 @@ def mock_step(live, p):
     def head(code):
         """Take one road toward a place: the one ending closest to it, avoiding going back and repeat visits."""
         target = w.places[code]["xy"]
-        options = []
-        for k, (_, i) in enumerate(w.adj[p.node], 1):
-            if i == p.e_in and len(w.adj[p.node]) > 1:
-                continue
-            end = live.chain(p.node, i)[-1][1]
-            options.append((math.dist(w.xy[end], target) + 150 * p.visits[end] + rng.uniform(0, 20), k))
-        k = min(options)[1]
+        options, n_roads = [], len(live.D.roads_from(p.node))
+        for k in range(n_roads):
+            steps, where = live.road_walk(p.node, k)
+            if n_roads > 1 and ((p.arm_in is not None and k == p.arm_in) or
+                                (p.arm_in is None and p.e_in is not None and steps and steps[0][2] == p.e_in)):
+                continue   # not back the way it came
+            end = steps[-1][1] if steps else p.node
+            options.append((math.dist(w.xy[end], target) + 150 * p.visits[end] + rng.uniform(0, 20), k + 1))
+        k = min(options)[1] if options else 1
         if p.place is None and rng.random() < 0.2:   # sometimes go the way someone ahead is going (tests the view)
             away = [int(x["doing"].rsplit(" ", 1)[1]) for x in live.people_near(p, p.t) if "walking away" in x["doing"]]
             if away:
@@ -567,7 +606,8 @@ async def claude_step(live, p, client, system, spend):
     if p.place:
         live._stay(p, hhmm(min(DAY_END, p.t + 15 * 60)))
     else:
-        live._walk(p, 1 + next((k for k, (_, i) in enumerate(live.w.adj[p.node]) if i != p.e_in), 0))
+        ks = [k for k in range(len(live.D.roads_from(p.node))) if k != p.arm_in] or [0]
+        live._walk(p, ks[0] + 1)
 
 
 class BudgetReached(Exception):

@@ -7,13 +7,16 @@ document is yours.
 
 ## 1. Question and hypotheses
 
-- Question: when a stranger makes your same turns several times in a row, how often is that coincidence?
-- Three explanations to separate (from the Introduction): equal chance per exit (1/N), a chance weighted
-  by the road network and nearby places, or people's own plans.
+- Question (project plan, 2.2): how the number of intersections, the possible directions and popular routes
+  change the chance that two people appear to follow each other, at different times of day; and (plan,
+  section 5) how that chance changes when route preference or imitation is added.
+- What is measured: the chance that a stranger, close behind you, makes your decisions at k real
+  intersections in a row, under a ladder of assumptions: equal chance (1/n), momentum, counted shares
+  (popular routes, as sensors would record them), imitation, and people with their own plans (Agent World).
+- We do not claim that anyone sharing turns is following on purpose (plan, section 5).
 - DECIDE: the main hypothesis in one sentence, and which number would count as support for it.
   default: none written.
-- DECIDE: the number of turns that counts as "being followed". default: the paper says 3 or more; the
-  group tables in the code use 5 (`SHARE_K` in `analyze.py`).
+- DECIDE: how many intersections count as "appearing to follow". default: 3, with 5 also reported.
 
 ## 2. The map and its decision points (preprocessing)
 
@@ -47,12 +50,30 @@ document is yours.
 
 ## 3. The population (paper section 3.1)
 
-- Today: 10,000 people drawn from mixes written by hand in `make_agents.py`. Six groups: undergraduates
-  and postgraduates (in halls, commuting), staff, local residents.
-- The paper says the population represents the 2021 census. That is not true yet.
-- DECIDE: reweight the existing 10,000 to census and HKU totals (no new run), rebuild and re-run (about
-  US$20), or change the sentence in the paper. default: nothing done.
-- DECIDE: the sources for the totals (census table numbers, HKU head counts) and the year.
+- Today: 10,000 people drawn from mixes written by hand in `make_agents.py`: 74% HKU students, 10% staff,
+  16% residents. It does not represent the area.
+- Official figures, with sources, are in `hku-agents/data/population_figures.csv`:
+  - residents of the nine census areas from Kennedy Town to Sai Ying Pun (2021 census): 143,781.
+    Ages: under 15 10.1%, 15-24 7.4%, 25-44 31.6%, 45-64 29.9%, 65+ 20.9%. Activity: working 54.9%,
+    students 12.8% (including school children), retired 18.0%, home-makers 4.1%, unpaid carers 1.7%,
+    others 8.5%. Of the working residents, 33.5% work in Central & Western, 14.3% at home (12.3% of
+    working residents are domestic helpers), 9.9% have no fixed place, and the rest work elsewhere;
+  - HKU (2025/26): 45,303 students (20,103 undergraduate, 20,366 taught postgraduate, 4,834 research),
+    10,076 staff, 7,800 hall places.
+- In those proportions (residents plus HKU students and staff, before removing HKU people who already live
+  in the area): residents about 73%, HKU students about 22%, staff about 5%.
+- Gaps: the census counts residents at night (30 June 2021, during COVID), so it includes HKU people who
+  live locally and leaves out everyone who comes in by day; workers coming in can only be counted for the
+  whole district, which includes Central; no station or pedestrian counts were found.
+- Not in the current generator at all: school children (10.1% of residents) and domestic helpers
+  (6.7% of residents), two groups that walk a lot locally.
+- DECIDE: how to use the figures. default: nothing done. Options:
+  - same size, new mix: 10,000 people in the proportions above, about US$20; same crowd density as day1,
+    so the effect of the mix can be seen on its own;
+  - bigger: for example 50,000 people, about US$100, closer to the real number of people in the area;
+  - reweight day1 to these proportions: free, but only 1,618 residents carry the residents' weight.
+- DECIDE: include A13 Tung Wah (12,320 people), which reaches Aberdeen Street? default: no.
+- DECIDE: how to estimate people who come into the area to work, shop or visit. default: left out.
 
 ## 4. Arm A: Agent World (done)
 
@@ -77,75 +98,104 @@ document is yours.
 - DECIDE: keep the older baseline (the agents' own trips re-walked with noisy turns, 2,611 m per trip) as
   a fourth column, or drop it? default: kept and labelled.
 
-## 6. The Markov chain of turns (implemented in `arms.py`)
+## 6. The Markov chains (implemented in `hku-agents/following.py`)
 
-- State: a road segment and the direction walked. Next state: the next segment, with the shares seen in
-  the trips. No memory of where the walker came from or is going.
-- Number reported: two people start walking the same road together; the chance that they make the same
-  next k turns. Compared with what the trips really show, for agents and for random walkers.
-- A pair counts as "met" when they enter the same segment the same way within 90 s and were not on the
-  same route just before.
-- DECIDE: is k = 3 the headline, as in the abstract? default: k = 1 to 5 in the table, 3 in the text.
-- DECIDE: fit the chain on the random-walk trips, the agent trips, or report both? default: both.
+- State: a decision point and the road you arrived by. Choice: the road out. No other memory: this is the
+  plan's chain of decisions, made exact.
+- Four tables of choice probabilities:
+  - equal: every road out has the same chance, 1/n, where n is the number of roads other than the one
+    you came by (turning back only at a dead end);
+  - momentum: weight exp(kappa cos(change of direction)), kappa = 2, so straight on is e^2 = 7.4 times
+    likelier than a right-angle turn;
+  - counted: the shares counted at each intersection and road in, per hour of day, in the Agent World run.
+    This is what the plan's thermal sensors would record, with no way to follow anyone. An hour with fewer
+    than 30 passes uses the whole day's shares;
+  - imitation: counted, but with chance rho = 0.3 a walker takes the road the person just in front of
+    them took (at most 30 m ahead): the stranger-following effect of Wang et al.
+- Chain walkers: one per Agent World trip, starting at that trip's first decision, at the same time and
+  pace, making the same number of decisions. All walkers share one clock. 3 repeats.
+- Formula: two independent walkers arriving at state s make the same next k decisions with chance
+  q_k(s) = sum over roads a of p(a | s)^2 q_(k-1)(next(s, a)), q_0 = 1 (the plan's "X^3", made exact).
+  The simulated walkers match it (equal and momentum exactly, counted within half a point because a walk
+  can cross into the next hour), which checks the code.
+- DECIDE: kappa (default 2; 0.5 to 4 in `following_sweeps.csv`), rho (default 0.3; 0 to 0.5), and the
+  minimum passes for an hour's own table (default 30).
 
 ## 7. Arm C: the live world (implemented in `hku-agents/live.py`, not run)
 
-- No navigation app: no `go_to`, `stroll` or `route_info`. At every junction the person sees the roads
-  leading off (name, compass heading, length, stairs, lifts, unlit at night, places passed, dead ends) and
-  picks one with `walk`. `search_places` and `nearby` give only direction and straight-line distance.
-- One shared clock. Everyone whose next decision falls in the next 10 s is asked at once, then the clock
-  moves on. Each person sees the others where they really are at that moment (within 50 m: a label, age
-  decade, distance, and "walking away from you along road 2", "coming toward you", or "standing at X").
-  People inside buildings are not seen; people at parks, sights, bus stops and MTR exits are.
+- No navigation app: no `go_to`, `stroll` or `route_info`. At every real intersection (section 2) the
+  person sees its roads (name, compass heading, metres to the next intersection, stairs, lifts, unlit at
+  night, places passed, dead ends, how many roads the next intersection has) and the people within 50 m,
+  and picks one road with `walk`. Walking then goes on by itself to the next intersection.
+- `search_places` and `nearby` give a place's direction and straight-line distance, not the way there.
+  Once a person names where they are heading, every view shows its direction and straight-line distance.
+- One shared clock: everyone whose next decision falls in the next 10 s is asked at once, then the clock
+  moves on. Each person sees the others where they really are at that moment ("walking away from you along
+  road 2", "coming toward you", "standing at X"). People inside buildings are not seen.
 - Nothing in the prompt mentions following. Whether anyone follows anyone is up to the agents.
-- The people are the first N of the day1 people (same personas, homes and timetables), so the arms are
-  compared on the same people.
+- The people are the first N of the day1 people, so the arms are compared on the same people.
 - The simulator steps in only when a trip passes 90 minutes (it walks the person to where they were going,
   marked `auto`), and at midnight.
-- Memory: the persona card stays; the conversation keeps the last 8 to 24 exchanges.
-- Tested with a free rule-based walker (1,000 people) and with a fake API server (2,610 valid requests).
-- Estimated cost, assuming about 185 calls per person and about US$0.0002 per call (day1 measured
-  US$0.000175): 1,000 people about US$30 to 60, 2,000 about US$60 to 120, 10,000 about US$300 to 600.
-  Time at 24 calls in parallel: about 4 hours per 1,000 people.
-- DECIDE: how many people. With N people, everyone meets fewer strangers than with 10,000, so the live
-  world is only compared with the other arms on the same N people. default: none run.
-- DECIDE: what a person sees at a junction (list above), sight distance (default 50 m), clock step
-  (default 10 s), when the simulator takes over a lost walker (default 90 min).
+- Tested with a free rule-based walker (1,000 people; every walk continuous) and a fake API server (2,610
+  valid requests, before the move to real intersections). The rule-based walker, which steers only by
+  straight-line distance, gets lost on the hillside: the simulator had to finish 42% of its trips.
+- Estimated cost, assuming about 55 to 85 calls per person (about 6 to 12 decisions per trip plus look-ups)
+  and about US$0.0002 per call (day1 measured US$0.000175): about US$10 to 30 per 1,000 people. Not measured.
+- DECIDE: run a 20-person pilot first (`--limit 20 --budget 2`) to measure the cost and how often agents
+  get lost. default: not run.
+- DECIDE: how many people; what a person sees at an intersection; sight distance (50 m); clock step (10 s);
+  when the simulator takes over (90 min).
 - DECIDE: whether the persona card's mental map, which gives walking minutes to known places, is
   acceptable without a navigation app. default: kept.
 
-## 8. Measures (paper section 2.1)
+## 8. Measures (implemented in `hku-agents/following.py`; paper section 2.1)
 
-- $P_k$, $\bar S_k$: `analyze.py` and `arms.py`. Window W = 90 s. 5,000 trips sampled as "you".
-- $U_e$ and $p_v(\tau)$: per segment and per junction, per arm.
-- DECIDE: W. default: 90 s. A sensitivity check at 30 s and 180 s is not done.
+- Following through k intersections: the same stranger, at most 30 m (about 22 s) behind you when you
+  reach each intersection, arrives and leaves by your roads at k of your intersections in a row. P_k: share
+  of trips with such a stranger (also among trips with at least k decisions). S_k: average number of such
+  strangers per trip.
+- Pairs arriving together: two people arrive at an intersection by the same road, one at most 30 m behind
+  the other; q_k is the share that make the same next k decisions. Compared with each chain's formula.
+- Same next road, by the number of roads at the intersection (3, 4, 5, 6+).
+- By hour of departure.
+- Who follows whom: shared start and destination (within 150 m), same group.
+- The plan's table (`decision_table.csv`): for each intersection and road in, the share of each road out,
+  labelled front, left, right or back, and the share that stop there, next to the equal-chance and momentum
+  probabilities.
+- DECIDE: the following distance. default: 30 m (15 m and 60 m in `following_sweeps.csv`).
+- DECIDE: the "same place" radius for who follows whom. default: 150 m.
 
-## 9. Tests (paper section 3.3; implemented in `arms.py`)
+## 9. Tests
 
-- Per junction, and per road and direction: Pearson chi-square test of the left/right/straight/back counts,
-  agents against random walk, at least 30 passes in each arm, Benjamini-Hochberg correction. The G-test is
-  reported next to it, and the result restricted to units where every expected count is 5 or more. One
-  pooled chi-square over all turns. Effect sizes: Cramér's V and total variation distance. A noise check compares two random-walk repeats with each other.
-- Paired by direction (left with left, and so on): mean difference and Wilcoxon test across roads.
-- Diebold-Mariano: the agents' turns are the observed series; the two forecasts are equal chance per exit
-  and the random-walk shares; loss is the Brier score; one value per hour of the day.
-- Road use: Spearman correlation, share of walking on the busiest 5% of segments, and a regression of the
-  agent-to-random ratio on places within 60 m, by the eight functions of Fig. 1.
-- Known limit: one person passes the same junction several times a day, so passes are not independent and
-  the p-values are too small. The effect sizes do not have this problem.
-- DECIDE: accept this design and change the two sentences in section 3.3 that say Diebold-Mariano is run
-  over each junction? default: design as above.
+- Chi-square goodness of fit at each intersection and road in with at least 30 passes: do the Agent
+  World's counts of each road out fit equal chance, or momentum? Turning back is left out, since equal
+  chance never turns back. Benjamini-Hochberg correction; effect size w = sqrt(chi-square / passes).
+  Calibrated on the equal-chance walkers' own counts (0% rejected after correction).
+- Models against the Agent World: the formula is exact, and the chain walkers have 3 repeats, so the
+  differences are shown with their spread rather than p-values (more simulation always gives smaller p).
+- Known limit: one person passes the same intersection on several trips, so passes are not independent
+  and p-values are too small. The effect sizes do not have this problem.
+- The older tests in `arms.py` (chi-square, G-test and Diebold-Mariano on raw map junctions with four
+  fixed options) are superseded by this. DECIDE: keep them in the paper or drop them. default: drop.
 - DECIDE: significance level. default: 5% after correction.
 
 ## 10. What we report
 
-- Table: $P_k$ and $\bar S_k$ for each arm. Table: junction tests. Table or figure: Markov chain.
-- Figures: `graphs/shared-turns-three-arms.pdf`, `graphs/markov-turns.pdf`, `graphs/road-use-ratio.pdf`.
+- Figures: `graphs/intersections.pdf` (preprocessing), `graphs/following-models.pdf`,
+  `graphs/following-pairs.pdf`, `graphs/following-roads.pdf`, `graphs/following-hours.pdf`, and the two
+  amenity maps. `graphs/road-use-ratio.pdf` (road use, from `arms.py`) is still valid.
+- Superseded (raw junctions, 90 s window): `graphs/shared-turns-three-arms.pdf`, `graphs/markov-turns.pdf`.
+- Tables: `hku-agents/out/day1/analysis/following.md` and its CSV files.
 - DECIDE: which of these go in the paper, given the page limit.
 
 ## 11. Limits to state
 
-- Synthetic people; one simulated day; one run of the agents.
-- Lighting and indoor routes are mostly missing from the map; opening hours are not enforced.
-- Arms differ in trip length (section 5).
+- Synthetic people; one simulated day; one run of the agents. The mix (74% students) is not yet based on
+  the census.
+- In the Agent World people choose where to go, but walk the quickest path; the live world, where they
+  choose every road, has not been run.
+- 10,000 people are fewer than the real number of pedestrians. With the same behaviour, more people can only
+  add strangers, so the chances reported are lower than they would be on real streets.
+- Lighting is tagged on 2% of segments and indoor routes are mostly missing; opening hours are not enforced.
+- The preprocessing thresholds (section 2) are our choices.
 - DECIDE: anything else you want stated.

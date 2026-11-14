@@ -99,9 +99,35 @@ runs out, the simulator walks them home so every day closes; those trips are mar
 - `out/<run>/web/web.json`: the website data. Copy it next to `same-route-simulator.html` and republish
   the page; its banner switches from "Test run" to the model's name by itself.
 
+## Real intersections and following (the main analysis)
+
+OpenStreetMap junctions are about 13 m apart on a typical trip, because sidewalks and crossings are separate
+ways. `decisions.py` merges them into 573 real intersections, each with its real number of roads (3 to 6),
+and turns any trip into a list of decisions: (intersection, road in, road out, time). `following.py` then
+measures how often a stranger, close behind you, makes your decisions at k intersections in a row, in the
+Agent World and under four Markov chains (equal chance, momentum, counted shares, imitation):
+
+```bash
+python following.py --run day1 --control mock_day1
+```
+
+```bash
+python make_following_figures.py --run day1
+```
+
+```bash
+python make_network_figure.py
+```
+
+`--control` is optional: a run of the same people with the free rule-based planner
+(`python run_day.py --run mock_day1 --planner mock --agents out/day1/people.jsonl`). The results are in
+`out/day1/analysis/following.md` with its tables, including `decision_table.csv` (the share of each road out
+at every intersection). It takes about 4 minutes and needs `scipy`; the figures need `matplotlib`.
+
 ## The other arms
 
-The agent run is one arm of the experiment. The others are compared with it by `arms.py`:
+`arms.py` is the earlier comparison on raw map junctions (90 s window); `following.py` supersedes it, except
+for road use:
 
 ```bash
 python arms.py --run day1
@@ -112,30 +138,22 @@ python make_compare_figures.py --run day1
 ```
 
 - **Random walk** (`random_walk.py`): one trip per real trip, from a random place to a random place by the
-  quickest path, with the real trip's departure time and pace. Five repeats. Costs nothing.
+  quickest path, with the real trip's departure time and pace. Costs nothing.
 - **Same trips, noisy turns**: the older baseline from `analyze.py`, kept for reference.
-- **Live world** (`live.py`): no navigation app. Everyone lives the day on one shared clock; at every junction
-  each person sees the roads leading off and the people around them, and picks a road. The people are the
+- **Live world** (`live.py`): no navigation app. Everyone lives the day on one shared clock; at every real
+  intersection each person sees its roads and the people around them, and picks a road. The people are the
   first N of the day1 people. Try it free with the rule-based walker first:
 
 ```bash
 python live.py --run live_test --planner mock --limit 1000
 ```
 
-Then the real run, which costs money (see `method.md`, section 7, for the estimate). A stopped run resumes
-from its checkpoint when the same command is run again:
+Then a small paid pilot, to measure the cost and how often agents get lost (see `method.md`, section 7). A
+stopped run resumes from its checkpoint when the same command is run again:
 
 ```bash
-python live.py --run live --planner claude --limit 1000 --budget 60 --concurrency 24
+python live.py --run live --planner claude --limit 20 --budget 2 --concurrency 8
 ```
-
-```bash
-python arms.py --run day1 --live live
-```
-
-`arms.py` writes `out/<run>/analysis/compare.md` and its tables: shared turns per arm, the Markov chain of
-turns against what happened, the per-junction tests with the Diebold-Mariano test, and road use per arm
-with its regression on nearby places. It needs `numpy` and `scipy`; the figures need `matplotlib`.
 
 ## Cost and time
 

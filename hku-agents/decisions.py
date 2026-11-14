@@ -127,7 +127,7 @@ class Decisions:
                     arm = len(self.arms[c])
                     self.arms[c].append({"dest": dest, "heading": head, "point": point, "branches": []})
                 self.arms[c][arm]["branches"].append({"node": n, "edge": i, "end": end, "metres": length, "secs": secs,
-                                                      "nodes": mids, "last": last})
+                                                      "nodes": mids, "last": last, "edges": edges})
                 self.branch_arm[(n, i)] = (c, arm)
         for c, arms in enumerate(self.arms):
             for A in arms:
@@ -135,6 +135,14 @@ class Decisions:
                 names = Counter(world.edges[b["edge"]]["name"] for b in A["branches"])
                 A["name"] = names.most_common(1)[0][0]
         self.is_decision = [len(a) >= 3 for a in self.arms]
+        self.member_set = [set(ms) for ms in self.members]
+        # every segment on a road out of an intersection -> that road (to tell which road someone is walking on)
+        self.arm_edges = [{} for _ in self.arms]
+        for c, arms in enumerate(self.arms):
+            for k, A in enumerate(arms):
+                for b in A["branches"]:
+                    for e in b["edges"]:
+                        self.arm_edges[c].setdefault(e, k)
 
     # ---------------- walking along the network ----------------
     def _raw_end(self, n, i):
@@ -284,6 +292,79 @@ class Decisions:
             secs += self.crossing_secs(c2, self.arms[c2][a2]["main"]["node"], self.arms[c2][out]["main"]["node"])
             cur_c, cur_arm = c2, out
         return None
+
+    def crossing_path(self, c, n_in, n_out):
+        """Quickest steps (from, to, edge) inside intersection c from junction n_in to junction n_out."""
+        if n_in == n_out:
+            return []
+        inside = self.inside[c]
+        dist, prev, pq = {n_in: 0.0}, {}, [(0.0, n_in)]
+        while pq:
+            d, u = heapq.heappop(pq)
+            if u == n_out:
+                break
+            if d > dist.get(u, math.inf):
+                continue
+            for v, i in self.eff[u]:
+                if v in inside:
+                    nd = d + self.w.edges[i]["secs"]
+                    if nd < dist.get(v, math.inf):
+                        dist[v], prev[v] = nd, (u, i)
+                        heapq.heappush(pq, (nd, v))
+        if n_out not in prev:
+            return []
+        steps, v = [], n_out
+        while v != n_in:
+            u, i = prev[v]
+            steps.append((u, v, i))
+            v = u
+        return steps[::-1]
+
+    def roads_from(self, node):
+        """The roads a person standing at node can take: [(first node, first edge)] in a fixed order. At a decision
+        intersection these are its arms (k-th road = arm k); elsewhere, the paths leaving the node."""
+        c = self.cluster_of.get(node)
+        if c is not None and self.is_decision[c]:
+            return [(A["main"]["node"], A["main"]["edge"]) for A in self.arms[c]]
+        return [(node, i) for _, i in self.eff[node]] or [(node, i) for _, i in self.w.adj[node]]
+
+    def advance(self, n, e, dest=None, limit=20000):
+        """Walk from node n along edge e, on through bends, intersections without a choice and dead ends (turning
+        back), until reaching a decision intersection, the node dest, or a spot where the way splits without being
+        an intersection (stepping out of a building entrance onto a path). Returns (steps, where), where is
+        ("place", node), ("junction", intersection, road in or None, node) or ("node", node, edge in)."""
+        steps, a, edge = [], n, e
+        for _ in range(limit):
+            E = self.w.edges[edge]
+            b = E["v"] if E["u"] == a else E["u"]
+            steps.append((a, b, edge))
+            if b == dest:
+                return steps, ("place", b)
+            c = self.cluster_of.get(b)
+            if c is not None and b in self.member_set[c]:
+                ai = self.branch_arm.get((b, edge))
+                if self.is_decision[c]:
+                    return steps, ("junction", c, ai[1] if ai and ai[0] == c else None, b)
+                # an intersection without a choice: cross it and leave by its other road
+                k_in = ai[1] if ai and ai[0] == c else None
+                outs = [k for k in range(len(self.arms[c])) if k != k_in] or [k_in if k_in is not None else 0]
+                A = self.arms[c][outs[0]]["main"]
+                cross = self.crossing_path(c, b, A["node"])
+                for st in cross:
+                    steps.append(st)
+                    if st[1] == dest:
+                        return steps, ("place", st[1])
+                a, edge = A["node"], A["edge"]
+                continue
+            ways = [j for _, j in self.eff[b]]
+            if edge not in ways and len(ways) >= 2:
+                return steps, ("node", b, edge)       # came in by a stub: the person chooses which way
+            nxt = [j for j in ways if j != edge]
+            if not nxt:                               # dead end: turn back
+                a = b
+                continue
+            a, edge = b, nxt[0]
+        return steps, ("node", a, edge)
 
     def through_secs(self, c, arm_in, arm_out):
         return self.crossing_secs(c, self.arms[c][arm_in]["main"]["node"], self.arms[c][arm_out]["main"]["node"])
