@@ -1,5 +1,9 @@
 # method.md: design of the same-route experiment
 
+> **How this document was produced.** The authors gave their specifications for the experiment to Claude
+> Code, which implemented them and drafted this document from the code. The authors reviewed it and made the
+> decisions listed below. Note added 15 November 2026.
+
 **Status: skeleton.** Each section says what the code does today, then lists the design choices that are
 yours to make. A line starting with `DECIDE:` is waiting for you; the value after `default:` is what the
 code uses now. Replace the line with your choice and a one-line reason, and delete this notice when the
