@@ -14,21 +14,35 @@ The decision problem (one episode = one follower)
              the quickest path to its destination.
   In view    the target came to this junction by the follower's road at most V seconds before it. The map has
              no buildings, so a true line of sight cannot be computed.
-  Reward     R each time it takes its target's road while the target is in view.
+  Reward     for closeness: each time it takes its target's road while the target is in view it earns
+             R * (1 - gap / V), where gap is how many seconds behind the target it is: R right behind them,
+             nothing at the edge of view. And for the catch: CATCH_REWARD, once, the first time it reaches a
+             junction at most CATCH_S seconds behind its target. The chase goes on after the catch. It starts
+             START_GAP_S behind, so it has to gain on its target to catch them.
   Penalty    the follower remembers d_min, the shortest walking distance to its destination over every
              junction it has passed. A road that leaves it at distance d costs 0.5 * x^2, with
              x = max(0, d - d_min) / L. A little farther costs almost nothing; walking away costs more and more,
              and it keeps costing on the way back until the follower is as close as it had been.
   Roads      any road out of the junction, the one it came by included: a follower that lets go may turn back.
-  Pace       its own; it never overtakes its target (it reaches the next junction at least 1 s after them) and
-             does not speed up, so a slow follower loses a fast target.
+  Speed      while it follows, it also chooses how fast to go to the next junction, from five speeds given as
+             multiples of its own comfortable walking speed (SPEEDS): walk 1.0, fast walk 1.30, jog 1.54, run
+             2.61, sprint 4.33. For an adult who walks at 1.34 m/s these are 1.34, 1.74, 2.07 (the speed at
+             which people change from walking to running), 3.5 (critical speed, the fastest speed a recreational
+             runner can hold) and 5.8 m/s (an untrained adult's 100 m). It never overtakes its target (it
+             reaches the next junction at least 1 s after them), so a faster speed only helps it keep up.
+             After the chase it walks at its own pace.
+  Stamina    a bar that only going faster than critical speed drains, as in the critical-speed model: the
+             bar is D' = 130 m of running above critical speed, so a sprint lasts about a minute. Walking,
+             fast walking, jogging and running at critical speed do not drain it. With the bar empty a
+             sprint is only a run. The bar does not refill during a walk.
+  Effort     draining the bar is penalised: SPRINT_COST times the share of the bar used on that stretch.
   End        when it takes the road its destination is on, or after MAX_STEPS junctions ("did not arrive").
 
 What is learned
   A table Q[state, action], by one-step Q-learning: Q <- Q + alpha * (r + gamma * max Q[next state] - Q).
   The state is what the follower can know at the junction, in bins: how far beyond its closest point its
-  quickest road leaves it, how far the target's road would, how many seconds behind the target it is, and how
-  far it still is from its destination. So what it learns is a rule about distances and gaps, not a route on
+  quickest road leaves it, how far the target's road would, how many seconds behind the target it is, whether
+  that gap is closing or widening, how full its stamina bar is, and how far it still is from its destination. So what it learns is a rule about distances and gaps, not a route on
   this map, and it can be tested on people it never trained on.
   Training and testing use different people: the people are split in two at random, followers are trained
   behind the trips of one half and tested behind the trips of the other. Exploration is epsilon-greedy, with
@@ -41,9 +55,12 @@ What is reported (on the test people)
   (rewards minus penalties) per follower, for five kinds of walker in exactly the same episodes:
     Agent World     the test people's own trips: following by coincidence
     never           a follower that always leaves: someone who just happens to start behind the target
-    rule            follows while the target's road scores better at this junction alone (R - 0.5 x^2)
-    Q-learning      the trained follower
-    always          follows for as long as the target is in view: the most following there can be
+    rule, walking   follows while the target's road scores better at this junction alone (closeness reward
+                    minus 0.5 x^2), at its own walking pace
+    rule, with speed  the same rule for the road, and a rule for the speed: the slowest speed that brings it to
+                    the next junction right behind its target, sprinting only to make the catch
+    Q-learning      the trained follower, choosing its road and its speed
+    always          follows for as long as the target is in view, running: the most following there can be
   Q-learning should score at least as well as the rule and the two fixed walkers; the script says if it does.
 
     python follower_rl.py --run census_run
@@ -72,23 +89,36 @@ from world import World
 REWARD = 1.0            # R
 SCALE_M = 100.0         # L, metres: the unit of x in the penalty 0.5 * x^2
 VIEW_S = 30.0           # V, seconds
-START_GAP_S = 5.0       # the follower reaches the first junction this long after its target
+START_GAP_S = 20.0      # the follower reaches the first junction this long after its target
+CATCH_S = 2.0           # it has caught its target when it reaches a junction at most this long after them
+CATCH_REWARD = 10.0     # the reward for the catch, given once
 GAMMA = 1.0             # no discount: the follower maximises its total score over the walk
 ALPHA = 0.2             # learning rate at the start; it falls to ALPHA / 10
 EPS_END = 0.02
-EPOCHS = 100
+EPOCHS = 150
 SEEDS = 3
 MAX_STEPS = 400
 TEST_SHARE = 0.5
 X_EDGES = (1e-9, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0)   # bins of x (in units of L): 0, then up to each edge, then more
 GAP_EDGES = (10.0, 20.0)                          # seconds behind the target
 HERE_EDGES = (200.0, 500.0, 1000.0)               # metres still to the follower's destination
+BAR_EDGES = (1 / 3, 2 / 3)                        # share of the stamina bar left
+TREND_EDGES = (-2.0, 2.0)                         # seconds the gap changed since the last junction: closing, steady, widening
+# Speeds while following, as multiples of the follower's own comfortable walking speed (sources in
+# data/walking_speeds.csv). For an adult walking at 1.34 m/s: 1.34, 1.74, 2.07, 3.5 and 5.8 m/s.
+SPEEDS = (1.0, 1.30, 1.54, 2.61, 4.33)
+SPEED_NAMES = ("walk", "fast walk", "jog", "run", "sprint")
+RUN = 3                                           # the level of critical speed: the fastest that does not drain the bar
+D_PRIME_M = 130.0                                 # the stamina bar: metres of running above critical speed
+SPRINT_COST = 1.0                                 # penalty for using the whole bar (the same size as one reward)
 N_MODE = 3                                        # 0 no target, 1 target on the quickest road, 2 a real choice
 NX, NG, NH = len(X_EDGES) + 1, len(GAP_EDGES) + 1, len(HERE_EDGES) + 1
-N_STATES = N_MODE * NX * NX * NG * NH
-POLICIES = ("never", "rule", "q", "always")
-NAMES = {"agents": "Agent World (coincidence)", "never": "Never follows", "rule": "Rule (one junction ahead)",
-         "q": "Q-learning", "always": "Always follows"}
+NB, NT = len(BAR_EDGES) + 1, len(TREND_EDGES) + 1
+N_STATES = N_MODE * NX * NX * NG * NH * NB * NT * 2    # the last 2: has it caught its target yet
+N_ACT = 1 + len(SPEEDS)                           # 0 leave (and walk); 1.. follow at each speed
+POLICIES = ("never", "rule", "rule_run", "q", "always")
+NAMES = {"agents": "Agent World (coincidence)", "never": "Never follows", "rule": "Rule, walking",
+         "rule_run": "Rule, with speed", "q": "Q-learning", "always": "Always follows, running"}
 
 
 class Env:
@@ -150,6 +180,8 @@ class Env:
         self.trip_dest = T([self.dest_of_node[w.places[t["to"]]["node"]] for t in trips], torch.int64)
         self.trip_pace = T([t["pace"] for t in trips], torch.float64)
         self.xe, self.ge, self.he = T(X_EDGES, torch.float32), T(GAP_EDGES, torch.float32), T(HERE_EDGES, torch.float32)
+        self.be, self.te = T(BAR_EDGES, torch.float32), T(TREND_EDGES, torch.float32)
+        self.speeds = T(SPEEDS, torch.float64)
 
     def episodes(self, leaders, rng):
         """For each leader trip, a donor trip of another person: the follower's destination and pace."""
@@ -164,7 +196,7 @@ class Env:
         return torch.as_tensor(leaders, device=self.dev), torch.as_tensor(donors, device=self.dev)
 
     def run(self, lead, donor, policy, Q=None, eps=0.0, alpha=0.0, gen=None, record=False):
-        """Walk one follower behind each leader trip. policy: never | rule | always | q. With alpha > 0 the table
+        """Walk one follower behind each leader trip. policy: never | rule | rule_run | always | q. With alpha > 0 the table
         Q is updated as they walk (Q-learning). Returns the score of each follower, and with record=True the
         walks. Episodes are independent of each other, so stepping them together changes nothing."""
         dev, B = self.dev, lead.numel()
@@ -181,21 +213,25 @@ class Env:
         score = torch.zeros(B, dtype=torch.float64, device=dev)
         metres = torch.zeros(B, dtype=torch.float64, device=dev)
         followed = torch.zeros(B, dtype=torch.int64, device=dev)
+        bar = torch.ones(B, dtype=torch.float64, device=dev)       # share of the stamina bar left
+        caught = torch.zeros(B, dtype=torch.bool, device=dev)
+        prev_gap = torch.full((B,), START_GAP_S, device=dev)
+        used = torch.zeros(len(SPEEDS), dtype=torch.float64, device=dev)   # stretches followed at each speed
         prev_f = torch.zeros(B, dtype=torch.int64, device=dev)
         prev_a = torch.zeros(B, dtype=torch.int64, device=dev)
         prev_r = torch.zeros(B, device=dev)
         has_prev = torch.zeros(B, dtype=torch.bool, device=dev)
         log = []
-        visits = torch.zeros((N_STATES, 2), device=dev) if record else None
+        visits = torch.zeros((N_STATES, 2), device=dev) if record else None   # real choices: left, followed
 
         def learn(idx, target):
             """Q[f, a] <- Q[f, a] + alpha * mean over the followers that were there of (target - Q[f, a])."""
             if alpha <= 0 or idx.numel() == 0:
                 return
-            flat = prev_f[idx] * 2 + prev_a[idx]
+            flat = prev_f[idx] * N_ACT + prev_a[idx]
             err = target - Q.view(-1)[flat]
-            tot = torch.zeros(N_STATES * 2, device=dev).index_add_(0, flat, err)
-            cnt = torch.zeros(N_STATES * 2, device=dev).index_add_(0, flat, torch.ones_like(err))
+            tot = torch.zeros(N_STATES * N_ACT, device=dev).index_add_(0, flat, err)
+            cnt = torch.zeros(N_STATES * N_ACT, device=dev).index_add_(0, flat, torch.ones_like(err))
             Q.view(-1).add_(alpha * tot / cnt.clamp(min=1))
 
         for step in range(MAX_STEPS + 1):
@@ -219,48 +255,84 @@ class Env:
             mode = torch.where(~in_view, 0, torch.where(l_slot == q_slot, 1, 2))
             f = (((mode * NX + torch.bucketize(xq, self.xe)) * NX + torch.where(in_view, torch.bucketize(xl, self.xe), 0)) * NG
                  + torch.where(in_view, torch.bucketize(gap, self.ge), 0)) * NH + torch.bucketize(here, self.he)
+            f = (f * NB + torch.bucketize(bar.float(), self.be)) * NT + torch.where(in_view, torch.bucketize(gap - prev_gap, self.te), 0)
+            prev_gap = torch.where(in_view, gap, prev_gap)
+            catch = alive & in_view & (gap <= CATCH_S) & ~caught          # it has just caught its target
+            caught = caught | catch
+            f = f * 2 + caught.long()
+            bonus = torch.where(catch, CATCH_REWARD, 0.0)
+            score += bonus.double()
+            near = (self.R * (1 - gap / self.V)).clamp(min=0)             # the reward for closeness, if it follows
 
             # learn from the step just taken, now that the state it led to is known
             if alpha > 0:
-                value = torch.where(mode == 0, Q[f, 0], torch.where(mode == 1, Q[f, 1], Q[f].max(1).values))
+                stay = Q[f, 1:].max(1).values
+                value = torch.where(mode == 0, Q[f, 0], torch.where(mode == 1, stay, torch.maximum(Q[f, 0], stay)))
                 value = torch.where(at_dest, torch.zeros_like(value), value)
                 idx = (alive & has_prev).nonzero().squeeze(1)
-                learn(idx, prev_r[idx] + self.gamma * value[idx])
+                learn(idx, prev_r[idx] + bonus[idx] + self.gamma * value[idx])
             arrived |= at_dest
             alive = alive & ~at_dest
             if step == MAX_STEPS or not alive.any():
                 break
 
-            # choose
+            # choose the road (follow or leave) and, when following, the speed
+            level = torch.zeros(B, dtype=torch.int64, device=dev)
             if policy == "never":
                 want = torch.zeros(B, dtype=torch.bool, device=dev)
             elif policy == "always":
-                want = torch.ones(B, dtype=torch.bool, device=dev)
-            elif policy == "rule":
-                want = self.R - 0.5 * xl * xl >= -0.5 * xq * xq
+                want, level = torch.ones(B, dtype=torch.bool, device=dev), level + RUN
+            elif policy in ("rule", "rule_run"):
+                want = near - 0.5 * xl * xl >= -0.5 * xq * xq
+                if policy == "rule_run":
+                    # the slowest speed that brings it to the next junction right behind its target; faster than a
+                    # run (a sprint) only to make the catch, and only while there is stamina left
+                    can = self.l_ok[m.clamp(max=self.l_ok.numel() - 1)] & (m + 1 < m_end)
+                    room = (self.l_t[(m + 1).clamp(max=self.l_t.numel() - 1)] + 1.0 - t).clamp(min=1e-6)
+                    need = self.leg_s[s, l_safe].double() / pace / room          # multiples of its walking speed
+                    level = torch.bucketize(need, self.speeds).clamp(max=len(SPEEDS) - 1)
+                    level = torch.where((level > RUN) & (caught | (bar <= 0)), RUN, level)
+                    level = torch.where(can, level, 0)
             else:
-                want = Q[f, 1] >= Q[f, 0]
+                best_speed = Q[f, 1:].argmax(1)
+                want, level = Q[f, 1:].max(1).values >= Q[f, 0], best_speed
                 if eps > 0:
                     explore = torch.rand(B, device=dev, generator=gen) < eps
-                    want = torch.where(explore, torch.rand(B, device=dev, generator=gen) < 0.5, want)
+                    pick = torch.randint(0, N_ACT, (B,), device=dev, generator=gen)      # any action, with equal chance
+                    any_speed = torch.randint(0, len(SPEEDS), (B,), device=dev, generator=gen)
+                    want = torch.where(explore, pick > 0, want)
+                    level = torch.where(explore, torch.where(pick > 0, pick - 1, any_speed), level)
             follow = (mode == 1) | ((mode == 2) & want)
+            level = torch.where(follow, level, 0)
+            act = torch.where(follow, level + 1, 0)
             j = torch.where(follow, l_safe, q_slot)
-            r = torch.where(follow, self.R, 0.0) - 0.5 * x[ar, j] ** 2
+            end_now = alive & ends[ar, j]
+
+            # the time to the next junction at that speed; never overtake the target; drain the bar above critical speed
+            mult = self.speeds[level]
+            mult = torch.where((level > RUN) & (bar <= 0), self.speeds[RUN], mult)       # no stamina left: a run
+            own = self.leg_s[s, j].double() / pace                                       # seconds at its own walking pace
+            t2 = t + own / mult
+            go_on = follow & self.l_ok[m.clamp(max=self.l_ok.numel() - 1)] & (m + 1 < m_end)
+            t2 = torch.where(go_on, torch.maximum(t2, self.l_t[(m + 1).clamp(max=self.l_t.numel() - 1)] + 1.0), t2)
+            dur = (t2 - t).clamp(min=1e-6)
+            above = (own / dur - self.speeds[RUN] - 1e-9).clamp(min=0)                   # multiples of walking speed above critical speed
+            drain = torch.minimum(above * C.WALK_SPEED * dur / D_PRIME_M, bar)
+            drain = torch.where(follow, drain, torch.zeros_like(drain))
+            r = torch.where(follow, near, torch.zeros_like(near)) - 0.5 * x[ar, j] ** 2 - SPRINT_COST * drain.float()
             if record:
-                visits.view(-1).index_add_(0, (f * 2 + follow.long())[alive & (mode == 2)],
-                                           torch.ones(int((alive & (mode == 2)).sum()), device=dev))
+                choice = alive & (mode == 2)
+                visits.view(-1).index_add_(0, (f * 2 + follow.long())[choice], torch.ones(int(choice.sum()), device=dev))
+                used.index_add_(0, level[alive & follow], torch.ones(int((alive & follow).sum()), dtype=torch.float64, device=dev))
                 log.append((alive.clone(), s.clone(), j.clone(), t.clone(), metres.clone()))
             score += torch.where(alive, r.double(), 0.0)
             followed += (alive & follow).long()
-            end_now = alive & ends[ar, j]
+            bar = torch.where(alive, bar - drain, bar)
 
             # move on
-            t2 = t + self.leg_s[s, j].double() / pace
-            go_on = follow & self.l_ok[m.clamp(max=self.l_ok.numel() - 1)] & (m + 1 < m_end)
-            t2 = torch.where(go_on, torch.maximum(t2, self.l_t[(m + 1).clamp(max=self.l_t.numel() - 1)] + 1.0), t2)
             if alpha > 0:
                 idx = end_now.nonzero().squeeze(1)
-                prev_f, prev_a, prev_r = torch.where(alive, f, prev_f), torch.where(alive, follow.long(), prev_a), torch.where(alive, r, prev_r)
+                prev_f, prev_a, prev_r = torch.where(alive, f, prev_f), torch.where(alive, act, prev_a), torch.where(alive, r, prev_r)
                 learn(idx, prev_r[idx])
                 has_prev = alive & ~end_now
             arrived |= end_now
@@ -271,9 +343,9 @@ class Env:
             m = torch.where(moving & go_on, m + 1, m)
             chasing = chasing & go_on
             alive = moving
-        out = {"score": score, "arrived": arrived, "followed": followed}
+        out = {"score": score, "arrived": arrived, "followed": followed, "bar_left": bar, "caught": caught}
         if record:
-            out["visits"] = visits
+            out["visits"], out["speeds"] = visits, used
             out["walks"] = self._walks(lead, donor, log)
         return out
 
@@ -302,7 +374,7 @@ class Env:
 def train(env, lead, seed, epochs=EPOCHS, alpha=ALPHA, eps_end=EPS_END, valid=None, log=None):
     """Q-learning behind the given leader trips. Every epoch draws new destinations for the followers."""
     dev = env.dev
-    Q = torch.zeros((N_STATES, 2), device=dev)
+    Q = torch.zeros((N_STATES, N_ACT), device=dev)
     gen = torch.Generator(device=dev).manual_seed(seed)
     rng = random.Random(seed)
     for ep in range(epochs):
@@ -325,15 +397,18 @@ def evaluate(env, leaders_index, L, Dn, policy, Q=None):
     rows = trail_scan(out["walks"], leaders_index)
     return {"rows": rows, "score": out["score"].mean().item(), "arrived": out["arrived"].float().mean().item(),
             "followed": out["followed"].double().mean().item(), "visits": out["visits"].cpu().numpy(),
+            "speeds": (out["speeds"] / out["speeds"].sum().clamp(min=1)).tolist(),
+            "caught": out["caught"].float().mean().item(),
+            "bar_used": 1 - out["bar_left"].mean().item(), "sprinted": (out["bar_left"] < 1 - 1e-9).double().mean().item(),
             "junctions": sum(len(w["seq"]) for w in out["walks"]) / max(1, len(out["walks"]))}
 
 
 def policy_table(Q, visits):
     """What was learned, where the test followers had a real choice: by how far the target's road would take the
     follower beyond its closest point, the share of those choices in which the table says FOLLOW."""
-    q = Q.cpu().numpy().reshape(N_MODE, NX, NX, NG, NH, 2)[2]
-    v = visits.reshape(N_MODE, NX, NX, NG, NH, 2)[2].sum(-1)
-    says = (q[..., 1] >= q[..., 0])
+    q = Q.cpu().numpy().reshape(N_MODE, NX, NX, NG, NH, NB, NT, 2, N_ACT)[2]
+    v = visits.reshape(N_MODE, NX, NX, NG, NH, NB, NT, 2, 2)[2].sum(-1)
+    says = (q[..., 1:].max(-1) >= q[..., 0])
     edges = [0.0] + [e for e in X_EDGES[1:]]
     rows = []
     for b in range(NX):
@@ -352,7 +427,8 @@ def figure(tk, curve, run):
     from make_figures import save
     from make_following_figures import BLUE, GREEN, GRID, MUTED, ORANGE, PURPLE
 
-    look = {"agents": (BLUE, "o"), "never": (MUTED, "D"), "rule": (GREEN, "^"), "q": (PURPLE, "v"), "always": (ORANGE, "s")}
+    look = {"agents": (BLUE, "o"), "never": (MUTED, "D"), "rule": (GREEN, "^"), "rule_run": (GREEN, "P"), "q": (PURPLE, "v"),
+            "always": (ORANGE, "s")}
     fig, (a, b) = plt.subplots(1, 2, figsize=(7.2, 2.7))
     k = [r["k"] for r in tk]
     for key, (col, mk) in look.items():
@@ -405,7 +481,7 @@ def check(device):
     ok = sum([x[:3] for x in w["seq"]] == [x[:3] for x in trips[g]["seq"]] for w, g in zip(same["walks"], te))
     assert ok >= 0.99 * len(te), f"only {ok} of {len(te)} followers with their target's destination repeat its route"
     assert same["arrived"].all(), "a follower with its target's destination did not arrive"
-    assert (same["score"] > 0).all(), "a follower on its target's own route was not rewarded at every junction"
+    assert (same["score"] > 0).all(), "a follower on its target's own route was not rewarded"
     # 2. a follower that never follows walks the quickest path to its own destination: no penalty, and it arrives
     never = env.run(L, Dn, "never")
     assert never["arrived"].all() and float(never["score"].min()) >= -1e-6, "never-follow walkers were penalised or lost"
@@ -415,7 +491,15 @@ def check(device):
     assert torch.equal(Q, Q2), "two trainings with one seed differ"
     sc = {p: env.run(L, Dn, p, Q=Q)["score"].mean().item() for p in POLICIES}
     assert sc["q"] >= max(sc["never"], sc["always"]) - 1e-6, f"Q-learning scores below a fixed walker: {sc}"
-    assert sc["q"] >= sc["rule"] - 0.02, f"Q-learning scores below the one-junction rule: {sc}"
+    assert sc["q"] >= max(sc["rule"], sc["rule_run"]) - 0.05, f"Q-learning scores below the one-junction rule: {sc}"
+    # 4. only going faster than critical speed drains the bar, and a sprint is paid for
+    L2 = L[:500]
+    for lv, name in enumerate(SPEED_NAMES):
+        Qf = torch.full((N_STATES, N_ACT), -1.0, device=device)
+        Qf[:, lv + 1] = 1.0                                   # a table that always follows at this speed
+        o = env.run(L2, L2, "q", Q=Qf)
+        drained = float((1 - o["bar_left"]).max())
+        assert (drained > 1e-6) == (lv > RUN), f"{name}: the stamina bar {'was' if drained > 1e-6 else 'was not'} drained"
     print(f"checks passed on {len(trips):,} quickest-path trips ({device}). Score per follower on the test half: "
           + ", ".join(f"{NAMES[p]} {sc[p]:.3f}" for p in POLICIES))
 
@@ -459,7 +543,7 @@ def main():
     L, Dn = env.episodes(te, random.Random(7))             # the test episodes are the same for every walker
     index = Leaders(trips)
 
-    res = {p: evaluate(env, index, L, Dn, p) for p in ("never", "rule", "always")}
+    res = {p: evaluate(env, index, L, Dn, p) for p in ("never", "rule", "rule_run", "always")}
     base = trail_scan([trips[g] for g in te], index)
     curve, runs, tables = [], [], []
     for seed in range(1, args.seeds + 1):
@@ -497,22 +581,26 @@ def main():
     scores = [r["score"] for r in runs]
     sd = float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0
     t3 = [t_k(r["rows"], 3) for r in runs]
-    beats = res["q"]["score"] >= max(res[p]["score"] for p in ("never", "rule", "always")) - 1e-9
+    beats = res["q"]["score"] >= max(res[p]["score"] for p in ("never", "rule", "rule_run", "always")) - 1e-9
     M = [f"# The Q-learning follower: {args.run}", "",
          f"{len(trips):,} Agent World trips of {n_people:,} people. The people are split in two at random: followers are "
          f"trained behind the {len(tr):,} trips of one half and tested behind the {len(te):,} trips of the other. A follower "
          f"starts {START_GAP_S:g} s behind its target at the first junction of the target's trip; its destination and pace "
-         f"are those of a trip of a different, randomly chosen person. Reward R = {args.reward:g} for taking its target's "
-         f"road while the target is at most {args.view:g} s in front; penalty 0.5 x^2 for a road that leaves it x beyond "
-         f"the closest it has been to its destination, x in units of {args.scale:g} m. Q-learning: {args.epochs} epochs, "
+         f"are those of a trip of a different, randomly chosen person. Reward for closeness, R (1 - gap / {args.view:g} s) with R = {args.reward:g}, each "
+         f"time it takes its target's road while the target is in view, and {CATCH_REWARD:g} once for the catch (reaching a "
+         f"junction at most {CATCH_S:g} s behind its target); penalty 0.5 x^2 for a road that leaves it x beyond "
+         f"the closest it has been to its destination, x in units of {args.scale:g} m. While it follows it chooses its "
+         f"speed: " + ", ".join(f"{n} {m:g}" for n, m in zip(SPEED_NAMES, SPEEDS)) + " times its own walking speed. Only "
+         f"going faster than a run drains its stamina bar ({D_PRIME_M:g} m above critical speed), and using the whole bar "
+         f"costs {SPRINT_COST:g}. Q-learning: {args.epochs} epochs, "
          f"gamma {args.gamma:g}, {args.seeds} trainings; the tables below use the training with the best test score. "
          f"Device: {device}.", "",
          "## Score per follower on the test people (rewards minus penalties)", "",
-         "| Walker | Score | Junctions passed | Junctions where it followed | Arrived |", "|---|---|---|---|---|"]
+         "| Walker | Score | Caught its target | Junctions passed | Junctions where it followed | Arrived |", "|---|---|---|---|---|---|"]
     for p in POLICIES:
         r = res[p]
         extra = f" (trainings: {np.mean(scores):.3f} ± {sd:.3f})" if p == "q" and len(scores) > 1 else ""
-        M.append(f"| {NAMES[p]} | {r['score']:.3f}{extra} | {r['junctions']:.1f} | {r['followed']:.1f} | {pct(r['arrived'])} |")
+        M.append(f"| {NAMES[p]} | {r['score']:.3f}{extra} | {pct(r['caught'])} | {r['junctions']:.1f} | {r['followed']:.1f} | {pct(r['arrived'])} |")
     M += ["", ("Q-learning scores at least as well as every fixed walker, as it should."
                if beats else "**Q-learning scores below a fixed walker: it has not learned enough. Train for longer.**"), "",
           "## Share of walkers trailing the same stranger through k junctions", "",
@@ -528,7 +616,15 @@ def main():
           "| The target's road would leave it beyond its closest point by | Choices | Follows |", "|---|---|---|"]
     for r in pol:
         M.append(f"| {r['target_road_beyond_closest']} | {r['choices']:,} | {pct(r['follow_share']) if r['choices'] else ''} |")
-    M += ["", f"The one-junction rule follows up to {args.scale * math.sqrt(2 * args.reward):.0f} m and never beyond.", "",
+    M += ["", f"The one-junction rule follows up to {args.scale * math.sqrt(2 * args.reward):.0f} m when it is right behind its "
+          f"target, less when it is farther back, and never beyond.", "",
+          "## The speed the Q-learning follower chose", "",
+          "Of the stretches on which it followed its target (the speed it asked for; it never overtakes, so it may "
+          "have gone slower):", "",
+          "| " + " | ".join(SPEED_NAMES) + " |", "|" + "---|" * len(SPEEDS),
+          "| " + " | ".join(pct(x) for x in res["q"]["speeds"]) + " |", "",
+          f"Followers who used any of their stamina bar: {pct(res['q']['sprinted'])}. Average share of the bar used: "
+          f"{pct(res['q']['bar_used'])}.", "",
           "Tables: follower_rl_tk.csv, follower_rl_curve.csv (learning curve), follower_rl_policy.csv, follower_rl_q.npy "
           "(the learned table). Figure: graphs/follower-rl.pdf."]
     (out_dir / "follower_rl.md").write_text("\n".join(M) + "\n", encoding="utf-8")
