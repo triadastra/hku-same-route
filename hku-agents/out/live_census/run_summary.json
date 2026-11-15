@@ -2,26 +2,26 @@
   "arm": "live",
   "planner": "claude",
   "partial": true,
-  "clock_reached": "15:10",
+  "clock_reached": "16:22",
   "note": "stopped before midnight; only trips finished by clock_reached are included",
   "agents": 1000,
-  "agents_started": 988,
-  "walks_in_progress_left_out": 80,
-  "calls": 106222,
-  "trips": 2896,
+  "agents_started": 998,
+  "walks_in_progress_left_out": 96,
+  "calls": 119801,
+  "trips": 3169,
   "auto_trips": 24,
-  "usd": 32.1324,
-  "usd_per_agent": 0.03213,
+  "usd": 36.2984,
+  "usd_per_agent": 0.0363,
   "tokens": {
-    "input": 215748,
-    "cache_write": 99664899,
-    "cache_read": 1308658232,
-    "output": 13132271
+    "input": 243244,
+    "cache_write": 112674813,
+    "cache_read": 1478779428,
+    "output": 14803849
   },
   "how_days_ended": {
-    "cut": 941,
-    "no tool call": 9,
-    "call limit": 17,
-    "ended": 33
+    "cut": 922,
+    "no tool call": 13,
+    "call limit": 22,
+    "ended": 43
   }
 }
