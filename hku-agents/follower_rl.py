@@ -472,44 +472,68 @@ def figure(tk, curve, run, suffix=""):
 
 
 def figure_pairs(pairs, run, suffix=""):
-    """The matched-pairs differences with their 95% intervals, drawn with seaborn. Every interval has its own
-    panel, zoomed so the interval spans it; the ticks give the lower limit, the mean and the upper limit. Rows:
-    each follower minus the never-follow walker, then Q-learning minus the rule with speed. Columns: k."""
+    """The matched-pairs differences with their 95% intervals, drawn with seaborn, as two graphs with one axis
+    each and one colour per k. follower-rl-intervals: each follower minus the never-follow walker (the axis is
+    zoomed in on the values and does not start at zero, because the intervals are under one point either way).
+    follower-rl-intervals-qlearning: Q-learning minus the rule with speed, against zero."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import seaborn as sns
     from make_figures import save
 
-    never = [(NAMES[p], NAMES["never"]) for p in ("always", "q", "rule_run", "rule")]
-    rows = never + [(NAMES["q"], NAMES["rule_run"])]
-    labels = [f"{w}\nminus never follows" for w, _ in never] + ["Q-learning\nminus rule with speed"]
     ks = sorted({int(r["k"]) for r in pairs})
-    palette = sns.color_palette("deep")
-    with sns.axes_style("whitegrid"), sns.plotting_context("paper", font_scale=0.85):
-        fig, axes = plt.subplots(len(rows), len(ks), figsize=(7.2, 4.6), squeeze=False)
-        for i, (walker, minus) in enumerate(rows):
-            colour = palette[0] if minus == NAMES["never"] else palette[4]
-            for j, k in enumerate(ks):
-                ax = axes[i][j]
-                r = next(r for r in pairs if int(r["k"]) == k and r["walker"] == walker and r["minus"] == minus)
-                d, lo, hi = (100 * float(r[c]) for c in ("diff", "lo", "hi"))
-                ax.errorbar([d], [0], xerr=[[d - lo], [hi - d]], fmt="o", color=colour, ecolor=colour, elinewidth=3,
-                            capsize=9, capthick=2, markersize=7, markeredgecolor="white", markeredgewidth=1)
-                pad = (hi - lo) * 0.14
-                ax.set_xlim(lo - pad, hi + pad)                   # the interval spans the panel
-                ax.set_ylim(-1, 1)
-                ax.set_xticks([lo, d, hi], [f"{lo:.1f}", f"{d:.1f}", f"{hi:.1f}"])
-                ax.set_yticks([])
-                ax.grid(axis="y", visible=False)
-                if i == 0:
-                    ax.set_title(f"Through {k} junctions", fontsize=8.5, loc="left")
-                if j == 0:
-                    ax.set_ylabel(labels[i], rotation=0, ha="right", va="center", fontsize=7.5, labelpad=6)
-                sns.despine(ax=ax, left=True)
-        fig.supxlabel("Difference in percentage points: mean over people (dot) and 95% interval (bar)", fontsize=8)
-        fig.tight_layout(h_pad=0.9, w_pad=1.2)
-    save(fig, ("follower-rl-intervals" if run == "census_run" else f"follower-rl-intervals-{run}") + suffix.replace("_", "-"))
+    # the fewest junctions red, the most blue, amber between (authors' choice of red and blue)
+    shades = ["#c44e52", "#e0a030", "#4c72b0"] if len(ks) == 3 else sns.color_palette("deep", len(ks))
+    colour = dict(zip(ks, shades))
+    ink = "#1f2423"
+
+    def bar(ax, y, r, label_dy):
+        k = int(r["k"])
+        d, lo, hi = (100 * float(r[c]) for c in ("diff", "lo", "hi"))
+        ax.errorbar([d], [y], xerr=[[d - lo], [hi - d]], fmt="o", color=colour[k], ecolor=colour[k], elinewidth=2.6,
+                    capsize=5, capthick=1.8, markersize=5.5, markeredgecolor="white", markeredgewidth=0.9, zorder=3)
+        ax.text(d, y + label_dy, f"{d:+.1f}  ({lo:.1f} to {hi:.1f})", ha="center", va="bottom", fontsize=6.3, color=ink)
+
+    walkers = [NAMES[p] for p in ("rule", "rule_run", "q", "always")]            # bottom to top
+    step = 0.28
+    with sns.axes_style("whitegrid"), sns.plotting_context("paper", font_scale=0.9):
+        fig, top = plt.subplots(figsize=(7.2, 4.1))
+        fig2, low = plt.subplots(figsize=(7.2, 1.9))
+        mine = [r for r in pairs if r["minus"] == NAMES["never"]]
+        for y, name in enumerate(walkers):
+            for i, k in enumerate(ks):                            # the smallest k on top within a row
+                r = next(r for r in mine if int(r["k"]) == k and r["walker"] == name)
+                bar(top, y + step * (1 - i), r, 0.075)
+        lo, hi = min(100 * float(r["lo"]) for r in mine), max(100 * float(r["hi"]) for r in mine)
+        top.set_xlim(lo - (hi - lo) * 0.09, hi + (hi - lo) * 0.09)
+        top.set_ylim(-0.5, len(walkers) - 0.38)
+        top.set_yticks(range(len(walkers)), walkers)
+        top.grid(axis="y", visible=False)
+        for y in range(1, len(walkers)):
+            top.axhline(y - 0.5 + 0.06, color="#e3e6e4", lw=0.8)
+        top.set_title("Each follower minus a walker that never follows", loc="left", fontsize=9)
+        top.set_xlabel("Percentage points (axis does not start at zero)")
+        top.legend(handles=[plt.Line2D([], [], color=colour[k], marker="o", lw=2.6, ms=5.5, mec="white", label=f"through {k} junctions")
+                            for k in ks], frameon=False, loc="lower right", fontsize=7.5)
+        close = [r for r in pairs if r["minus"] == NAMES["rule_run"] and r["walker"] == NAMES["q"]]
+        for i, k in enumerate(ks):
+            bar(low, len(ks) - 1 - i, next(r for r in close if int(r["k"]) == k), 0.16)
+        low.axvline(0, color="#6b7370", lw=1.0)
+        low.text(0.03, len(ks) - 0.75, "no difference", fontsize=6.5, color="#6b7370", va="center")
+        low.set_xlim(-0.15, max(100 * float(r["hi"]) for r in close) * 1.12)
+        low.set_ylim(-0.5, len(ks) - 0.25)
+        low.set_yticks(range(len(ks)), [f"{k} junctions" for k in reversed(ks)])
+        low.grid(axis="y", visible=False)
+        low.set_title("Q-learning minus the rule with speed", loc="left", fontsize=9)
+        low.set_xlabel("Percentage points: mean over people (dot) and 95% interval (bar)")
+        sns.despine(fig=fig, left=True)
+        sns.despine(fig=fig2, left=True)
+        fig.tight_layout()
+        fig2.tight_layout()
+    name = ("follower-rl-intervals" if run == "census_run" else f"follower-rl-intervals-{run}")
+    save(fig, name + suffix.replace("_", "-"))
+    save(fig2, name + "-qlearning" + suffix.replace("_", "-"))
 
 
 def split_people(trips, seed, test_share=TEST_SHARE):
@@ -729,7 +753,8 @@ def main():
           f"Followers who used any of their stamina bar: {pct(res['q']['sprinted'])}. Average share of the bar used: "
           f"{pct(res['q']['bar_used'])}.", "",
           "Tables: follower_rl_tk.csv, follower_rl_curve.csv (learning curve), follower_rl_policy.csv, follower_rl_q.npy "
-          "(the learned table), follower_rl_paired.csv. Figures: graphs/follower-rl.pdf, graphs/follower-rl-intervals.pdf."]
+          "(the learned table), follower_rl_paired.csv. Figures: graphs/follower-rl.pdf, graphs/follower-rl-intervals.pdf, "
+          "graphs/follower-rl-intervals-qlearning.pdf."]
     (out_dir / f"follower_rl{args.suffix}.md").write_text("\n".join(M) + "\n", encoding="utf-8")
     if not args.no_figure:
         figure(tk, curve, args.run, args.suffix)
