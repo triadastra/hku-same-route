@@ -1,0 +1,22 @@
+k,walker,minus,diff,lo,hi,people,t
+3,"Rule, walking",Never follows,0.26,0.2527,0.2672,4974,70.4901
+3,"Rule, with speed",Never follows,0.2795,0.2723,0.2867,4974,76.1353
+3,Q-learning,Never follows,0.2864,0.2791,0.2936,4974,77.6482
+3,"Always follows, running",Never follows,0.2948,0.2876,0.3021,4974,79.9021
+3,Never follows,Agent World (coincidence),0.1667,0.157,0.1765,4974,33.4085
+3,Q-learning,Agent World (coincidence),0.4531,0.4446,0.4616,4974,104.3138
+3,Q-learning,"Rule, with speed",0.0068,0.0048,0.0089,4974,6.482
+5,"Rule, walking",Never follows,0.3479,0.3396,0.3563,4974,81.5925
+5,"Rule, with speed",Never follows,0.417,0.4086,0.4253,4974,97.9085
+5,Q-learning,Never follows,0.4328,0.4244,0.4411,4974,101.0399
+5,"Always follows, running",Never follows,0.46,0.4517,0.4684,4974,108.2822
+5,Never follows,Agent World (coincidence),0.1341,0.1241,0.1441,4974,26.3579
+5,Q-learning,Agent World (coincidence),0.5668,0.5581,0.5756,4974,126.4361
+5,Q-learning,"Rule, with speed",0.0158,0.0126,0.0189,4974,9.8747
+10,"Rule, walking",Never follows,0.2656,0.2569,0.2744,4974,59.4998
+10,"Rule, with speed",Never follows,0.4139,0.4046,0.4232,4974,87.0113
+10,Q-learning,Never follows,0.4282,0.4188,0.4375,4974,89.6491
+10,"Always follows, running",Never follows,0.5348,0.525,0.5447,4974,106.6859
+10,Never follows,Agent World (coincidence),0.0507,0.0432,0.0581,4974,13.3505
+10,Q-learning,Agent World (coincidence),0.4788,0.4699,0.4878,4974,105.0116
+10,Q-learning,"Rule, with speed",0.0143,0.0103,0.0182,4974,7.0521

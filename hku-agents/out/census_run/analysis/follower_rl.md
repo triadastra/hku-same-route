@@ -9,7 +9,7 @@
 | Never follows | 1.195 | 8.6% | 30.7 | 2.4 | 100.0% |
 | Rule, walking | 5.489 | 29.5% | 38.8 | 10.7 | 100.0% |
 | Rule, with speed | 11.636 | 91.7% | 44.1 | 17.0 | 100.0% |
-| Q-learning | 11.563 (trainings: 11.444 ± 0.140) | 93.2% | 45.4 | 18.0 | 100.0% |
+| Q-learning | 11.563 | 93.2% | 45.4 | 18.0 | 100.0% |
 | Always follows, running | -139.545 | 93.4% | 57.4 | 26.7 | 100.0% |
 
 Q-learning scores at least as well as the walkers that never follow, always follow, or follow by the walking rule, as it should.
@@ -30,7 +30,35 @@ At most 30 m behind along the road each time. In brackets: 95% bootstrap interva
 | 8 | 17.1% (16.5% to 17.7%) | 23.0% (22.5% to 23.6%) | 43.3% (42.6% to 44.2%) | 69.3% (68.7% to 70.1%) | 71.8% (71.2% to 72.5%) | 79.9% (79.2% to 80.4%) |
 | 10 | 11.7% (11.2% to 12.2%) | 15.6% (15.1% to 16.0%) | 34.2% (33.5% to 35.0%) | 58.7% (58.0% to 59.4%) | 60.8% (60.2% to 61.6%) | 72.0% (71.2% to 72.6%) |
 
-Q-learning, T_3 over the 3 trainings: 96.4%, 96.4%, 96.4%.
+## Differences, as matched pairs by person
+
+For every test person: the share of their trips on which one walker trails the same stranger through k junctions, minus the same share for another walker behind the same trips. The table gives the mean difference over people in percentage points, with its 95% t-interval (mean ± t* s / √n). A person is one observation, so several trips by one person are not counted as independent.
+
+| k | Walker | minus | Difference (points) | 95% interval | People |
+|---|---|---|---|---|---|
+| 3 | Rule, walking | Never follows | +20.9 | +20.2 to +21.6 | 4,974 |
+| 3 | Rule, with speed | Never follows | +28.4 | +27.7 to +29.1 | 4,974 |
+| 3 | Q-learning | Never follows | +29.9 | +29.1 to +30.6 | 4,974 |
+| 3 | Always follows, running | Never follows | +30.8 | +30.1 to +31.6 | 4,974 |
+| 3 | Never follows | Agent World (coincidence) | +14.7 | +13.7 to +15.7 | 4,974 |
+| 3 | Q-learning | Agent World (coincidence) | +44.6 | +43.8 to +45.5 | 4,974 |
+| 3 | Q-learning | Rule, with speed | +1.5 | +1.2 to +1.7 | 4,974 |
+| 5 | Rule, walking | Never follows | +23.2 | +22.3 to +24.0 | 4,974 |
+| 5 | Rule, with speed | Never follows | +41.9 | +41.1 to +42.8 | 4,974 |
+| 5 | Q-learning | Never follows | +44.3 | +43.5 to +45.2 | 4,974 |
+| 5 | Always follows, running | Never follows | +47.6 | +46.8 to +48.5 | 4,974 |
+| 5 | Never follows | Agent World (coincidence) | +10.5 | +9.5 to +11.5 | 4,974 |
+| 5 | Q-learning | Agent World (coincidence) | +54.8 | +53.9 to +55.7 | 4,974 |
+| 5 | Q-learning | Rule, with speed | +2.4 | +2.0 to +2.7 | 4,974 |
+| 10 | Rule, walking | Never follows | +17.6 | +16.8 to +18.4 | 4,974 |
+| 10 | Rule, with speed | Never follows | +40.9 | +39.9 to +41.8 | 4,974 |
+| 10 | Q-learning | Never follows | +42.8 | +41.8 to +43.7 | 4,974 |
+| 10 | Always follows, running | Never follows | +53.5 | +52.5 to +54.5 | 4,974 |
+| 10 | Never follows | Agent World (coincidence) | +3.3 | +2.6 to +4.1 | 4,974 |
+| 10 | Q-learning | Agent World (coincidence) | +46.1 | +45.2 to +47.0 | 4,974 |
+| 10 | Q-learning | Rule, with speed | +1.9 | +1.5 to +2.3 | 4,974 |
+
+Q-learning, T_3 over the 1 trainings: 96.4%.
 
 ## What the follower learned
 

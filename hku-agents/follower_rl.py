@@ -404,6 +404,27 @@ def evaluate(env, leaders_index, L, Dn, policy, Q=None):
             "junctions": sum(len(w["seq"]) for w in out["walks"]) / max(1, len(out["walks"]))}
 
 
+def paired(rows_a, rows_b, k):
+    """Matched pairs by person: for every test person, the share of their trips on which walker B trails the same
+    stranger through k junctions, minus the same share for walker A. Returns the mean difference over people, its
+    95% t-interval (mean +- t* s / sqrt(n)) and the number of people. A person is one observation, so several
+    trips by one person do not count as independent, and both walkers are compared behind the same trips."""
+    from scipy import stats
+
+    def by_person(rows):
+        n, hit = {}, {}
+        for r in rows:
+            a = r["agent"].lstrip("F")                  # a follower is filed under the person it walked behind
+            n[a] = n.get(a, 0) + 1
+            hit[a] = hit.get(a, 0) + (r["max"] >= k)
+        return {a: hit[a] / n[a] for a in n}
+    A, B = by_person(rows_a), by_person(rows_b)
+    d = np.array([B[a] - A[a] for a in sorted(A) if a in B])
+    mean, se = float(d.mean()), float(d.std(ddof=1) / math.sqrt(len(d)))
+    half = float(stats.t.ppf(0.975, len(d) - 1)) * se
+    return {"diff": mean, "lo": mean - half, "hi": mean + half, "people": len(d), "t": mean / se if se else float("inf")}
+
+
 def policy_table(Q, visits):
     """What was learned, where the test followers had a real choice: by how far the target's road would take the
     follower beyond its closest point, the share of those choices in which the table says FOLLOW."""
@@ -520,6 +541,7 @@ def main():
     ap.add_argument("--gamma", type=float, default=GAMMA)
     ap.add_argument("--start-gap", type=float, default=START_GAP_S, help="seconds behind its target at the start")
     ap.add_argument("--suffix", default="", help="added to the names of the files written, e.g. _start5")
+    ap.add_argument("--reuse", action="store_true", help="use the table saved by an earlier run instead of training again")
     ap.add_argument("--boot", type=int, default=500, help="bootstrap resamples of people")
     ap.add_argument("--check", action="store_true", help="test the code on trips made here, then stop")
     ap.add_argument("--no-figure", action="store_true")
@@ -553,7 +575,15 @@ def main():
     res = {p: evaluate(env, index, L, Dn, p) for p in ("never", "rule", "rule_run", "always")}
     base = trail_scan([trips[g] for g in te], index)
     curve, runs, tables = [], [], []
-    for seed in range(1, args.seeds + 1):
+    saved = out_dir / f"follower_rl_q{args.suffix}.npy"
+    if args.reuse:
+        if not saved.exists():
+            raise SystemExit(f"{saved} not found: run once without --reuse")
+        tables.append(torch.as_tensor(np.load(saved), device=device))
+        runs.append(evaluate(env, index, L, Dn, "q", Q=tables[0]))
+        with open(out_dir / f"follower_rl_curve{args.suffix}.csv") as f:
+            curve = [{k: float(v) for k, v in r.items()} for r in csv.DictReader(f)]
+    for seed in range(1, (0 if args.reuse else args.seeds) + 1):
         t0 = time.time()
         Q = train(env, tr, seed, epochs=args.epochs, valid=(L, Dn), log=curve)
         runs.append(evaluate(env, index, L, Dn, "q", Q=Q))
@@ -561,7 +591,19 @@ def main():
         print(f"seed {seed}: score {runs[-1]['score']:.3f}, T_3 {t_k(runs[-1]['rows'], 3):.3f}, {time.time() - t0:.0f} s", flush=True)
     best = max(range(len(runs)), key=lambda i: runs[i]["score"])
     res["q"] = runs[best]
-    np.save(out_dir / f"follower_rl_q{args.suffix}.npy", tables[best].cpu().numpy())
+    if not args.reuse:
+        np.save(saved, tables[best].cpu().numpy())
+
+    # matched pairs by person: each walker against the never-follow walker, and against the people's own trips
+    pairs = []
+    for k in (3, 5, 10):
+        for a, b in [("never", p) for p in ("rule", "rule_run", "q", "always")] + [("agents", "never"), ("agents", "q"), ("rule_run", "q")]:
+            ra = base if a == "agents" else res[a]["rows"]
+            pairs.append({"k": k, "walker": NAMES[b], "minus": NAMES[a], **paired(ra, res[b]["rows"], k)})
+    with open(out_dir / f"follower_rl_paired{args.suffix}.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(pairs[0]))
+        w.writeheader()
+        w.writerows({k: (round(v, 4) if isinstance(v, float) else v) for k, v in r.items()} for r in pairs)
 
     tk = []
     for k in range(1, KMAX + 1):
@@ -573,6 +615,8 @@ def main():
         tk.append(row)
     for name, rows in ((f"follower_rl_tk{args.suffix}.csv", [{k: (v if k == "k" else round(v, 4)) for k, v in r.items()} for r in tk]),
                        (f"follower_rl_curve{args.suffix}.csv", curve)):
+        if args.reuse and "curve" in name:
+            continue
         with open(out_dir / name, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0]))
             w.writeheader()
@@ -619,6 +663,14 @@ def main():
     for r in tk:
         if r["k"] in (1, 2, 3, 4, 5, 6, 8, 10):
             M.append(f"| {r['k']} | " + " | ".join(ci(r, p) for p in ("agents",) + POLICIES) + " |")
+    M += ["", "## Differences, as matched pairs by person", "",
+          "For every test person: the share of their trips on which one walker trails the same stranger through k "
+          "junctions, minus the same share for another walker behind the same trips. The table gives the mean "
+          "difference over people in percentage points, with its 95% t-interval (mean ± t* s / √n). A person is one "
+          "observation, so several trips by one person are not counted as independent.", "",
+          "| k | Walker | minus | Difference (points) | 95% interval | People |", "|---|---|---|---|---|---|"]
+    for r in pairs:
+        M.append(f"| {r['k']} | {r['walker']} | {r['minus']} | {100 * r['diff']:+.1f} | {100 * r['lo']:+.1f} to {100 * r['hi']:+.1f} | {r['people']:,} |")
     M += ["", f"Q-learning, T_3 over the {len(runs)} trainings: " + ", ".join(pct(x) for x in t3) + ".", "",
           "## What the follower learned", "",
           "Where a test follower had a real choice (its target took a road other than its quickest road), the share of "
