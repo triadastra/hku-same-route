@@ -1,0 +1,15 @@
+what,value,p3,p5,q3_formula_on_agent_pairs
+"momentum, kappa",0.5,0.0224,0.0021,0.1154
+"momentum, kappa",1.0,0.0314,0.0052,0.1666
+"momentum, kappa",2.0,0.0604,0.019,0.3211
+"momentum, kappa",4.0,0.1247,0.058,0.5711
+"imitation, rho",0.0,0.0839,0.0259,
+"imitation, rho",0.1,0.0853,0.0252,
+"imitation, rho",0.3,0.1247,0.0421,
+"imitation, rho",0.5,0.1609,0.0729,
+"following distance, Agent World",15,0.0525,0.0193,
+"following distance, Markov: counted",15,0.0363,0.0079,
+"following distance, Agent World",30,0.0943,0.039,
+"following distance, Markov: counted",30,0.0794,0.02,
+"following distance, Agent World",60,0.1523,0.0698,
+"following distance, Markov: counted",60,0.1405,0.0449,
