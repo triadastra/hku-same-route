@@ -1,0 +1,145 @@
+in_front,behind,pairs,expected,observed_over_expected
+Works outside C&W,Works outside C&W,1094,214.6,5.098
+Works outside C&W,Works in C&W,505,222.1,2.274
+Works outside C&W,No fixed workplace,24,99.9,0.24
+Works outside C&W,Works at home,9,16.2,0.555
+Works outside C&W,Domestic helper,33,103.9,0.318
+Works outside C&W,School pupil,68,170.0,0.4
+Works outside C&W,College student,179,34.0,5.265
+Works outside C&W,Retired,75,224.4,0.334
+Works outside C&W,Home-maker,16,45.2,0.354
+Works outside C&W,Unpaid carer,12,39.2,0.306
+Works outside C&W,Not working,49,165.5,0.296
+Works outside C&W,HKU,87,816.0,0.107
+Works in C&W,Works outside C&W,486,216.3,2.247
+Works in C&W,Works in C&W,637,223.8,2.846
+Works in C&W,No fixed workplace,114,100.7,1.132
+Works in C&W,Works at home,19,16.3,1.162
+Works in C&W,Domestic helper,70,104.7,0.669
+Works in C&W,School pupil,102,171.3,0.595
+Works in C&W,College student,63,34.3,1.838
+Works in C&W,Retired,168,226.1,0.743
+Works in C&W,Home-maker,44,45.6,0.965
+Works in C&W,Unpaid carer,37,39.5,0.937
+Works in C&W,Not working,171,166.8,1.025
+Works in C&W,HKU,257,822.4,0.312
+No fixed workplace,Works outside C&W,34,111.2,0.306
+No fixed workplace,Works in C&W,119,115.1,1.034
+No fixed workplace,No fixed workplace,188,51.8,3.63
+No fixed workplace,Works at home,9,8.4,1.07
+No fixed workplace,Domestic helper,73,53.8,1.356
+No fixed workplace,School pupil,57,88.1,0.647
+No fixed workplace,College student,4,17.6,0.227
+No fixed workplace,Retired,142,116.3,1.221
+No fixed workplace,Home-maker,37,23.4,1.578
+No fixed workplace,Unpaid carer,42,20.3,2.067
+No fixed workplace,Not working,193,85.8,2.249
+No fixed workplace,HKU,217,423.0,0.513
+Works at home,Works outside C&W,5,16.2,0.309
+Works at home,Works in C&W,19,16.7,1.136
+Works at home,No fixed workplace,8,7.5,1.063
+Works at home,Works at home,2,1.2,1.637
+Works at home,Domestic helper,16,7.8,2.045
+Works at home,School pupil,10,12.8,0.781
+Works at home,College student,1,2.6,0.391
+Works at home,Retired,31,16.9,1.834
+Works at home,Home-maker,5,3.4,1.468
+Works at home,Unpaid carer,11,3.0,3.726
+Works at home,Not working,17,12.5,1.364
+Works at home,HKU,37,61.5,0.602
+Domestic helper,Works outside C&W,29,117.6,0.247
+Domestic helper,Works in C&W,84,121.7,0.69
+Domestic helper,No fixed workplace,74,54.8,1.351
+Domestic helper,Works at home,17,8.9,1.912
+Domestic helper,Domestic helper,194,56.9,3.408
+Domestic helper,School pupil,161,93.2,1.728
+Domestic helper,College student,9,18.6,0.483
+Domestic helper,Retired,226,123.0,1.838
+Domestic helper,Home-maker,65,24.8,2.622
+Domestic helper,Unpaid carer,35,21.5,1.629
+Domestic helper,Not working,114,90.7,1.257
+Domestic helper,HKU,171,447.3,0.382
+School pupil,Works outside C&W,50,146.2,0.342
+School pupil,Works in C&W,82,151.3,0.542
+School pupil,No fixed workplace,45,68.1,0.661
+School pupil,Works at home,9,11.0,0.815
+School pupil,Domestic helper,109,70.7,1.541
+School pupil,School pupil,953,115.8,8.231
+School pupil,College student,9,23.2,0.389
+School pupil,Retired,47,152.8,0.308
+School pupil,Home-maker,7,30.8,0.227
+School pupil,Unpaid carer,5,26.7,0.187
+School pupil,Not working,43,112.7,0.381
+School pupil,HKU,106,555.7,0.191
+College student,Works outside C&W,167,34.0,4.909
+College student,Works in C&W,68,35.2,1.931
+College student,No fixed workplace,4,15.8,0.253
+College student,Works at home,1,2.6,0.389
+College student,Domestic helper,7,16.5,0.425
+College student,School pupil,10,26.9,0.371
+College student,College student,35,5.4,6.494
+College student,Retired,11,35.6,0.309
+College student,Home-maker,1,7.2,0.139
+College student,Unpaid carer,1,6.2,0.161
+College student,Not working,12,26.2,0.457
+College student,HKU,24,129.4,0.186
+Retired,Works outside C&W,54,176.9,0.305
+Retired,Works in C&W,149,183.1,0.814
+Retired,No fixed workplace,87,82.4,1.056
+Retired,Works at home,24,13.4,1.795
+Retired,Domestic helper,155,85.6,1.81
+Retired,School pupil,49,140.1,0.35
+Retired,College student,5,28.0,0.178
+Retired,Retired,677,184.9,3.661
+Retired,Home-maker,87,37.3,2.334
+Retired,Unpaid carer,37,32.3,1.145
+Retired,Not working,200,136.4,1.466
+Retired,HKU,249,672.6,0.37
+Home-maker,Works outside C&W,15,45.4,0.33
+Home-maker,Works in C&W,40,47.0,0.851
+Home-maker,No fixed workplace,21,21.1,0.994
+Home-maker,Works at home,8,3.4,2.332
+Home-maker,Domestic helper,52,22.0,2.367
+Home-maker,School pupil,15,36.0,0.417
+Home-maker,College student,1,7.2,0.139
+Home-maker,Retired,139,47.5,2.929
+Home-maker,Home-maker,37,9.6,3.867
+Home-maker,Unpaid carer,11,8.3,1.327
+Home-maker,Not working,56,35.0,1.599
+Home-maker,HKU,60,172.6,0.348
+Unpaid carer,Works outside C&W,12,33.7,0.356
+Unpaid carer,Works in C&W,36,34.9,1.032
+Unpaid carer,No fixed workplace,44,15.7,2.802
+Unpaid carer,Works at home,5,2.5,1.962
+Unpaid carer,Domestic helper,20,16.3,1.225
+Unpaid carer,School pupil,10,26.7,0.374
+Unpaid carer,College student,1,5.3,0.187
+Unpaid carer,Retired,48,35.3,1.361
+Unpaid carer,Home-maker,12,7.1,1.688
+Unpaid carer,Unpaid carer,22,6.2,3.572
+Unpaid carer,Not working,65,26.0,2.499
+Unpaid carer,HKU,63,128.2,0.491
+Not working,Works outside C&W,49,170.3,0.288
+Not working,Works in C&W,178,176.2,1.01
+Not working,No fixed workplace,160,79.3,2.018
+Not working,Works at home,23,12.9,1.787
+Not working,Domestic helper,108,82.4,1.31
+Not working,School pupil,63,134.9,0.467
+Not working,College student,3,27.0,0.111
+Not working,Retired,270,178.1,1.516
+Not working,Home-maker,63,35.9,1.755
+Not working,Unpaid carer,78,31.1,2.507
+Not working,Not working,347,131.4,2.642
+Not working,HKU,365,647.6,0.564
+HKU,Works outside C&W,69,781.6,0.088
+HKU,Works in C&W,219,808.8,0.271
+HKU,No fixed workplace,192,363.9,0.528
+HKU,Works at home,30,59.1,0.508
+HKU,Domestic helper,162,378.3,0.428
+HKU,School pupil,137,619.1,0.221
+HKU,College student,17,123.8,0.137
+HKU,Retired,324,817.2,0.396
+HKU,Home-maker,61,164.7,0.37
+HKU,Unpaid carer,86,142.8,0.602
+HKU,Not working,325,602.8,0.539
+HKU,HKU,6212,2971.8,2.09
