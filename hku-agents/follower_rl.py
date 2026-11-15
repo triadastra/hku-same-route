@@ -16,9 +16,9 @@ The decision problem (one episode = one follower)
              no buildings, so a true line of sight cannot be computed.
   Reward     for closeness: each time it takes its target's road while the target is in view it earns
              R * (1 - gap / V), where gap is how many seconds behind the target it is: R right behind them,
-             nothing at the edge of view. And for the catch: CATCH_REWARD, once, the first time it reaches a
-             junction at most CATCH_S seconds behind its target. The chase goes on after the catch. It starts
-             START_GAP_S behind, so it has to gain on its target to catch them.
+             nothing at the edge of view. There is no separate reward for catching the target: being close is
+             the whole reward, at every junction. (The script still counts who came within CATCH_S seconds of
+             their target, as a statistic.) It starts START_GAP_S behind.
   Penalty    the follower remembers d_min, the shortest walking distance to its destination over every
              junction it has passed. A road that leaves it at distance d costs 0.5 * x^2, with
              x = max(0, d - d_min) / L. A little farther costs almost nothing; walking away costs more and more,
@@ -58,7 +58,8 @@ What is reported (on the test people)
     rule, walking   follows while the target's road scores better at this junction alone (closeness reward
                     minus 0.5 x^2), at its own walking pace
     rule, with speed  the same rule for the road, and a rule for the speed: the slowest speed that brings it to
-                    the next junction right behind its target, sprinting only to make the catch
+                    the next junction right behind its target, sprinting only until it has first come close.
+                    It is told when its target reaches the next junction, which the learner cannot see
     Q-learning      the trained follower, choosing its road and its speed
     always          follows for as long as the target is in view, running: the most following there can be
   Q-learning should score at least as well as the rule and the two fixed walkers; the script says if it does.
@@ -90,8 +91,8 @@ REWARD = 1.0            # R
 SCALE_M = 100.0         # L, metres: the unit of x in the penalty 0.5 * x^2
 VIEW_S = 30.0           # V, seconds
 START_GAP_S = 20.0      # the follower reaches the first junction this long after its target
-CATCH_S = 2.0           # it has caught its target when it reaches a junction at most this long after them
-CATCH_REWARD = 10.0     # the reward for the catch, given once
+CATCH_S = 5.0           # it has come close to its target when it reaches a junction at most this long after them
+CATCH_REWARD = 0.0      # no reward for the catch itself (authors' decision): closeness is the reward
 GAMMA = 1.0             # no discount: the follower maximises its total score over the walk
 ALPHA = 0.2             # learning rate at the start; it falls to ALPHA / 10
 EPS_END = 0.02
@@ -124,8 +125,8 @@ NAMES = {"agents": "Agent World (coincidence)", "never": "Never follows", "rule"
 class Env:
     """The map and the Agent World trips as tensors, and the walk of many followers at once."""
 
-    def __init__(self, D, trips, device, reward=REWARD, scale_m=SCALE_M, view_s=VIEW_S, gamma=GAMMA):
-        self.D, self.trips, self.dev = D, trips, device
+    def __init__(self, D, trips, device, reward=REWARD, scale_m=SCALE_M, view_s=VIEW_S, gamma=GAMMA, start_gap=START_GAP_S):
+        self.D, self.trips, self.dev, self.start_gap = D, trips, device, start_gap
         self.R, self.L, self.V, self.gamma = reward, scale_m, view_s, gamma
         w = D.w
         # decision states: a junction and the road arrived by
@@ -204,7 +205,7 @@ class Env:
         m = self.off[lead].clone()                            # index of the target's current decision
         m_end = self.off[lead + 1]
         s = self.l_sid[m].clone()
-        t = self.l_t[m] + START_GAP_S
+        t = self.l_t[m] + self.start_gap
         dest, pace = self.trip_dest[donor], self.trip_pace[donor]
         chasing = torch.ones(B, dtype=torch.bool, device=dev)
         alive = torch.ones(B, dtype=torch.bool, device=dev)
@@ -215,7 +216,7 @@ class Env:
         followed = torch.zeros(B, dtype=torch.int64, device=dev)
         bar = torch.ones(B, dtype=torch.float64, device=dev)       # share of the stamina bar left
         caught = torch.zeros(B, dtype=torch.bool, device=dev)
-        prev_gap = torch.full((B,), START_GAP_S, device=dev)
+        prev_gap = torch.full((B,), float(self.start_gap), device=dev)
         used = torch.zeros(len(SPEEDS), dtype=torch.float64, device=dev)   # stretches followed at each speed
         prev_f = torch.zeros(B, dtype=torch.int64, device=dev)
         prev_a = torch.zeros(B, dtype=torch.int64, device=dev)
@@ -286,7 +287,7 @@ class Env:
                 want = near - 0.5 * xl * xl >= -0.5 * xq * xq
                 if policy == "rule_run":
                     # the slowest speed that brings it to the next junction right behind its target; faster than a
-                    # run (a sprint) only to make the catch, and only while there is stamina left
+                    # run (a sprint) only until it has first come close, and only while there is stamina left
                     can = self.l_ok[m.clamp(max=self.l_ok.numel() - 1)] & (m + 1 < m_end)
                     room = (self.l_t[(m + 1).clamp(max=self.l_t.numel() - 1)] + 1.0 - t).clamp(min=1e-6)
                     need = self.leg_s[s, l_safe].double() / pace / room          # multiples of its walking speed
@@ -420,7 +421,7 @@ def policy_table(Q, visits):
     return rows
 
 
-def figure(tk, curve, run):
+def figure(tk, curve, run, suffix=""):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -446,7 +447,7 @@ def figure(tk, curve, run):
     for ax in (a, b):
         ax.grid(axis="y", color=GRID, lw=0.5)
     fig.tight_layout()
-    save(fig, "follower-rl" if run == "census_run" else f"follower-rl-{run}")
+    save(fig, ("follower-rl" if run == "census_run" else f"follower-rl-{run}") + suffix.replace("_", "-"))
 
 
 def split_people(trips, seed, test_share=TEST_SHARE):
@@ -491,7 +492,10 @@ def check(device):
     assert torch.equal(Q, Q2), "two trainings with one seed differ"
     sc = {p: env.run(L, Dn, p, Q=Q)["score"].mean().item() for p in POLICIES}
     assert sc["q"] >= max(sc["never"], sc["always"]) - 1e-6, f"Q-learning scores below a fixed walker: {sc}"
-    assert sc["q"] >= max(sc["rule"], sc["rule_run"]) - 0.05, f"Q-learning scores below the one-junction rule: {sc}"
+    assert sc["q"] >= sc["rule"] - 0.05, f"Q-learning scores below the walking rule: {sc}"
+    # (the rule with speed is told when its target reaches the next junction, which the learner cannot see, so it
+    # may score a little higher: it is reported, not required)
+    assert sc["q"] >= 0.9 * sc["rule_run"], f"Q-learning scores far below the rule with speed: {sc}"
     # 4. only going faster than critical speed drains the bar, and a sprint is paid for
     L2 = L[:500]
     for lv, name in enumerate(SPEED_NAMES):
@@ -514,6 +518,8 @@ def main():
     ap.add_argument("--scale", type=float, default=SCALE_M, help="L, metres")
     ap.add_argument("--view", type=float, default=VIEW_S, help="V, seconds")
     ap.add_argument("--gamma", type=float, default=GAMMA)
+    ap.add_argument("--start-gap", type=float, default=START_GAP_S, help="seconds behind its target at the start")
+    ap.add_argument("--suffix", default="", help="added to the names of the files written, e.g. _start5")
     ap.add_argument("--boot", type=int, default=500, help="bootstrap resamples of people")
     ap.add_argument("--check", action="store_true", help="test the code on trips made here, then stop")
     ap.add_argument("--no-figure", action="store_true")
@@ -536,7 +542,8 @@ def main():
         raw = [t for t in map(json.loads, f) if t["segments"]]
     trips = [t for t in as_decisions(D, raw) if t["seq"]]
     del raw
-    env = Env(D, trips, device, reward=args.reward, scale_m=args.scale, view_s=args.view, gamma=args.gamma)
+    env = Env(D, trips, device, reward=args.reward, scale_m=args.scale, view_s=args.view, gamma=args.gamma,
+              start_gap=args.start_gap)
     tr, te = split_people(trips, seed=7)
     n_people = len({t["agent"] for t in trips})
     print(f"{len(trips):,} trips of {n_people:,} people; training behind {len(tr):,} trips, testing behind {len(te):,}", flush=True)
@@ -554,7 +561,7 @@ def main():
         print(f"seed {seed}: score {runs[-1]['score']:.3f}, T_3 {t_k(runs[-1]['rows'], 3):.3f}, {time.time() - t0:.0f} s", flush=True)
     best = max(range(len(runs)), key=lambda i: runs[i]["score"])
     res["q"] = runs[best]
-    np.save(out_dir / "follower_rl_q.npy", tables[best].cpu().numpy())
+    np.save(out_dir / f"follower_rl_q{args.suffix}.npy", tables[best].cpu().numpy())
 
     tk = []
     for k in range(1, KMAX + 1):
@@ -564,14 +571,14 @@ def main():
             row[p] = t_k(res[p]["rows"], k)
             row[p + "_lo"], row[p + "_hi"] = interval(res[p]["rows"], k, args.boot)
         tk.append(row)
-    for name, rows in (("follower_rl_tk.csv", [{k: (v if k == "k" else round(v, 4)) for k, v in r.items()} for r in tk]),
-                       ("follower_rl_curve.csv", curve)):
+    for name, rows in ((f"follower_rl_tk{args.suffix}.csv", [{k: (v if k == "k" else round(v, 4)) for k, v in r.items()} for r in tk]),
+                       (f"follower_rl_curve{args.suffix}.csv", curve)):
         with open(out_dir / name, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0]))
             w.writeheader()
             w.writerows(rows)
     pol = policy_table(tables[best], res["q"]["visits"])
-    with open(out_dir / "follower_rl_policy.csv", "w", newline="") as f:
+    with open(out_dir / f"follower_rl_policy{args.suffix}.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(pol[0]))
         w.writeheader()
         w.writerows({k: (round(v, 4) if isinstance(v, float) else v) for k, v in r.items()} for r in pol)
@@ -581,14 +588,14 @@ def main():
     scores = [r["score"] for r in runs]
     sd = float(np.std(scores, ddof=1)) if len(scores) > 1 else 0.0
     t3 = [t_k(r["rows"], 3) for r in runs]
-    beats = res["q"]["score"] >= max(res[p]["score"] for p in ("never", "rule", "rule_run", "always")) - 1e-9
+    beats = res["q"]["score"] >= max(res[p]["score"] for p in ("never", "rule", "always")) - 1e-9
+    vs_speed = res["q"]["score"] - res["rule_run"]["score"]
     M = [f"# The Q-learning follower: {args.run}", "",
          f"{len(trips):,} Agent World trips of {n_people:,} people. The people are split in two at random: followers are "
          f"trained behind the {len(tr):,} trips of one half and tested behind the {len(te):,} trips of the other. A follower "
-         f"starts {START_GAP_S:g} s behind its target at the first junction of the target's trip; its destination and pace "
+         f"starts {args.start_gap:g} s behind its target at the first junction of the target's trip; its destination and pace "
          f"are those of a trip of a different, randomly chosen person. Reward for closeness, R (1 - gap / {args.view:g} s) with R = {args.reward:g}, each "
-         f"time it takes its target's road while the target is in view, and {CATCH_REWARD:g} once for the catch (reaching a "
-         f"junction at most {CATCH_S:g} s behind its target); penalty 0.5 x^2 for a road that leaves it x beyond "
+         f"time it takes its target's road while the target is in view (no separate reward for catching it); penalty 0.5 x^2 for a road that leaves it x beyond "
          f"the closest it has been to its destination, x in units of {args.scale:g} m. While it follows it chooses its "
          f"speed: " + ", ".join(f"{n} {m:g}" for n, m in zip(SPEED_NAMES, SPEEDS)) + " times its own walking speed. Only "
          f"going faster than a run drains its stamina bar ({D_PRIME_M:g} m above critical speed), and using the whole bar "
@@ -596,13 +603,16 @@ def main():
          f"gamma {args.gamma:g}, {args.seeds} trainings; the tables below use the training with the best test score. "
          f"Device: {device}.", "",
          "## Score per follower on the test people (rewards minus penalties)", "",
-         "| Walker | Score | Caught its target | Junctions passed | Junctions where it followed | Arrived |", "|---|---|---|---|---|---|"]
+         "| Walker | Score | Came within " + f"{CATCH_S:g} s" + " of its target | Junctions passed | Junctions where it followed | Arrived |", "|---|---|---|---|---|---|"]
     for p in POLICIES:
         r = res[p]
         extra = f" (trainings: {np.mean(scores):.3f} ± {sd:.3f})" if p == "q" and len(scores) > 1 else ""
         M.append(f"| {NAMES[p]} | {r['score']:.3f}{extra} | {pct(r['caught'])} | {r['junctions']:.1f} | {r['followed']:.1f} | {pct(r['arrived'])} |")
-    M += ["", ("Q-learning scores at least as well as every fixed walker, as it should."
-               if beats else "**Q-learning scores below a fixed walker: it has not learned enough. Train for longer.**"), "",
+    M += ["", ("Q-learning scores at least as well as the walkers that never follow, always follow, or follow by the "
+               "walking rule, as it should." if beats else
+               "**Q-learning scores below a simple fixed walker: it has not learned enough. Train for longer.**"),
+          f"Against the rule with speed it scores {vs_speed:+.3f}. That rule is told when its target will reach the next "
+          f"junction and sets its speed to match; the learner only sees its gap and whether it is closing.", "",
           "## Share of walkers trailing the same stranger through k junctions", "",
           f"At most {FOLLOW_M} m behind along the road each time. In brackets: 95% bootstrap interval, resampling people.", "",
           "| k | " + " | ".join(NAMES[p] for p in ("agents",) + POLICIES) + " |", "|---|" + "---|" * (len(POLICIES) + 1)]
@@ -627,9 +637,9 @@ def main():
           f"{pct(res['q']['bar_used'])}.", "",
           "Tables: follower_rl_tk.csv, follower_rl_curve.csv (learning curve), follower_rl_policy.csv, follower_rl_q.npy "
           "(the learned table). Figure: graphs/follower-rl.pdf."]
-    (out_dir / "follower_rl.md").write_text("\n".join(M) + "\n", encoding="utf-8")
+    (out_dir / f"follower_rl{args.suffix}.md").write_text("\n".join(M) + "\n", encoding="utf-8")
     if not args.no_figure:
-        figure(tk, curve, args.run)
+        figure(tk, curve, args.run, args.suffix)
     print(f"wrote {out_dir / 'follower_rl.md'}")
 
 
