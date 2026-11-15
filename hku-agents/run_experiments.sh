@@ -124,6 +124,10 @@ step_analyse() {
   python following.py --run "$CENSUS_RUN" "${control_arg[@]}"
   python make_following_figures.py --run "$CENSUS_RUN"
   python make_junction_figure.py --run "$CENSUS_RUN"
+  say "The Q-learning follower: trained to follow one of the Agent World's people (about 10 minutes on a CPU)"
+  python -c "import torch" 2>/dev/null || pip install torch
+  python follower_rl.py --check
+  python follower_rl.py --run "$CENSUS_RUN"      # Q-learning; uses CUDA if there is a GPU, else the CPU
   if [ -f "out/$LIVE_RUN/trips.jsonl" ]; then
     say "The live world's own results, and experiment 2 on the same people, to compare like with like"
     python following.py --run "$LIVE_RUN"
@@ -134,6 +138,7 @@ step_analyse() {
   python make_compare_figures.py --run "$CENSUS_RUN"
   echo
   echo "Results: out/$CENSUS_RUN/analysis/following.md (main), out/$CENSUS_RUN/analysis/compare.md (road use),"
+  echo "out/$CENSUS_RUN/analysis/follower_rl.md (the Q-learning follower),"
   echo "out/$LIVE_RUN/analysis/following.md and out/$CENSUS_RUN/analysis/same_people_as_$LIVE_RUN/following.md (live"
   echo "world against the Agent World on the same people). Figures in ../graphs/."
 }

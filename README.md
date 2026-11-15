@@ -20,6 +20,9 @@ in a row, within 90 seconds, purely by coincidence.
 | `hku-agents/out/day1/people.jsonl.gz` | The 10,000 people: group, home, schedule and traits. |
 | `hku-agents/out/day1/agents.tar.gz` | One file per person: their whole day, including every tool call the agent made. |
 | `hku-agents/out/day1/analysis/following.md` | The main analysis: how often a stranger close behind you makes your decisions at real intersections, in the Agent World and under four Markov chains, with chi-square tests and the table of each intersection's choices. Rebuilt by `python following.py --run day1` inside `hku-agents/`. |
+| `hku-agents/follower_rl.py` | The Q-learning follower: trained to follow one Agent World person while having a destination of its own, as the top of the scale. `python follower_rl.py --check` tests it; `python follower_rl.py --run census_run` trains and tests it (CUDA if there is a GPU, else CPU). Design in `method.md`, section 6b. |
+| `hku-agents/out/census_run/analysis/follower_rl.md` | Its results on the census run: trailing through k junctions and score, against the Agent World's people, a rule, and walkers that never or always follow. |
+| `hku-agents/follower.py` | An earlier rule-based follower, superseded by `follower_rl.py`; kept for the trailing measure it defines. |
 | `hku-agents/out/day1/analysis/compare.md` | The agent run against random walking: shared turns, the Markov chain of turns, junction tests and road use. Rebuilt by `python arms.py --run day1` inside `hku-agents/`. |
 | `graphs/` | Paper figures: the amenity maps, the real intersections, following under each model (`following-*.pdf`), and the road-use map. |
 | `method.md` | Design document for the experiment. A skeleton: the lines marked `DECIDE:` are still to be filled in. |
