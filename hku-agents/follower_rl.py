@@ -471,6 +471,42 @@ def figure(tk, curve, run, suffix=""):
     save(fig, ("follower-rl" if run == "census_run" else f"follower-rl-{run}") + suffix.replace("_", "-"))
 
 
+def figure_pairs(pairs, run, suffix=""):
+    """The matched-pairs differences against the never-follow walker, with their 95% intervals, one panel per k."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from make_figures import save
+    from make_following_figures import BLUE, GRID, INK, MUTED
+
+    rows = [r for r in pairs if r["minus"] == NAMES["never"]]
+    ks = sorted({int(r["k"]) for r in rows})
+    walkers = [NAMES[p] for p in ("always", "q", "rule_run", "rule")]            # top to bottom
+    top = max(100 * float(r["hi"]) for r in rows)
+    fig, axes = plt.subplots(1, len(ks), figsize=(7.2, 2.1), sharey=True)
+    for ax, k in zip(axes, ks):
+        for y, name in enumerate(reversed(walkers)):
+            r = next(r for r in rows if int(r["k"]) == k and r["walker"] == name)
+            d, lo, hi = (100 * float(r[c]) for c in ("diff", "lo", "hi"))
+            ax.plot([lo, hi], [y, y], color=BLUE, lw=2.2, solid_capstyle="butt", zorder=3)
+            ax.plot([lo, lo], [y - 0.16, y + 0.16], color=BLUE, lw=1.2, zorder=3)
+            ax.plot([hi, hi], [y - 0.16, y + 0.16], color=BLUE, lw=1.2, zorder=3)
+            ax.plot(d, y, "o", color=BLUE, ms=4.5, mec="white", mew=0.8, zorder=4)
+            ax.text(hi + top * 0.05, y, f"{d:+.1f}  ({lo:.1f} to {hi:.1f})", ha="left", va="center", fontsize=6.5, color=INK)
+        ax.axvline(0, color=MUTED, lw=0.8)
+        ax.grid(axis="x", color=GRID, lw=0.5)
+        ax.set_xlim(-top * 0.02, top * 2.05)                 # room on the right for the numbers
+        ax.set_xticks([x for x in range(0, int(top) + 1, 20)])
+        ax.set_ylim(-0.6, len(walkers) - 0.4)
+        ax.set_title(f"Through {k} junctions", fontsize=8, loc="left")
+        ax.set_yticks(range(len(walkers)), list(reversed(walkers)))
+        ax.tick_params(axis="y", length=0)
+        ax.spines["left"].set_visible(False)
+    fig.supxlabel("Percentage points more than a walker that never follows (mean over people, 95% interval)", fontsize=8)
+    fig.tight_layout()
+    save(fig, ("follower-rl-intervals" if run == "census_run" else f"follower-rl-intervals-{run}") + suffix.replace("_", "-"))
+
+
 def split_people(trips, seed, test_share=TEST_SHARE):
     people = sorted({t["agent"] for t in trips})
     random.Random(seed).shuffle(people)
@@ -688,10 +724,11 @@ def main():
           f"Followers who used any of their stamina bar: {pct(res['q']['sprinted'])}. Average share of the bar used: "
           f"{pct(res['q']['bar_used'])}.", "",
           "Tables: follower_rl_tk.csv, follower_rl_curve.csv (learning curve), follower_rl_policy.csv, follower_rl_q.npy "
-          "(the learned table). Figure: graphs/follower-rl.pdf."]
+          "(the learned table), follower_rl_paired.csv. Figures: graphs/follower-rl.pdf, graphs/follower-rl-intervals.pdf."]
     (out_dir / f"follower_rl{args.suffix}.md").write_text("\n".join(M) + "\n", encoding="utf-8")
     if not args.no_figure:
         figure(tk, curve, args.run, args.suffix)
+        figure_pairs(pairs, args.run, args.suffix)
     print(f"wrote {out_dir / 'follower_rl.md'}")
 
 
