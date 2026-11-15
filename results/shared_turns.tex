@@ -1,0 +1,38 @@
+% Written by hku-agents/make_shared_turns_table.py from results/shared_turns.csv. Do not edit by hand.
+% Needs \usepackage{booktabs}.
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Shared turns by condition, window $W = \SI{90}{\second}$ (run \texttt{census\_run}). $P_k$: share of trips on which at least one stranger makes the same $k$ turns in a row. $\bar{S}_k$: mean number of such strangers per trip. Trips per condition: Agent World: 42{,}161, Random Walking: 41{,}708, Momentum Chain: 41{,}708, Random Init and End: 42{,}161. Repeats: Agent World: 1, Random Walking: 3, Momentum Chain: 3, Random Init and End: 5; values are means over repeats. Largest standard deviation across repeats: 0.34 percentage points for $P_k$ and 0.099 for $\bar{S}_k$.}
+\label{tab:shared-turns}
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+$k$ & \shortstack{Agent\\World} & \shortstack{Random\\Walking} & \shortstack{Momentum\\Chain} & \shortstack{Random Init\\and End} \\
+\midrule
+\multicolumn{5}{@{}l}{$P_k$ (\%)} \\
+1 & 93.2 & 92.1 & 94.2 & 96.2 \\
+2 & 87.4 & 79.2 & 87.8 & 93.3 \\
+3 & 80.2 & 60.3 & 78.5 & 90.1 \\
+4 & 72.9 & 40.0 & 67.9 & 86.7 \\
+5 & 65.1 & 22.8 & 56.4 & 83.3 \\
+6 & 57.7 & 11.3 & 44.9 & 79.7 \\
+7 & 50.9 & 5.0 & 34.2 & 76.0 \\
+8 & 45.7 & 2.1 & 25.2 & 72.1 \\
+9 & 40.8 & 0.9 & 17.9 & 68.3 \\
+10 & 37.2 & 0.4 & 12.3 & 64.4 \\
+\midrule
+\multicolumn{5}{@{}l}{$\bar{S}_k$ (strangers per trip)} \\
+1 & 17.51 & 10.54 & 14.91 & 17.67 \\
+2 & 12.00 & 4.66 & 9.74 & 14.49 \\
+3 & 8.88 & 1.96 & 6.18 & 11.94 \\
+4 & 6.95 & 0.81 & 3.86 & 10.22 \\
+5 & 5.37 & 0.34 & 2.35 & 8.41 \\
+6 & 4.43 & 0.14 & 1.45 & 7.16 \\
+7 & 3.68 & 0.055 & 0.88 & 6.15 \\
+8 & 3.07 & 0.022 & 0.54 & 5.21 \\
+9 & 2.60 & 0.009 & 0.33 & 4.50 \\
+10 & 2.25 & 0.004 & 0.20 & 3.94 \\
+\bottomrule
+\end{tabular}
+\end{table}
