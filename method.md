@@ -210,42 +210,67 @@ a destination, a target and a memory of its closest point.
 
 ### 6b. The Q-learning follower (implemented in `hku-agents/follower_rl.py`; run on `census_run`)
 
-Added on 2026-11-14 at the authors' request. It replaces 6a for results: the follower of 6a changes
-targets and keeps its own trip's destination, which the authors ruled out. `follower.py` is kept for the
-measure it defines (T_k) and as a record.
+Added on 2026-11-14 and revised on 2026-11-15 at the authors' request. It replaces 6a for results: the
+follower of 6a changes targets and keeps its own trip's destination, which the authors ruled out.
+`follower.py` is kept for the measure it defines (T_k) and as a record.
 
-- The world is the census Agent World run, replayed unchanged. A follower starts 5 s behind one Agent
-  World person (its target) at the first junction of one of that person's trips. Nobody sees followers.
-- One target for the whole chase (authors' rule): if the follower loses its target or lets go, the chase
-  is over and it walks the quickest path to its own destination. It never takes another target.
-- Its destination and pace are those of a trip of a different, randomly chosen person (authors' rule),
-  so following and its own destination pull in different directions.
-- Decision at each junction while the target is in view and took a road other than the follower's
-  quickest road: follow, or leave. A follower may turn back the way it came.
-- Reward and penalty as in 6a (authors' rules): R = 1 for taking the target's road while the target is at
-  most 30 s in front on the same road; 0.5 x^2 for a road that leaves it x beyond the closest it has been
+- The world is the census Agent World run, replayed unchanged. The Agent World people walk exactly as
+  they did, at the pace they chose (slow, normal or fast; they never run). Nobody sees followers.
+- A follower starts behind one Agent World person (its target) at the first junction of one of that
+  person's trips. One target for the whole chase (authors' rule): if it loses its target or lets go, the
+  chase is over and it walks the quickest path to its own destination. It never takes another target.
+- Its destination and comfortable walking speed are those of a trip of a different, randomly chosen
+  person (authors' rule), so following and its own destination pull in different directions.
+- Road: at each junction while the target is in view and took a road other than the follower's quickest
+  road, it chooses to follow or to leave. A follower may turn back the way it came.
+- Speed (authors' rule: the follower chooses its speed, from walking to sprinting, from published values):
+  while it follows it chooses one of five speeds, as multiples of its own walking speed: walk 1.0, fast
+  walk 1.30, jog 1.54, run 2.61, sprint 4.33. For an adult who walks at 1.34 m/s these are 1.34, 1.74,
+  2.07 (the walk-to-run transition), 3.5 (critical speed of recreational runners) and 5.8 m/s (an
+  untrained adult's 100 m). It never overtakes its target. Sources and their weaknesses are in
+  `hku-agents/data/walking_speeds.csv`: the run value comes from runners, who are fitter than an average
+  resident, and the sprint value from a running website, not a study.
+- Stamina (authors' rule: sprinting is penalised, fast walking is not): a bar of 130 m of running above
+  critical speed (D' of the critical-speed model), drained only by going faster than a run. With the bar
+  empty a sprint is only a run. It does not refill during a walk. Using the whole bar costs 1.
+- Reward (authors' rule: closeness to the target, not the catch): each time it takes its target's road
+  while the target is in view it earns 1 - gap / 30 s, where gap is how far behind the target it is. There
+  is no separate reward for catching the target.
+- Penalty (authors' rule, as in 6a): 0.5 x^2 for a road that leaves it x beyond the closest it has been
   to its destination, x in units of 100 m.
 - Learning: one-step tabular Q-learning, no discount (gamma = 1), epsilon-greedy from 1 to 0.02, learning
-  rate 0.2 falling to 0.02, 100 epochs, 3 trainings with different random numbers. The state is what the
+  rate 0.2 falling to 0.02, 150 epochs, 3 trainings with different random numbers. The state is what the
   follower can know at the junction, in bins: how far beyond its closest point its quickest road and its
-  target's road would leave it, seconds behind the target, and distance left to its destination (2,304
-  states, 2 actions). So it learns a rule about distances, not a route on this map.
+  target's road would leave it, seconds behind the target, whether that gap is closing or widening, how
+  full its stamina bar is, whether it has been within 5 s of its target, and distance left to its
+  destination. Six actions: leave, or follow at one of the five speeds.
 - People are split in two at random: training behind the trips of one half, testing behind the trips of
   the other. Every number reported is from the test half.
 - All followers of an epoch are stepped together as PyTorch tensors, on CUDA when there is a GPU. It was
-  written and tested on a CPU (about 8 minutes for the whole script); it has not been run on a GPU.
-- Compared in the same test episodes: a follower that never follows, the one-junction rule of 6a, a
-  follower that always follows, and the Agent World people's own trips (coincidence).
-- Result on `census_run` (`out/census_run/analysis/follower_rl.md`): trailing the same stranger through 3
-  junctions: Agent World 50.1%, never follows 67.3%, rule 95.0%, Q-learning 95.1%, always follows 96.2%;
-  through 10: 11.7%, 17.3%, 46.9%, 46.1%, 54.7%. Score per follower: never 2.68, rule 10.40, Q-learning
-  10.67, always -72.2. Q-learning learned to follow somewhat farther off course than the rule's 141 m
-  (it still follows in 62% of choices at 150 to 200 m, and stops beyond 200 m).
+  written and tested on a CPU (about 15 minutes for the whole script); it has not been run on a GPU.
+- Compared in the same test episodes: a follower that never follows; the one-junction rule walking; the
+  same rule with a rule for its speed (the slowest speed that keeps it right behind its target, sprinting
+  only until it has first come close; this rule is told when its target reaches the next junction, which
+  the learner cannot see); a follower that always follows, running; and the Agent World people's own
+  trips (coincidence).
+- Results on `census_run`, start 20 s behind (`out/census_run/analysis/follower_rl.md`). Trailing the same
+  stranger through 3 junctions: Agent World 50.1%, never follows 65.3%, rule walking 86.5%, rule with
+  speed 94.8%, Q-learning 96.4%, always follows 97.4%. Through 10: 11.7%, 15.6%, 34.2%, 58.7%, 60.8%,
+  72.0%. Score per follower: never 1.20, rule walking 5.49, rule with speed 11.64, Q-learning 11.56,
+  always -139.5. 93.2% of Q-learning followers came within 5 s of their target; 70.5% used some of their
+  stamina bar, 6.0% of it on average. It follows up to about 200 m off course and not beyond.
+- The same with a start 5 s behind is in `follower_rl_start5.md`: through 3 junctions Q-learning 97.2%,
+  through 10 62.4%.
+- The "speed chosen" table in the results counts the speed asked for. Asking for a sprint costs nothing
+  when the no-overtaking rule holds the follower back, so that table overstates sprinting; the stamina
+  used is the real measure.
 - Checks (`python follower_rl.py --check`, no run needed): a follower given its target's own destination
   repeats the target's route; one that never follows is never penalised and arrives; the same seed gives
-  the same table; Q-learning scores at least as well as the fixed walkers on people it did not train on.
-- DECIDE: the start gap (default 5 s); the unit of x (default 100 m); the view time (default 30 s);
-  whether a follower may speed up to keep its target (default: no); a discount (default: none).
+  the same table; Q-learning scores at least as well as the never, always and walking-rule followers on
+  people it did not train on; only speeds above a run drain the bar.
+- DECIDE: the start gap (20 s or 5 s: the authors wrote "5 seconds" without saying for which number, so
+  both were run); the unit of x (100 m); the view time (30 s); the sprint cost (1); whether the bar
+  refills; whether the speeds should be scaled down for the general population.
 
 ## 7. Arm C: the live world (implemented in `hku-agents/live.py`, not run)
 

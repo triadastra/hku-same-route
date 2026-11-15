@@ -1,0 +1,9 @@
+target_road_beyond_closest,choices,follow_share
+0 m (not beyond its closest point),29341,1.0
+0 to 25 m,56403,1.0
+25 to 50 m,31073,1.0
+50 to 100 m,43659,1.0
+100 to 150 m,29995,1.0
+150 to 200 m,16806,0.8865
+200 to 300 m,5919,0.0007
+over 300 m,725,0.0
