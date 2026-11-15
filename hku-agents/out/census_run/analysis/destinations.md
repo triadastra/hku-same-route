@@ -28,27 +28,27 @@ The ratio compares how often agents went to a category with how many of the map'
 
 ## By kind of person
 
-Share of each group's free trips.
+Share of each group's free trips. The kinds of resident are those of the census; HKU is students and staff together.
 
-| Category | Residents (11,924 trips) | HKU students (5,201 trips) | HKU staff (319 trips) |
-|---|---|---|---|
-| food | 35.8% | 53.4% | 60.5% |
-| library | 7.9% | 14.7% | 11.6% |
-| mtr | 12.2% | 3.5% | 8.2% |
-| sight | 9.9% | 6.0% | 1.6% |
-| park | 6.7% | 8.2% | 15.0% |
-| building | 7.5% | 4.0% | 0.9% |
-| hku | 7.2% | 3.4% | 0.6% |
-| shop | 5.8% | 3.2% | 0.6% |
-| bus | 2.8% | 1.3% | 0.6% |
-| money | 0.8% | 0.4% | 0.0% |
-| vending | 0.7% | 0.5% | 0.0% |
-| school | 0.7% | 0.2% | 0.0% |
-| service | 0.7% | 0.3% | 0.0% |
-| health | 0.5% | 0.3% | 0.0% |
-| toilet | 0.4% | 0.2% | 0.0% |
-| hall | 0.3% | 0.3% | 0.3% |
-| worship | 0.2% | 0.1% | 0.0% |
+| Category | Works outside C&W (1,007 trips) | Works in C&W (2,096 trips) | No fixed workplace (992 trips) | Works at home (295 trips) | Domestic helper (981 trips) | School pupil (741 trips) | College student (171 trips) | Retired (2,141 trips) | Home-maker (515 trips) | Unpaid carer (377 trips) | Not working (2,608 trips) | HKU (5,520 trips) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| food | 33.5% | 40.5% | 46.7% | 39.0% | 29.5% | 34.8% | 28.1% | 33.4% | 28.9% | 37.7% | 34.4% | 53.8% |
+| library | 2.9% | 6.1% | 6.2% | 5.4% | 9.4% | 17.3% | 2.3% | 8.7% | 8.0% | 9.8% | 8.3% | 14.5% |
+| mtr | 39.0% | 18.6% | 4.6% | 12.2% | 4.6% | 11.2% | 32.7% | 7.8% | 6.4% | 9.8% | 6.4% | 3.8% |
+| sight | 4.4% | 7.3% | 11.1% | 9.2% | 14.0% | 4.7% | 5.3% | 12.2% | 16.9% | 8.0% | 11.0% | 5.8% |
+| park | 3.4% | 5.4% | 5.2% | 10.8% | 4.6% | 17.8% | 9.4% | 6.4% | 6.0% | 4.8% | 6.9% | 8.6% |
+| building | 3.1% | 7.2% | 8.0% | 5.4% | 11.8% | 3.4% | 2.3% | 8.9% | 9.3% | 7.4% | 7.9% | 3.8% |
+| hku | 7.3% | 5.9% | 6.1% | 5.8% | 9.8% | 2.3% | 9.9% | 6.7% | 8.7% | 9.3% | 8.8% | 3.2% |
+| shop | 2.6% | 4.6% | 5.1% | 4.7% | 7.0% | 3.6% | 4.1% | 6.0% | 6.8% | 7.7% | 8.1% | 3.1% |
+| bus | 1.6% | 2.0% | 2.9% | 1.7% | 3.5% | 1.1% | 2.3% | 4.1% | 3.3% | 1.9% | 3.1% | 1.3% |
+| money | 0.6% | 0.3% | 0.8% | 2.0% | 1.1% | 0.1% | 0.0% | 1.1% | 0.8% | 0.8% | 1.0% | 0.4% |
+| vending | 0.3% | 0.2% | 0.4% | 1.7% | 0.6% | 2.3% | 0.0% | 0.6% | 0.6% | 0.5% | 1.0% | 0.4% |
+| school | 0.3% | 0.3% | 0.6% | 0.3% | 1.6% | 0.5% | 1.2% | 0.9% | 0.6% | 0.5% | 0.9% | 0.2% |
+| service | 0.3% | 0.4% | 0.4% | 0.0% | 0.5% | 0.3% | 0.6% | 1.0% | 1.2% | 1.6% | 1.0% | 0.3% |
+| health | 0.4% | 0.3% | 0.4% | 0.3% | 0.5% | 0.3% | 1.2% | 0.9% | 1.0% | 0.0% | 0.3% | 0.3% |
+| toilet | 0.1% | 0.3% | 0.8% | 0.7% | 0.7% | 0.0% | 0.0% | 0.5% | 0.6% | 0.3% | 0.4% | 0.1% |
+| hall | 0.3% | 0.4% | 0.3% | 0.3% | 0.3% | 0.3% | 0.6% | 0.4% | 0.4% | 0.0% | 0.2% | 0.3% |
+| worship | 0.0% | 0.2% | 0.2% | 0.3% | 0.5% | 0.0% | 0.0% | 0.3% | 0.6% | 0.0% | 0.3% | 0.1% |
 
 ## How concentrated the choices are
 
@@ -76,4 +76,4 @@ Share of each group's free trips.
 | TamJai SamGor (F013) | food | 201 |
 | Mein Bowl (F005) | food | 199 |
 
-Table: destinations.csv. Figure: graphs/destination-choice.pdf.
+Table: destinations.csv. Figures: graphs/destination-choice.pdf, graphs/destination-by-kind.pdf.
