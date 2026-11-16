@@ -1,0 +1,8 @@
+# The simulator and the UI need only the standard library plus anthropic (for the paid planner).
+anthropic          # the Claude planner (the free rule-based planner needs nothing)
+numpy
+scipy              # analysis: tests, smoothing
+matplotlib         # figures
+seaborn            # two of the figures (figure map, figure junction-probabilities)
+pandas             # figure map
+torch              # only for: python -m sameroute analyse follower-rl

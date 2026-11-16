@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same Route Simulator</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <button class="icon-btn only-narrow" id="toggle-runs" aria-label="Show runs">☰</button>
+    <div>
+      <div class="title">Same route, by coincidence</div>
+      <div class="subtitle">Kennedy Town to Sai Ying Pun · one simulated weekday</div>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="map" class="active">Map</button>
+    <button role="tab" data-tab="results">Results</button>
+    <button role="tab" data-tab="figures">Figures</button>
+  </nav>
+  <button class="primary" id="new-run">New free run</button>
+</header>
+
+<div class="layout">
+  <aside class="runs" id="runs-panel">
+    <div class="panel-head">
+      <span>Runs</span>
+      <span class="muted small" id="runs-count"></span>
+    </div>
+    <div id="runs-list" class="runs-list"></div>
+    <div class="runs-foot muted small">
+      Folders in <code>runs/</code>. Paid runs start from the command line (<code>docs/RUNBOOK.md</code>) and show up
+      here while they run.
+    </div>
+  </aside>
+
+  <main>
+    <!-- Map -->
+    <section class="tab-page active" id="page-map">
+      <div class="map-wrap" id="map-wrap">
+        <canvas id="map"></canvas>
+        <div class="overlay clock-box">
+          <div class="run-line"><span id="run-title">No run selected</span> <span id="live-badge" class="badge live hidden">LIVE</span></div>
+          <div class="clock" id="clock">--:--</div>
+          <div class="stats" id="stats"></div>
+          <div class="progress hidden" id="progress-box">
+            <div class="bar"><div id="progress-bar"></div></div>
+            <div class="small muted" id="progress-text"></div>
+          </div>
+          <div class="small notice hidden" id="map-notice"></div>
+        </div>
+        <div class="overlay legend" id="legend"></div>
+        <div class="overlay controls" id="controls">
+          <button class="icon-btn" id="play" aria-label="Play">▶</button>
+          <div class="scrub">
+            <input type="range" id="time" min="21600" max="86400" step="10" value="28800" aria-label="Time of day">
+            <div class="ticks" id="ticks"></div>
+          </div>
+          <label class="small">Speed
+            <select id="speed">
+              <option value="60">1 min/s</option>
+              <option value="300" selected>5 min/s</option>
+              <option value="900">15 min/s</option>
+              <option value="1800">30 min/s</option>
+            </select>
+          </label>
+          <label class="small">Colour
+            <select id="colour">
+              <option value="group" selected>by group</option>
+              <option value="kind">by kind of walk</option>
+            </select>
+          </label>
+          <label class="small check"><input type="checkbox" id="trails" checked> Trails</label>
+          <label class="small">People
+            <select id="sample">
+              <option value="1000">1,000</option>
+              <option value="3000" selected>3,000</option>
+              <option value="0">all</option>
+            </select>
+          </label>
+        </div>
+        <aside class="person hidden" id="person">
+          <button class="icon-btn close" id="person-close" aria-label="Close">✕</button>
+          <div id="person-body"></div>
+        </aside>
+        <div class="empty hidden" id="map-empty"></div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="tab-page" id="page-results">
+      <div class="results">
+        <div id="summary-cards" class="cards"></div>
+        <div class="files-wrap">
+          <div class="files">
+            <div class="panel-head"><span>Analysis files</span></div>
+            <div id="files-list"></div>
+          </div>
+          <article class="doc" id="doc"><p class="muted">Pick a file on the left.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Figures -->
+    <section class="tab-page" id="page-figures">
+      <div class="figures">
+        <p class="muted small">Paper figures in <code>graphs/</code>, newest first. Rebuild them with
+          <code>python -m sameroute figure &lt;name&gt;</code>.</p>
+        <div id="figure-grid" class="figure-grid"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="launch">
+  <form method="dialog" id="launch-form">
+    <h2>Start a free run</h2>
+    <p class="muted small">Uses the rule-based planner: no API key, no cost. It tests the simulator and gives you
+      something to watch; it says nothing about real people. New people are drawn in the census and HKU mix.</p>
+    <fieldset class="kind">
+      <label><input type="radio" name="kind" value="live" checked>
+        <span><b>Live world</b><br><span class="small muted">One shared clock; everyone picks every junction. Watch it move.</span></span></label>
+      <label><input type="radio" name="kind" value="agent-world">
+        <span><b>Agent World</b><br><span class="small muted">Each person lives their whole day at once; the run fills up person by person.</span></span></label>
+    </fieldset>
+    <div class="row">
+      <label>Run name <input name="run" id="launch-name" required pattern="[A-Za-z0-9_.-]{1,64}"></label>
+      <label>People <input name="people" type="number" min="10" max="10000" value="300"></label>
+      <label>Seed <input name="seed" type="number" value="7"></label>
+    </div>
+    <label id="slow-label">Watch speed: <span id="slow-text"></span>
+      <input name="slow" type="range" min="0" max="60" step="1" value="20" id="slow"></label>
+    <details class="small">
+      <summary>Paid runs (Claude Haiku) from the command line</summary>
+      <pre id="paid-cmds">bash run_experiments.sh check
+bash run_experiments.sh agent-world     # about US$20, stops at US$30
+bash run_experiments.sh live            # US$20 to 60, stops at US$60</pre>
+    </details>
+    <div class="error hidden" id="launch-error"></div>
+    <div class="actions">
+      <button value="cancel" formnovalidate>Cancel</button>
+      <button class="primary" id="launch-go" value="go">Start</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="lightbox"><img id="lightbox-img" alt=""><form method="dialog"><button class="icon-btn close" aria-label="Close">✕</button></form></dialog>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
