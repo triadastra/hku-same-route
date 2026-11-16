@@ -3,3 +3,21 @@
 # Local editor and assistant settings
 .claude/
 __pycache__/
+*.egg-info/
+
+# Simulation runs are hundreds of MB. For each finished run keep the analysis tables, the run summary, and the raw
+# output compressed (the plain files are over GitHub's size limit; `bash run_experiments.sh pack` makes them).
+# Everything else in runs/ (test runs, checkpoints, progress files, the UI's caches) stays out of git.
+runs/*
+!runs/day1/
+!runs/census_run/
+!runs/live_census/
+runs/*/*
+!runs/*/analysis/
+!runs/*/run_summary.json
+!runs/*/trips.jsonl.gz
+!runs/*/people.jsonl.gz
+!runs/*/agents.tar.gz
+
+# Downloaded OpenStreetMap caches (fetched again by `python -m sameroute build-map`)
+data/osm_*.json

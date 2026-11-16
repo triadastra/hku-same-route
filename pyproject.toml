@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sameroute"
+version = "1.0.0"
+description = "Same route, by coincidence: the HKU COMP1110 same-route simulator"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["anthropic", "numpy", "scipy", "matplotlib"]
+
+[project.optional-dependencies]
+figures = ["seaborn", "pandas"]
+follower = ["torch"]
+
+[project.scripts]
+sameroute = "sameroute.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sameroute*"]
+
+[tool.setuptools.package-data]
+sameroute = ["ui/static/*", "export/*.html"]

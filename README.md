@@ -10,41 +10,117 @@ in a row, within 90 seconds, purely by coincidence.
 
 **Results website:** https://claude.ai/artifact/KwTUxCbLH9h1zDb2tTBqUp
 
-| Path | What it is |
-|---|---|
-| `RUNBOOK.md` | How to run the final experiments: what is ready, the commands, costs, checks and what to report. Start here. |
-| `hku-agents/run_experiments.sh` | One documented script for every step of the final experiments (`bash run_experiments.sh people`, `check`, `agent-world`, `control`, `live`, `analyse`, `pack`). |
-| `hku-agents/` | The simulator: map building, people, agent tools, the day runner and the analysis. Its README explains how to run everything. |
-| `hku-agents/out/day1/analysis/` | Result tables from the 10,000-person run (one weekday, US$20.49, 57,530 trips). |
-| `hku-agents/out/day1/trips.jsonl.gz` | Every trip of the run (57,530), with each road segment, time and turn. |
-| `hku-agents/out/day1/people.jsonl.gz` | The 10,000 people: group, home, schedule and traits. |
-| `hku-agents/out/day1/agents.tar.gz` | One file per person: their whole day, including every tool call the agent made. |
-| `hku-agents/out/day1/analysis/following.md` | The main analysis: how often a stranger close behind you makes your decisions at real intersections, in the Agent World and under four Markov chains, with chi-square tests and the table of each intersection's choices. Rebuilt by `python following.py --run day1` inside `hku-agents/`. |
-| `hku-agents/follower_rl.py` | The Q-learning follower: trained to follow one Agent World person while having a destination of its own, as the top of the scale. `python follower_rl.py --check` tests it; `python follower_rl.py --run census_run` trains and tests it (CUDA if there is a GPU, else CPU). Design in `method.md`, section 6b. |
-| `hku-agents/out/census_run/analysis/follower_rl.md` | Its results on the census run: trailing through k junctions and score, against the Agent World's people, a rule, and walkers that never or always follow. |
-| `hku-agents/follower.py` | An earlier rule-based follower, superseded by `follower_rl.py`; kept for the trailing measure it defines. |
-| `hku-agents/out/day1/analysis/compare.md` | The agent run against random walking: shared turns, the Markov chain of turns, junction tests and road use. Rebuilt by `python arms.py --run day1` inside `hku-agents/`. |
-| `graphs/` | Paper figures: the amenity maps, the real intersections, following under each model (`following-*.pdf`), and the road-use map. |
-| `method.md` | Design document for the experiment. A skeleton: the lines marked `DECIDE:` are still to be filled in. |
-| `plan.md` | What of the method is done and what is not. |
-| `results.xlsx` | All the results in one workbook: a summary sheet with the key findings, then every table from the analysis. |
-| `same-route-simulator.html` | The results website. It reads `web.json` from the same folder. |
-| `amenity-heat-map.html` | Heat map of what each block is for: the 1,538 places on the map, counted per one-hectare block in eight functions. Rebuilt by `python hku-agents/export_amenity_map.py`. |
-| `web.json` | Website data exported from the run (2,000 of the 10,000 people, for the map replay). |
-
-The raw output of the run is compressed because the plain files are over GitHub's size limit. To
-re-run the analysis on it, unpack it in place:
+## Start here
 
 ```bash
-cd hku-agents/out/day1
-gunzip -k trips.jsonl.gz people.jsonl.gz
-tar -xzf agents.tar.gz
-cd ../.. && python analyze.py --run day1
+pip install -r requirements.txt
 ```
 
-Running `python pipeline.py` inside `hku-agents/` runs a new simulation from scratch. That calls the API
-(about US$20 for 10,000 people) and gives a different day, since the agents are not deterministic. Put your
-own Anthropic API key in `hku-agents/.env` (never commit it). Downloaded OpenStreetMap caches are not in the
-repository and are fetched again when needed.
+```bash
+python -m sameroute ui
+```
+
+Open http://127.0.0.1:8765. On the left are the runs in `runs/`; pick one to replay its day on the map (press
+play, drag the clock, click anyone to see who they are and every walk and tool call of their day), read its
+analysis tables under **Results**, and browse the paper figures under **Figures**. **New free run** starts a
+simulation with the rule-based planner (no API key, no cost) so you can watch one in progress: the live world
+moves on its shared clock in front of you; the Agent World fills up as each person finishes their day. Paid runs
+started from the command line show up in the same way, with their spend against the budget.
+
+## One command for everything
+
+Every part of the project is a command of `python -m sameroute` (run from the repository root). With no command it
+lists them all; `python -m sameroute <command> --help` lists a command's options.
+
+| To... | Run |
+|---|---|
+| See every command | `python -m sameroute` |
+| Watch runs and read results in the browser | `python -m sameroute ui` |
+| See how far each run got, in the terminal | `python -m sameroute status` |
+| Check everything before spending money (free) | `python -m sameroute check` |
+| Make people | `python -m sameroute people --n 10000 --seed 7 --out runs/<run>/people.jsonl` |
+| Run the Agent World (experiment 2) | `python -m sameroute agent-world --run <run> --agents runs/<run>/people.jsonl --planner mock` (free) or `--planner claude` (paid) |
+| Run the live world (experiment 3) | `python -m sameroute live --run <run> --agents runs/<run>/people.jsonl --limit 1000 --planner mock` (free) or `--planner claude` (paid) |
+| The main analysis | `python -m sameroute analyse following --run <run>` |
+| The Q-learning follower | `python -m sameroute analyse follower-rl --run <run>` |
+| A paper figure | `python -m sameroute figure following --run <run>` (and `figure arms`, `figure junction-shares`, ...) |
+| The final experiments, step by step | `bash run_experiments.sh <step>`, as `docs/RUNBOOK.md` explains |
+
+Paid runs stop at their `--budget`, and can be stopped any time with Ctrl+C (or **Stop** in the UI); run the same
+command again to continue, without paying twice for anyone who finished. Put your Anthropic API key in `.env` at
+the repository root (`ANTHROPIC_API_KEY=...`; git ignores the file) or in the environment.
+
+## What is where
+
+| Path | What it is |
+|---|---|
+| `docs/RUNBOOK.md` | How to run the final experiments: the commands, costs, checks and what to report. Read before spending money. |
+| `docs/method.md` | The design of the experiment, with the authors' decisions. `docs/plan.md` and `docs/method-review.md` track it against the paper. |
+| `docs/simulator.md` | How the simulator works: the world, the people, their tools, the outputs, each analysis. |
+| `run_experiments.sh` | The final experiments, one step at a time (`people`, `check`, `agent-world`, `control`, `live`, `analyse`, `pack`). |
+| `sameroute/config.py` | Every setting the simulation uses (walking speeds, the model, prices, budgets) and where files live. |
+| `sameroute/world/` | The map: building it from OpenStreetMap (`build_map.py`), place captions, routing and walking (`world.py`), intersections (`decisions.py`), groups of people. |
+| `sameroute/people.py` | The synthetic population, in the proportions of the 2021 census and HKU's figures. |
+| `sameroute/sim/` | The simulations: the Agent World (`agent_world.py`, with the agent's tools and prompts in `agent_tools.py`), the live world (`live_world.py`), random walking, the preflight checks, and the progress reports the UI reads. |
+| `sameroute/analysis/` | Following at real intersections and the Markov chains (`following.py`), the Q-learning follower (`follower_rl.py`), the arms compared (`arms.py`), chain tests (`model_tests.py`), shared turns. |
+| `sameroute/figures/` | The paper figures, written to `graphs/`. |
+| `sameroute/export/` | The website data, the amenity heat map, and the results of a live run stopped before midnight. |
+| `sameroute/ui/` | The browser UI (standard library only). |
+| `data/` | The map (`graph.json`, `places.csv`), the population sources (`population_figures.csv`) and the walking-speed sources (`walking_speeds.csv`). |
+| `runs/` | One folder per run (below). Test runs you make stay out of git. |
+| `graphs/` | Paper figures (PDF and PNG). |
+| `results/` | Paper tables. `results.xlsx` has all the results in one workbook. |
+| `website/` | The results website (`same-route-simulator.html`, which reads `web.json` next to it) and the amenity heat map. |
+| `tests/` | `python -m unittest discover tests`: checks that the simulation still gives exactly the results it gave before (30 seconds, free). |
+
+## The runs in this repository
+
+| Run | What it is | People | Walks | Cost |
+|---|---|---|---|---|
+| `runs/day1/` | Experiment 1: Agent World, the earlier population (74% HKU students) | 10,000 | 57,530 | US$20.49 |
+| `runs/census_run/` | Experiment 2: Agent World, the census population | 10,000 | 42,377 | US$17.06 |
+| `runs/live_census/` | Experiment 3: live world, the first 1,000 census people, stopped at 16:22 on its clock | 1,000 | 3,169 | US$36.30 |
+
+Each holds `run_summary.json`, `analysis/` (the result tables; `analysis/following.md` is the main one), and the raw
+output compressed, because the plain files are over GitHub's size limit: `trips.jsonl.gz` (every walk, with each
+road segment, time and turn), `people.jsonl.gz` (the people) and `agents.tar.gz` (one file per person: their whole
+day, including every tool call the agent made). The UI reads the compressed files directly. To re-run an analysis,
+unpack them in place first:
+
+```bash
+cd runs/census_run && gunzip -k trips.jsonl.gz people.jsonl.gz && tar -xzf agents.tar.gz && cd ../..
+```
+
+```bash
+python -m sameroute analyse following --run census_run
+```
+
+## Before the reorganisation
+
+The code used to live in `hku-agents/` as one script per step, run from inside that folder, with outputs in
+`hku-agents/out/`. The same code is now the `sameroute` package, the same steps are commands of
+`python -m sameroute`, and outputs are in `runs/`. The simulations, protocols and methods are unchanged: every
+step was run before and after on the same inputs and gave byte-identical outputs, and `tests/` keeps checking it.
+
+| Before (in `hku-agents/`) | Now (in the repository root) |
+|---|---|
+| `python make_agents.py ...` | `python -m sameroute people ...` |
+| `python preflight.py ...` | `python -m sameroute check ...` |
+| `python run_day.py ...` | `python -m sameroute agent-world ...` |
+| `python live.py ...` | `python -m sameroute live ...` |
+| `python random_walk.py ...` | `python -m sameroute random-walk ...` |
+| `python analyze.py ...` | `python -m sameroute analyse summary ...` |
+| `python following.py ...` | `python -m sameroute analyse following ...` |
+| `python arms.py ...` | `python -m sameroute analyse arms ...` |
+| `python follower_rl.py ...`, `follower.py ...` | `python -m sameroute analyse follower-rl ...`, `analyse follower ...` |
+| `python extra_analysis.py ...` | `python -m sameroute analyse model-tests ...` |
+| `python make_shared_turns_table.py ...`, `live_shared_turns.py ...` | `python -m sameroute analyse shared-turns-table ...`, `analyse live-shared-turns ...` |
+| `python make_following_figures.py`, `make_compare_figures.py`, `make_junction_figure.py`, `make_junction_graph.py` | `python -m sameroute figure following`, `figure arms`, `figure junction-shares`, `figure junction-probabilities` |
+| `python live_figures.py`, `live_single_figures.py`, `make_network_figure.py`, `make_figures.py`, `make_map_figure.py` | `python -m sameroute figure live-vs-agent-world`, `figure live-single`, `figure intersections`, `figure amenity`, `figure map` |
+| `python export_web.py`, `export_amenity_map.py`, `export_partial_live.py` | `python -m sameroute export web`, `export amenity-map`, `export partial-live` |
+| `python build_map.py`, `captions.py`, `pipeline.py` | `python -m sameroute build-map`, `captions`, `pipeline` |
+
+A live-world checkpoint saved by the old `live.py` still loads (`python -m sameroute export partial-live`).
+`pip install -e .` also installs a `sameroute` command, so `sameroute ui` works from anywhere.
 
 Map data © OpenStreetMap contributors, ODbL.
